@@ -141,7 +141,7 @@ func IsValidPassword(password string) bool{
         isUpperCase, _ := regexp.MatchString(`[A-Z]`, string(r))
         isLowerCase, _ := regexp.MatchString(`[a-z]`, string(r))
         hasNumber, _ := regexp.MatchString(`[0-9]`, string(r))
-        specialCharacter, _ := regexp.MatchString(`[#?!@$%^&*-]`, string(r))
+        specialCharacter, _ := regexp.MatchString(`[#?!@$%^&*]`, string(r))
         if isUpperCase{
             gotUpperCase = true
         }else if isLowerCase{
