@@ -1,0 +1,323 @@
+
+{{define "Head"}}
+    <title>{{.Job.Title}}</title>
+{{end}}
+
+{{define "Style"}}
+    .job > *, .job_info > *, #application > *{
+        margin-bottom: .5rem;
+    }
+    .job_header{
+        margin-bottom: .5rem;
+    }
+    .job_title{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        & .text{
+            font-size: 1.3rem;
+            flex: 1;
+        }
+        & .bookmark{
+            position:relative;
+            width: 1.5rem;
+            aspect-ratio: 1/1.2;
+            border: 2px solid black;
+            border-radius: 5px 5px 0 0;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+            transition: all .3s linear; 
+            &::after{
+                content: "";
+                position: absolute;
+                bottom: 0;
+                width: 1.5rem;
+                aspect-ratio: 1/1;
+                transform: translateY(1.4rem) rotate(45deg);
+                background-color: #f0f0f0;
+                border: 2px solid transparent;
+                border-top: 2px solid black;
+                border-left: 2px solid black;
+                pointer-event: none;
+            }
+        }
+        & .fill{
+            background-color: var(--primary_color);
+        }
+    }
+    .job_entreprise{
+        display: flex;
+        justify-content: flex-end;
+    }
+    .job_info{
+        padding: .3rem;
+        border-radius: 5px;
+        background: rgb(119,182,234);
+        background: linear-gradient(145deg, rgba(119,182,234,1) 0%, rgba(119,173,208,1) 42%, rgba(200,206,210,1) 100%);
+        
+        & > *:last-child{
+            margin-bottom: 0px;
+        }
+
+        & .job_info_data{
+            display: flex;
+            gap: .3rem;
+            align-items: center;
+        }
+        & .job_info_data_icon{
+            height: 1.5rem;
+            width: 1.5rem;
+        }
+    }
+    .job_entreprise_name{
+        font-size: 1rem;
+        text-decoration: underline;
+    }
+    .job_header{
+        font-size: 1.2rem;
+    }
+    .job_description_text{
+        text-wrap: wrap;
+    }
+    .job_avantage, .job_skill{
+        & .job_avantage_list, & .job_skill_list{
+            list-style: inside;
+
+            & .job_avantage_list_value, & .job_skill_list_value{
+                margin-bottom: .3rem;
+            }
+        }
+    }
+    .job_submitBtn{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 2rem;
+        border-radius: 25px;
+        background: hsla(207, 73%, 69%, 1);
+    }
+    #application{
+        margin: auto !important;
+        width: 350px;
+        border-radius: 15px;
+        border: none;
+        padding: .5rem;
+        transition: transform .1s linear, display .1s linear allow-discrete, overlay 100ms linear allow-discrete;
+        transform: scale(0);
+        &:popover-open{
+            transform: scale(1);
+            @starting-style{
+                transform: scale(0);
+            }
+        }
+        .application_cv{
+            display: flex;
+            gap: .5rem;
+            align-items: end;
+
+            .application_cv_btn{
+                height: 2rem;
+                padding: 0 .5rem;
+                background-color: rgb(220,220,220);
+                display: inline-flex;
+                align-items: center;
+                border-radius: 5px;
+            }
+            #application_cv_name{
+                font-weight: bold;
+                text-decoration: underline;
+            }
+        }
+        .application_submitBtn{
+            width: 100%;
+            height: 2rem;
+            border-radius: 5px;
+            background-color: var(--primary_color);
+        }
+        &::backdrop{
+            background-color: rgba(0,0,0,.4);
+        }
+    }
+
+    .successResponse{
+        position: fixed;
+        inset: 0;
+        z-index: 11;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: closeFeedback .1s linear 2s forwards; 
+    }
+    .successResponse_bg{
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0,0,0, .3);
+        z-index: -3;
+    }
+    .successRsponse_circle{
+        position: relative;
+        height: 120px;
+        width: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &::after{
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            scale: .8;
+            background-color: #2cb655;
+            border-radius: 50%;
+            z-index: -1;
+            animation: big .4s ease-in forwards;
+        }
+        &::before{
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #2cb65596;
+            border-radius: 50%;
+            opacity: 1;
+            scale: .8;
+            border: 1px solid #2cb6554a;
+            z-index: -2;
+            animation: blowUp 1s ease-in forwards;
+        }
+    }
+    @keyframes big{
+        to{scale: 1;}
+    }
+
+    @keyframes blowUp{
+        100%{
+            scale: 1.8;
+            opacity: 0;
+        }
+    }
+    #checkmark{
+       stroke-dasharray: 23;
+       stroke-dashoffset: 23;
+       animation: checkmarkAnimation .4s ease-in forwards;
+    }
+    @keyframes checkmarkAnimation{
+        from{
+            stroke-dashoffset: 23;
+        }to{
+            stroke-dashoffset: 0;
+        }
+    }
+    @keyframes closeFeedback{
+        100%{
+            display: none;
+        }
+    }
+{{end}}
+
+{{define "Body"}}
+    <main class="job">
+        <div class="job_title">
+            <h1 class="text">{{.Job.Title}}</h1>
+            <button class="bookmark" onclick="onBookmarkClick(this)"></button>
+        </div>
+        <div class="job_info">
+            <div class="job_info_data">
+                <svg class="job_info_data_icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                <a class="job_entreprise_name" href="{{with .Job.IsThirdParty}}#{{else}}/entreprise/4{{end}}">{{.EntrepriseName}}</a>
+            </div>
+            <div class="job_info_data">
+                <img src="/static/location.svg" class="job_info_data_icon" />
+                <p>{{.FullAdresse}}</p>
+            </div>
+            <div class="job_info_data">
+                <img src="/static/contract.svg" class="job_info_data_icon" />
+                <p>{{.Contract}}</p>
+            </div>
+            {{if .SalaryString}}
+                <div class="job_info_data">
+                    <img src="/static/euro.svg" class="job_info_data_icon" />
+                    <p>{{.SalaryString}}</p>
+                </div>
+            {{end}}
+            {{if .WeeklyWorkTime}}
+                <div class="job_info_data">
+                    <img src="/static/clock.svg" class="job_info_data_icon" />
+                    <p>{{.WeeklyWorkTime}}H</p>
+                </div>
+            {{end}}
+        </div>
+        <div>
+            <h2 class="job_header">Description</h2>
+            <pre class="job_description_text">{{.Job.Description}}</pre>
+        </div>
+        {{if .Advantage}}
+            <div class="job_avantage">
+                <h2 class="job_header">Advantages</h2> 
+                <ul class="job_avantage_list">
+                    {{range .Advantage}}
+                        <li class="job_avantage_list_value">{{.}}</li>
+                    {{end}}
+                </ul>
+            </div>
+        {{end}}
+        {{if .SkillNeeded}}
+            <div class="job_skill">
+                <h2 class="job_header">Compétences</h2> 
+                <ul class="job_skill_list">
+                    {{range .SkillNeeded}}
+                        <li class="job_skill_list_value">{{.Label}}</li>
+                    {{end}}
+                </ul>
+            </div>
+        {{end}}
+        {{if .IsThirdParty}}
+            {{if and (.ThirdPartyLink) (eq (slice .ThirdPartyLink 0 4) "http")}}
+                <a href="{{.ThirdPartyLink}}" target="_blank" href="{{.ThirdPartyLink}}"  class="job_submitBtn">Postuler</a>
+            {{else}}
+                <p>Postuler: {{.ThirdPartyLink}}</p>
+            {{end}}
+        {{else}}
+            {{if .User.Id}}
+                <button type="button" id="submitBtn" hx-swap-oob="true"  popovertarget="application" {{if .Applied}}disabled="true"{{end}}  class="job_submitBtn">Postuler</button>
+            {{else}}
+                <a href="/connexion" class="job_submitBtn">Connected-vous</a>
+            {{end}}
+        {{end}}
+        <form id="application" popover hx-put="/mes-postulations" hx-swap="outerHTML" hx-vals='{"jobId": "{{.Id}}"}' hx-encoding="multipart/form-data">
+            <h2 style="text-align: center;">Choisir votre CV</h2>
+            <div>
+                <input type="radio" id="user_cv" name="user_cv"/>
+                <label for="user_cv">Utiliser votre CV</label>
+            </div>
+            <div class="application_cv">
+                <label for="cv" class="application_cv_btn">Choisir un CV</label>
+                <input type="file" id="cv" name="cv" onchange="onNewCv(event)"  class="hidden"/>
+                <p id="application_cv_name"></p>
+            </div>
+            <button type="submit" class="application_submitBtn">Envoyer</button>
+        </form>
+    </main>
+    <script>
+        const cvName = document.getElementById("application_cv_name")
+        const onNewCv = (event)=>{
+            if(event.target.files.length > 0){
+                cvName.textContent = event.target.files[0].name
+            }
+        }
+
+        const onBookmarkClick = (ele)=>{
+            ele.classList.toggle("fill")
+        }
+
+    </script>
+{{end}}

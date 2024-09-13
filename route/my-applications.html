@@ -1,0 +1,122 @@
+{{define "Head"}}
+    <title>Mes postulation</title>
+{{end}}
+
+
+{{define "Style"}}
+
+.application{
+    & .card{
+        position: relative;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .3rem;
+        background-color: rgb(220,220,220);
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: .5rem;
+        height: 80px;
+
+        & .title{
+            font-size: 1.1rem;
+            margin-bottom: .3rem;
+        }
+
+        & .cancelBtn{
+            height: 1.5rem;
+            padding: 0 5px;
+            border-radius: 5px;
+            border: 1px solid red;
+            color: red;
+            font-weight: bold;
+        }
+        
+        & .status{
+            position: relative;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            font-size: .8rem;
+            text-wrap: nowrap;
+        }
+    }
+}
+.waiting::before, .validate::before{
+    content: "";
+    height: .8rem;
+    width: .8rem;
+    border-radius: 50%;
+    margin-right: .3rem;
+}
+.waiting::before{
+    background-color: rgb(245, 154, 58);
+}
+.validate::before{
+    background-color: #00c749;
+}
+
+.fade{
+    animation: fadeAnimation .3s linear;
+}
+
+@keyframes fadeAnimation{
+    100%{
+       top: calc(-80px - .5rem); 
+       opacity: 0;
+    }
+}
+
+.reorder{
+    transition: top .3s linear;
+    top: calc(-80px - .5rem);
+}
+
+{{end}}
+
+{{define "Body"}}
+    <main>
+        <h1 style="margin-bottom: .5rem;">Mes Postulations</h1>
+        <div class="application">
+            {{range $i, $v := .Apps}}
+            <div class="card" data-index="{{$i}}">
+                <div>
+                    <h1 class="title">{{$v.Title}}</h1>
+                    <button 
+                        type="button" 
+                        hx-delete="/mes-postulations" 
+                        hx-vals='{"id": "{{$v.Id}}"}'
+                        hx-swap="none"
+                        hx-target="closest .card"
+                        class="cancelBtn">Se retirer</button>
+                </div>
+                <p class="status validate" >En Attente</p>
+            </div>
+            {{end}}
+        </div>
+    </main>
+    <script>
+        document.body.addEventListener("onDeleteCard", (ev)=>{
+            onDeleteCard(ev.target)
+        })
+        const onDeleteCard = (ele)=>{
+            const parent = ele.closest(".card")
+            const cards = document.getElementsByClassName("card")
+            parent.classList.add("fade")
+            for(card of cards){
+                if(Number(card.dataset.index) > Number(parent.dataset.index)){
+                    card.classList.add("reorder")
+                }
+            }
+            parent.addEventListener("animationend", ()=>{
+                parent.remove()
+                for(card of cards){
+                    if(Number(card.dataset.index) > Number(parent.dataset.index)){
+                        card.classList.remove("reorder")
+                    }
+                }
+            })
+        }
+    </script>
+{{end}}

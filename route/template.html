@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/static/Notification.js" type="module"></script>
+    <script src="/static/htmx.js" defer></script>
+    <link rel="stylesheet" href="/static/globals.css" />
+    {{template "Head" .}}
+    <style id="style">
+        {{template "Style"}}
+    </style>
+</head>
+<body>
+    <notification-ele type="error" msg="Hello World" id="notif" hx-swap-oob="true"></notification-ele>
+    <nav>
+        <div class="nav_blur"></div>
+        <div class="nav_content">
+            <a href="/" class="nav_home">Home</a>
+                <div class="mobile_nav_right">
+                    <button type="button" class="nav_search"  popovertarget="search-pop">
+                        <img src="/static/search.svg" class="nav_search_icon" />
+                    </button>
+                    {{if .User.Id}}
+                        <button type="button" class="nav_userBtn" popovertarget="nav_userBtn_menu">
+                            <!-- <img src="/static/eye.svg" class="nav_userBtn_icon"  /> -->
+                            <p>MD</p>
+                        </button>
+                    {{else}}
+                        <a href="/connexion" class="nav_sign">Connexion</a>
+                    {{end}}
+                </div>
+                <div id="nav_userBtn_menu" popover>
+                    <a href="/mes-postulations" class="nav_userBtn_menu_item">Mes postulations</a>
+                    <a href="/profile"  class="nav_userBtn_menu_item">Mon compte</a>
+                    <button type="button" hx-delete="/connexion" hx-swap="none"  class="nav_userBtn_menu_item">
+                        <img src="/static/signout.svg" style="height:1.5rem;width: 1.5rem;" />
+                        Se Déconnecter
+                    </button>
+                </div>
+            <form popover id="search-pop" action="/search">
+                <div class="fields">
+                    <input placeholder="Ex. Web Dev" value="{{.Search.Query}}" required class="input" name="q" id="search_query" autocomplete="off"/>
+                    <input placeholder="Paris" value="{{.Search.City}}" oninput="onSearchCity(this)"  class="input" name="city" id="search_city" autocomplete="off"/>
+                    <input id="search_postal" value="{{.Search.Postal}}" name="postal" style="display: none;" />
+                    <input id="search_lat"  value="{{.Search.Lat}}" name="la" style="display: none;" />
+                    <input id="search_long" value="{{.Search.Long}}"  name="lo" style="display: none;" />
+                </div>
+                <div id="suggest" style="display: none;"></div>
+                <button type="submit" style="display: none;"></button>
+            </form>
+        </div>
+    </nav>
+    {{template "Body" .}}
+    <script>
+        let cityRequest
+        const suggest = document.getElementById("suggest")
+        const query = document.getElementById("search_query")
+        const city = document.getElementById("search_city")
+        const postal = document.getElementById("search_postal")
+        const lat = document.getElementById("search_lat")
+        const long = document.getElementById("search_long")
+        const onSuggestClick = (ele, suggestType)=>{
+            if (suggestType === "addr"){
+                const [cityValue, postalValue] = ele.textContent.split(",")
+                city.value = cityValue
+                postal.value = postalValue.trim()
+                lat.value = ele.dataset.lat
+                long.value = ele.dataset.long
+                suggest.style.display = "none"
+                city.focus()
+            }
+        }
+        const onSearchCity = (ele)=>{
+            clearTimeout(cityRequest)
+            cityRequest = setTimeout(async ()=>{
+                let innerHtml = ""
+                if(ele.value !== ""){
+                    const fetchAddr = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${ele.value}&type=municipality&limit=5`)
+                    const jsonAddr = await fetchAddr.json()
+                    for(p of jsonAddr.features){
+                        innerHtml += `<p class="item" data-lat="${p.geometry.coordinates[1]}" data-long="${p.geometry.coordinates[0]}"  onclick="onSuggestClick(this, 'addr')">${p.properties.name}, ${p.properties.citycode}</p>` 
+                    }
+                    suggest.style.display = "block"
+                    suggest.innerHTML = innerHtml
+                }
+            }, 500)
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,626 @@
+{{define "Head"}}
+    <title>{{.Job.Title}}</title>
+    <script src="/static/Dropdown.js" type="module"></script>
+    <script src="/static/ToggleBtn.js" type="module"></script>
+{{end}}
+
+{{define "Style"}}
+    .newjob > * , .title, .newjob_section > *, #template_save > *{
+        margin-bottom: .5rem;
+    }
+    .title{
+        font-size: 1.2rem;
+    }
+    .template{
+        display: flex;
+        justify-content: flex-end;
+        gap: .5rem;
+        align-items: center;
+        margin-bottom: .5rem;
+    }
+    .newjob{
+        container-type: inline-size;
+        container-name: advantagesAncSKill;
+
+        .bottomContent{
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+            .newjob_section{
+                padding: 5px;
+                border-radius: 5px;
+                border: 1px solid lightgray;
+                width: 100%;
+                .newjob_profile{
+                    display: grid;
+                    gap: .5rem;
+                    grid-template-columns: 1fr .2fr .2fr;
+                }
+                .newjob_profile_deleteBtn{
+                    height: 2rem;
+                    width: 2rem;
+                    border: 1px solid lightgray;
+                    justify-self: end;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .toggleBtn{
+                    justify-self: center;
+                }
+            }
+        }
+        .action{
+            display: flex;
+            gap: .5rem;
+            .newjob_submitBtn, .newjob_templateBtn{
+                height: 2rem;
+                border-radius: 10px;
+                width: 100%;
+                font-weight: bold;
+            }
+        }
+
+        @container advantagesAncSKill (width >= 650px){
+            .bottomContent{
+                flex-direction: row;
+                gap: 2rem;
+                .newjob_section{
+                    border: none;
+                }
+            }
+
+        }
+    }
+    .subheader{
+        font-size: 1rem;
+    }
+    .newjob_field{
+        position: relative;
+        height: 2.5rem;
+        width: 100%;
+    }
+    .newjob_field_input{
+        height: 100%;
+        width: 100%;
+        padding: 0px 5px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        background-color: white;
+    }
+    .newjob_field_input_withLabel{
+        padding: 10px 5px 0px 5px;
+    }
+    .newjob_field_label{
+        position: absolute;
+        left: 5px;
+        top: .5rem;
+        font-size: .9rem;
+        transition: all .2s linear;
+    }
+    .newjob_field_input:focus + .newjob_field_label, .newjob_field_input:valid + .newjob_field_label{
+        top: .2rem;
+        left: 5px;
+        font-size: .7rem;
+    }
+    .newjob_flex{
+        display: flex;
+        gap: .5rem;
+    }
+    .newjob_description{
+        border-radius: 5px;
+        outline: 1px solid lightgray;
+        padding: 5px;
+        background-color: white;
+        text-wrap: wrap;
+    }
+    .newjob_advantage{
+        display: grid;
+        grid-template-columns: 1fr .1fr;
+        gap: .5rem;
+    }
+    .newjob_headerWithButton{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .newjob_addBtn{
+        height: 2rem;
+        width: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid lightgray;
+    }
+    .newjob_profile_header{
+        font-size: .9rem;
+    }
+    .newjob_submitBtn{
+        border: 1px solid var(--success_border_color);
+        color: var(--success_border_color);
+    }
+    .deleteModalBtn{
+        border: 1px solid #c11c30;
+        color: #c11c30;
+    }
+    .newjob_modelBtn{
+        border: 1px solid var(--primary_color);
+        color: var(--primary_color);
+    }
+    .newjob_templateBtn{
+        border: 2px solid var(--primary_color);
+    }
+
+    .job_tab{
+        display: flex;
+        gap: .5rem;
+        justify-content: center;
+        margin-bottom: .5rem;
+    }
+    .job_tab_btn{
+        height: 2rem;
+        padding: 0 .5rem;
+        border-radius: 5px;
+        background-color: rgb(220,220,220);
+    }
+    .selected_tab{
+        background: rgb(240,240,240);
+        background: radial-gradient(circle, rgba(240,240,240,1) 25%, rgba(112,112,112,1) 100%);
+        background-position: 50% -28%;
+        background-size: 100% 250%;
+        animation: tabAnimation .2s linear forwards; 
+    }
+    @keyframes tabAnimation{
+        100%{
+            background-position: 50% 0%;
+        }
+    }
+
+    #delete_modal, #template_save{
+        background-color: white;
+        border-radius: 10px;
+        padding: 10px;
+        margin: auto;
+        transition: scale .2s linear, display .2s linear allow-discrete;
+        border: none;
+        scale: 0;
+        &::backdrop{
+            background-color: rgba(0,0,0,.6);
+        }
+        &:popover-open{
+            transition: scale .2s linear;
+            scale: 1;
+            @starting-style{
+                scale: 0;
+            }
+        }
+        .title{
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .action{
+            display: flex;
+            gap: .5rem;
+            .deleteBtn, .cancelBtn{
+                height: 2rem;
+                border-radius: 5px;
+                width: 100%;
+                font-weight: bold;
+            }
+            .deleteBtn{
+                border: 1px solid #c11c30;
+                color: #c11c30;
+            }
+            .cancelBtn{
+                border: 1px solid #e39048;
+                color: #ff6d35;
+            }
+        }
+    }
+    
+    .application_card{
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        -webkit-box-shadow: 0px 0px 15px 2px darkgray; 
+        box-shadow: 0px 0px 15px 2px darkgray;
+        & .person > *{
+            margin-bottom: .2rem;
+        }
+        & .person{
+            & .visual{
+                display: flex;
+                gap: .5rem;
+                & .photo{
+                    height: 4rem;
+                    width: 4rem;
+                    border: 1px solid darkgray;
+                    border-radius: 50%;
+                }
+                & .name{
+                    font-size: 1.1rem;
+                }
+            }
+        }
+    }
+    .application_card_view{
+        height: 2rem;
+        width: 2rem;
+        border-radius: 5px;
+        border: 1px solid lightgray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .application_card_control_btn{
+        height: 1.5rem;
+        padding: 0 .5rem;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+    .template_save_input{
+        height: 2rem;
+        display: block;
+        padding: 0 5px;
+        border-radius: 5px;
+        border: 1px solid black;
+    }
+    .template_save_btn{
+        height: 2rem;
+        width: 100%;
+        border-radius: 5px;
+        background-color: var(--primary_color);
+    }
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-outline {
+    background-color: white;
+    border: 1px solid #ccc;
+    color: #333;
+}
+
+.btn-outline:hover {
+    background-color: #f0f0f0;
+}
+
+.btn-delete {
+    background-color: #ff4d4f;
+    border: none;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #ff7875;
+}
+
+#status-select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.875rem;
+    background-color: white;
+}
+
+@media only screen and (min-width: 768px) {
+    main{
+        width: 750px;
+    }
+}
+
+
+@media only screen and (min-width: 992px) {
+    main{
+        width: 1000px
+    }
+}
+
+{{end}}
+
+{{define "Body"}}
+    <main>
+        <div class="job_tab">
+            <button type="button" class="job_tab_btn selected_tab" onclick="onChangeScene(this, 'offert')">Annonce</button>
+            <button type="button" class="job_tab_btn" onclick="onChangeScene(this, 'application')">Candidates</button>
+        </div>
+        <form class="newjob" id="offert" hx-patch="/job/{{.Job.Id}}" hx-ext="json-enc" hx-vals='js:{...getJobValues()}'  hx-swap="none">
+            <div class="newjob_field">
+                <input type="text" autocomplete="off"  required id="title" value="{{.Job.Title}}"  name="title" class="newjob_field_input newjob_field_input_withLabel" />
+                <label for="title" class="newjob_field_label">Titre</label>
+            </div>
+            <div class="newjob_flex">
+                <div class="newjob_field" style="flex: 1;">
+                    <input type="text" autocomplete="off" value="{{.Job.City}}" placeholder="Paris" id="city"  name="city" class="newjob_field_input newjob_field_input_withLabel" />
+                    <label for="adresse" class="newjob_field_label">Departement</label>
+                </div>
+                <div class="newjob_field" style="flex: .7;">
+                    <input type="text" autocomplete="off" value="{{.Job.Postal}}"  placeholder="75001" id="postal" name="postal" class="newjob_field_input newjob_field_input_withLabel" />
+                    <label for="adresse" class="newjob_field_label">Postal</label>
+                </div>
+            </div>
+            <h2 class="subheader">Salaire</h2>
+            <div class="newjob_flex">
+                <div class="newjob_field">
+                    <input type="number" placeholder="1500" value="{{index .Job.Salary 0}}"  id="minSalary" name="salary" class="newjob_field_input newjob_field_input_withLabel salary" />
+                    <label for="minSalary" class="newjob_field_label">Min</label>
+                </div>
+                <div class="newjob_field">
+                    <input type="number" placeholder="2000" id="maxSalary" value="{{index .Job.Salary 1}}" name="salary" class="newjob_field_input newjob_field_input_withLabel salary" />
+                    <label for="maxSalary" class="newjob_field_label">Max</label>
+                </div>
+            </div>
+            <h2 class="subheader">Contrat</h2>
+            <div class="newjob_flex">
+                <dropdown-ele id="contract" value="{{.Job.Contract}}"  array='[{"id": "32", "value": "CDD a object defini"}]'></dropdown-ele>
+                <div class="newjob_field">
+                    <input type="number" value="{{.Job.WeeklyWorkTime}}" placeholder="35" id="weeklyWorkTime" name="weeklyWorkTime" class="newjob_field_input newjob_field_input_withLabel" />
+                    <label for="weeklyWorkTime" class="newjob_field_label">Heures</label>
+                </div>
+                <div class="newjob_field">
+                    <input type="date"  id="startTime" name="startTime" class="newjob_field_input newjob_field_input_withLabel" />
+                    <label for="startTime" class="newjob_field_label">Debut</label>
+                </div>
+            </div>
+            <h2 class="subheader">Description</h2>
+            <pre class="newjob_description"  contenteditable="true">{{.Job.Description}}</pre>
+            <div class="bottomContent">
+                <div class="newjob_section" id="advantage">
+                    <div class="newjob_headerWithButton">
+                        <h2 class="subheader">Avantages</h2>
+                        <button type="button" class="newjob_addBtn" onclick="onNewAdvantage()">
+                            <svg
+                                width="63.999996"
+                                height="63.999996"
+                                style="width: 60%;height: 60%;"
+                                viewbox="0 0 16.933332 16.933332">
+                                <g
+                                    transform="translate(-49.871622,-101.59117)">
+                                <rect
+                                    style="fill:#000000;stroke-width:0.0701647"
+                                    id="rect113"
+                                    width="2.6458337"
+                                    height="15.875"
+                                    x="108.73493"
+                                    y="-66.275787"
+                                    ry="1.3229169"
+                                    transform="rotate(90)" />
+                                <rect
+                                    style="fill:#000000;stroke-width:0.0701647"
+                                    id="rect273"
+                                    width="2.6458337"
+                                    height="15.875"
+                                    x="57.015373"
+                                    y="102.12034"
+                                    ry="1.3229169" />
+                                </g>
+                            </svg>
+                        </button>
+                    </div>
+                    {{range .Job.Advantage}}
+                        <div class="newjob_advantage">
+                            <input type="text" autocomplete="off" value="{{.}}" placeholder="Titre de transport" class="newjob_field_input advantage" />
+                            <button type="button" class="newjob_profile_deleteBtn" onclick="onDeleteProfileOrAdvantage(this)"><img src="/static/close.svg" style="width: 60%;height: 60%;"  /></button>
+                        </div>
+                     {{end}}
+                </div>
+                <div class="newjob_section" id="profile"> 
+                    <div class="newjob_headerWithButton">
+                        <h2 class="subheader">Compétances</h2>
+                        <button type="button" class="newjob_addBtn" onclick="onNewProfil(this)">
+                            <svg
+                                width="63.999996"
+                                height="63.999996"
+                                style="width: 60%;height: 60%;"
+                                viewbox="0 0 16.933332 16.933332">
+                                <g
+                                    transform="translate(-49.871622,-101.59117)">
+                                <rect
+                                    style="fill:#000000;stroke-width:0.0701647"
+                                    id="rect113"
+                                    width="2.6458337"
+                                    height="15.875"
+                                    x="108.73493"
+                                    y="-66.275787"
+                                    ry="1.3229169"
+                                    transform="rotate(90)" />
+                                <rect
+                                    style="fill:#000000;stroke-width:0.0701647"
+                                    id="rect273"
+                                    width="2.6458337"
+                                    height="15.875"
+                                    x="57.015373"
+                                    y="102.12034"
+                                    ry="1.3229169" />
+                                </g>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="newjob_profile">
+                        <h3 class="newjob_profile_header">Titre</h3>
+                        <h3 class="newjob_profile_header">Obligatoire</h3>
+                        <h3></h3>
+                    </div>
+                    {{range .Job.SkillNeeded}}
+                        <div class="newjob_profile content">
+                            <input type="text" autocomplete="off" value="{{.Label}}"  placeholder="experience 2 ans"  class="newjob_field_input" />
+                            <toggle-btn class="toggleBtn" on="{{if .Required}}true{{else}}false{{end}}"></toggle-btn>
+                        <button type="button" class="newjob_profile_deleteBtn" onclick="onDeleteProfileOrAdvantage(this)"><img src="/static/close.svg" style="width: 60%;height: 60%;" /></button>
+                        </div>
+                    {{end}}
+                </div>
+            </div>
+            <div class="action">
+                <button type="button" popovertarget="delete_modal" class="newjob_submitBtn deleteModalBtn">Supprimer</button>
+                <button type="button" popovertarget="template_save" class="newjob_submitBtn newjob_modelBtn">Creer un modele</button>
+                <button type="submit" class="newjob_submitBtn" >Modifier</button>
+            </div>
+        </form>
+        <div id="delete_modal" popover>
+            <h1 class="title">Voulez-vous supprimer l'annonce?</h1>
+            <div class="action">
+                <button type="button" class="cancelBtn" popovertarget="delete_modal" popovertargetaction="hide">Cancel</button>
+                <button type="button" class="deleteBtn" hx-delete="/job/{{.Job.Id}}" onclick="onDeleteOffert(this)" hx-swap="none">Supprimer</button>
+            </div>
+        </div>
+        <form hx-post="/job/{{.Job.Id}}" hx-swap="none" id="template_save" popover> <h1 style="text-align: center;font-size: 1.2rem;">Enregistrer ce modele</h1>
+            <input type="text" placeholder="CDD Compable H/F" name="tname" autocomplete="off" class="template_save_input"/>
+            <button type="submit" class="template_save_btn" onclick="onSaveTemplate(this)">Enregistrer</button>
+        </form>
+        <div id="application" class="hidden">
+            {{range .Application}}
+                <div class="application_card">
+                    <div class="person">
+                        <div class="visual">
+                            <img class="photo" src="/static/profile-picture.jpeg"></img>
+                            <h1 class="name">{{.Name}}</h1>
+                        </div>
+                        <p>{{.Gender}}, {{.Age}}</p>
+                        <p>{{.Adresse}}</p>
+                        <p>Tel: 0622442593</p>
+                    </div>
+                    <div class="card-footer">
+                        <dropdown-ele height="2rem" id="status" array='[{"id": "", "value": "Pending"}, {"id": "", "value":"Rejected"}, {"id": "", "value": "Reviewed"}]'></dropdown-ele>
+                        <a id="view-cv-btn" href="/job/{{.JobId}}/cv/{{.UserId}}" class="btn btn-outline">Voir CV</a>
+                    </div>
+                </div>
+            {{end}}
+        </div>
+    </main>
+    <script>
+
+        //<div style="display: flex;gap: .5rem;">
+        //    <button type="button" style="border: 1px solid red;color: red;" class="deleteBtn"
+        //        hx-delete="/job/2" hx-swap="delete" hx-target="closest .application_card">Effacer</button>
+
+        //    <button type="button" class="actionBtn">Schedule interview</button>
+        //</div>
+        // <a href="/job/JobId/cv/UserId"" class="application_card_view"><img src="/static/eye.svg" style="width: 80%;height: 80%;" /></a>
+        const description = document.querySelector(".newjob_description")
+        const contract = document.getElementById("contract") 
+        const workTime = document.getElementById("weeklyWorkTime")
+        const offert = document.getElementById("offert")
+        const applications = document.getElementById("application")
+        const tabs = document.getElementsByClassName("job_tab_btn")
+        const salary = document.getElementsByClassName('salary')
+
+        const onDeleteOffert = (ele)=>{
+            ele.closest("#delete_modal").hidePopover()
+        }
+
+        const onChangeScene = (ele, scene)=>{
+            for(const tab of tabs){
+                tab.classList.remove("selected_tab")
+            }
+            ele.classList.add("selected_tab")
+            if(scene === "offert"){
+                offert.classList.remove("hidden")
+                applications.classList.add("hidden")
+            }else{
+                offert.classList.add("hidden")
+                applications.classList.remove("hidden")
+            }
+        }
+        // Edit Javascript
+        const onSaveTemplate = (ele)=>{
+            ele.parentElement.hidePopover()
+        }
+
+        const profileContainer = document.getElementById("profile")
+        const advantageContainer = document.getElementById("advantage")
+        const onNewProfil = ()=>{
+            const newProfile = document.createElement("div")
+            newProfile.classList.add("newjob_profile", "content")
+            newProfile.innerHTML = `
+                <input type="text" autocomplete="off"  placeholder="Experience 2 ans"  class="newjob_field_input" />
+                <toggle-btn on="false" class="toggleBtn"></toggle-btn>
+                <button type="button" onclick="onDeleteProfileOrAdvantage(this)"  class="newjob_profile_deleteBtn">
+                    <svg
+                        width="63.999996"
+                        height="63.999996"
+                        style="width: 60%;height: 60%;"
+                        viewBox="0 0 16.933332 16.933332">
+                        <g
+                            transform="translate(-51.903267,-103.62282)">
+                            <rect
+                                style="fill:#000000;stroke-width:0.0928013"
+                                width="3.4994376"
+                                height="20.996624"
+                                x="120.19751"
+                                y="26.072937"
+                                ry="1.7497188"
+                                transform="rotate(45)" />
+                            <rect
+                                style="fill:#000000;stroke-width:0.0928013"
+                                id="rect273"
+                                width="3.4994376"
+                                height="20.996624"
+                                x="-38.320965"
+                                y="111.44891"
+                                ry="1.7497188"
+                                transform="rotate(-45)" />
+                        </g>
+                    </svg>
+                </button>
+            `
+            profileContainer.appendChild(newProfile)
+        }
+
+        const onDeleteProfileOrAdvantage = (ele)=>{
+            ele.parentElement.remove()
+        }
+
+
+        const onNewAdvantage = ()=>{
+            const newAdvantage = document.createElement("div")
+            newAdvantage.classList.add("newjob_advantage")
+            newAdvantage.innerHTML = `
+                <input type="text" autocomplete="off" placeholder="Titre de transport"  class="newjob_field_input advantage" />
+                <button type="button" class="newjob_profile_deleteBtn" onclick="onDeleteProfileOrAdvantage(this)"><img src="/static/close.svg" style="width: 60%;height: 60%;" /></button>
+            `
+            advantageContainer.appendChild(newAdvantage)
+        }
+
+        const getJobValues = ()=>{
+            const profilWanted = []
+            const advantageList = []
+            const salaryList = []
+            const contractValue = contract.querySelector(".dropdown_display")
+            const profilNeeded = document.getElementsByClassName("content")
+            const advantage = document.getElementsByClassName("advantage")
+
+            for(const profil of profilNeeded){
+                const titre = profil.querySelector(".newjob_field_input")
+                const required = profil.getElementsByTagName("toggle-btn")[0]
+                profilWanted.push({label: titre.value, required: required.getAttribute("on") === "true" ? true : false})
+            }
+            for(const adv of advantage){
+                advantageList.push(adv.value)
+            }
+            for(const sal of salary){
+                salaryList.push(parseFloat(sal.value))
+            }
+            return {
+                salary: salaryList,
+                description: description.innerText, 
+                weeklyWorkTime: parseFloat(weeklyWorkTime.value),
+                skill: profilWanted,
+                advantage: advantageList
+            }
+            
+        }
+    </script>
+{{end}}

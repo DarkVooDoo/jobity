@@ -1,0 +1,69 @@
+{{define "Head"}}
+    <title>Company name</title>
+{{end}}
+
+{{define "Style"}}
+
+    .company_info > *{
+        margin-bottom: .5rem;
+    }
+    
+    .company_info{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+    .company_info_photo{
+        height: 4rem;
+    }
+
+    .company_tab_link{
+        height: 2rem;
+        padding: 0 .5rem;
+        border: 1px solid lightgray;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background-color: rgb(240,240,240);
+    }
+    .selected_tab{
+        background: rgb(240,240,240);
+        background: linear-gradient(180deg, rgba(240,240,240,1) 15%, rgba(112,112,112,1) 100%);
+        background-size: 150% 150%;
+        animation: tabAnimation .2s linear forwards;
+    }
+    @keyframes tabAnimation{
+        50%{
+            background-position: 0% 0%;
+        }100%{
+            background-position: 0% 30%;
+        }
+    }
+
+{{end}}
+
+{{define "Body"}}
+    <main>
+        <div class="company_info">
+            <img src="/static/france-travail.png" class="company_info_photo" />
+            <h1>France travail</h1>
+            <p>7 Rue vineuse, Paris</p>
+        </div>
+        <div class="company_tab">
+            <button type="button" class="company_tab_link selected_tab" onclick="onTabClick(this)">Jobs</button>
+            <button type="button" class="company_tab_link" onclick="onTabClick(this)" >Mission</button>
+            <button type="button" class="company_tab_link" onclick="onTabClick(this)" >Avis</button>
+        </div>
+    </main>
+    <script>
+        const tabs = document.getElementsByClassName("company_tab_link")
+        const onTabClick = (ele)=>{
+            for(let tab of tabs){
+                tab.classList.remove("selected_tab")
+            }
+            ele.classList.add("selected_tab")
+        }
+
+    </script>
+{{end}}

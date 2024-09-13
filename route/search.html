@@ -1,0 +1,421 @@
+{{define "Head"}}
+    <title>Recherche</title>
+    <script src="/static/JobCard.js" type="module"></script>
+    <script src="/static/Dropdown.js" type="module"></script>
+    <script src="/static/ToggleBtn.js" type="module"></script>
+{{end}}
+%end
+{{define "Style"}}
+
+main{
+    container-type: inline-size;
+}
+
+#search_jobs{
+    display: grid;
+    gap: 1rem;
+    @container (width >= 678px){
+        grid-template-columns: repeat(2, 1fr);
+    }
+    @container (width >= 970px){
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+.search_filterBtn{
+    height: 2rem;
+    padding: 0 .5rem;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+}
+#filter{
+    background-color: white;
+    margin: 0;
+    position: fixed;
+    inset: unset;
+    height: 100%;
+    width: 250px;
+    border: none;
+    right: 0px;
+    bottom: 0px;
+    transform: translateX(250px);
+    transition: transform 200ms ease-in-out , overlay 200ms ease-in-out allow-discrete, display 200ms ease-in-out allow-discrete;
+    &:popover-open{
+        right: 0;
+        padding: .5rem .3rem;
+        transition: transform .2s ease-in-out;
+        transform: translateX(0px);
+        @starting-style{
+            transform: translateX(250px);
+        }
+    }
+    &::backdrop{
+        transition: display 1s ease-in-out;
+        transition-behavior: allow-discrete; /* Note: be sure to write this after the shorthand */
+        background-color: rgba(0,0,0,.2);
+    }
+    & .row{
+        padding: 1rem 0;
+
+        & .header{
+            font-size: 1.1rem;
+            margin-bottom: .3rem;
+            font-weight: normal;
+        }
+
+        & .salary, & .exp{
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: .3rem;
+        }
+
+        & .field{
+            height: 2rem;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid lightgray;
+            padding: 0 5px;
+        }
+    }
+    & .row:has(+ * ~ .submitBtn:last-child){
+        border-bottom: 1px solid darkgray;
+    }
+}
+
+.submitBtn{
+    height: 2rem;
+    width: 100%;
+    border-radius: 25px;
+    font-weight: bold;
+    background-color: var(--primary_color);
+}
+
+.distance{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    & input[type="range"]{
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: lightgray;
+        border-radius: 25px;
+        width: 70%;
+        height: 1rem;
+        &::-webkit-slider-thumb{
+            position: relative;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 1.5rem;
+            width: 1.5rem;
+            border-radius: 50%;
+            background-color: orange;
+        accent-color: red;
+        }
+    }
+    &::after{
+        position: relative;
+        content: attr(data-dist);
+        text-align: center;
+        width: 1rem;
+    }
+    p{
+        width: 1rem;
+        text-align: center;
+    }
+}
+
+    .card {
+        width: 100%;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: var(--card_shadow);
+        margin-bottom: 20px;
+        overflow: hidden;
+        .card-content {
+            padding: 20px;
+            .card-header {
+                display: flex;
+                gap: 16px;
+                .company-photo {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    object-fit: cover;
+                    border: 1px solid black;
+                    border-radius: 50%;
+                }
+                .card-info {
+                    flex-grow: 1;
+                }
+            }
+        }
+    }
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            min-height: 3.9rem;
+            align-content: center;
+        }
+        .card-company-info {
+            .company-name, .card-location, .card-salary {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.875rem;
+                color: #666;
+                margin-bottom: .2rem;
+                .salary, .location, .name{
+                    font-size: .85rem;
+                }
+            }
+            .card-salary{
+                height: 2.4rem;
+                text-wrap: balance;
+            }
+        }
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .badge {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+        }
+        .card-salary {
+            font-size: 0.875rem;
+            color: #4a5568;
+        }
+        .card-footer {
+            background-color: #c9d6e1;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-posted {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            color: #666;
+        }
+        .button {
+            background-color: transparent;
+            color: #3182ce;
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #b2c4d3;
+        }
+        .icon {
+            width: 16px;
+            height: 16px;
+        }
+        .w-photo{
+            display: none;
+        }
+
+
+
+
+
+    :root {
+            --range-thumb-size: 20px;
+            --range-track-height: 8px;
+            --range-track-color: #e0e0e0;
+            --range-track-fill-color: #2563eb;
+            --range-thumb-color: #2563eb;
+            --range-thumb-hover-color: #1d4ed8;
+        }
+
+        .range-container {
+            width: 100%;
+            position: relative;
+            margin-top: 30px;
+        }
+
+        .range-input {
+            width: 100%;
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        .range-input:focus {
+            outline: none;
+        }
+
+        .range-input::-webkit-slider-runnable-track {
+            width: 100%;
+            height: var(--range-track-height);
+            background-color: var(--range-track-color);
+            border-radius: 3px;
+            border: none;
+        }
+
+        .range-input::-moz-range-track {
+            width: 100%;
+            height: var(--range-track-height);
+            background-color: var(--range-track-color);
+            border-radius: 3px;
+            border: none;
+        }
+
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: var(--range-thumb-size);
+            height: var(--range-thumb-size);
+            background-color: var(--range-thumb-color);
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: calc((var(--range-thumb-size) - var(--range-track-height)) / -2);
+            transition: background-color 0.2s ease;
+        }
+
+        .range-input::-moz-range-thumb {
+            width: var(--range-thumb-size);
+            height: var(--range-thumb-size);
+            background-color: var(--range-thumb-color);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .range-input::-webkit-slider-thumb:hover,
+        .range-input::-moz-range-thumb:hover {
+            background-color: var(--range-thumb-hover-color);
+        }
+
+        .range-value {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--range-thumb-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 14px;
+            transition: left 0.2s ease;
+        }
+
+        .range-track-fill {
+            position: absolute;
+            top: 6px;
+            left: 0;
+            height: var(--range-track-height);
+            background-color: var(--range-track-fill-color);
+            border-radius: 3px;
+            pointer-events: none;
+        }
+
+{{end}}
+%end
+{{define "Body"}}
+    <main>
+        <div style="display: flex;justify-content: flex-end;margin-bottom: .5rem;">
+            <button type="button" popovertarget="filter" class="search_filterBtn">Filtre</button>
+        </div>
+        <div id="search_jobs">
+            {{range .Jobs}}
+            <job-card id="{{.Id}}" salary="{{.SalaryString}}" entreprise="{{.EntrepriseName}}"  isThirdParty="{{.IsThirdParty}}" contract="{{.Contract}}" title="{{.Title}}" fulladdr="{{.FullAdresse}}" date="{{.Date}}" fulltime="{{.FulltimeString}}" ></job-card>
+            {{end}}
+        </div>
+
+        <button type="button" hx-post="/search" hx-vals='{"postal": "{{.Search.Postal}}", "q": "{{.Search.Query}}", "city": "{{.Search.City}}", "sr": "{{.Search.FrancetravailPosition}}", "lp": "{{.Search.Lastposition}}"}' hx-swap="beforeend" hx-target="#search_jobs"  hx-swap-oob="true" id="search_more">More</button>
+        <form id="filter" hx-put="/search" hx-ext="json-enc" hx-vals='js:{"postal": "{{.Search.Postal}}", "q": "{{.Search.Query}}", "city": "{{.Search.City}}", ...getValues()}' hx-target="#search_jobs" hx-swap="innerHTML" popover>
+            <div class="row">
+                <h2 class="header">Trier par</h2>
+                <div>
+                    <input type="radio" name="order" id="asc" value="ASC" checked />
+                    <label>Décroissant</label>
+                </div>
+                <div>
+                    <input type="radio" name="order" id="desc" value="DESC" />
+                    <label>Croissant</label>
+                </div>
+            </div>
+            <div class="row">
+                <h2 class="header">Salaire</h2>
+                <div class="salary">
+                    <div>
+                        <input type="number" placeholder="Salaire Min" class="field"  id="minSalary" name="minSalary" />
+                    </div>
+                    <div>
+                        <input type="number" placeholder="Salaire Max"  class="field" id="maxSalary" name="maxSalary" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <h2 class="header">Contrat</h2>
+                <dropdown-ele height="2rem" id="contract" array="{{.Contract}}"></dropdown-ele>
+            </div>
+            <div class="row" style="display: flex;align-items: center;justify-content: space-between;">
+                <h2 class="header">Temps plein</h2>
+                <toggle-btn on="true" id="fulltime"></toggle-btn>
+            </div>
+            <div class="row">
+                <h2 class="header">Distance</h2>
+                <div class="range-container">
+                    <input type="range" id="distance"  class="range-input" value="20" min="0" max="100" value="50">
+                    <div class="range-track-fill"></div>
+                    <div class="range-value" id="range-value">50</div>
+                </div>
+            </div>
+            <div class="row" style="display: flex;align-items: center;justify-content: space-between;">
+                <h2 class="header">Autres sites</h2>
+                <toggle-btn on="true" id="thirdParty"></toggle-btn>
+            </div>
+            <button type="submit" class="submitBtn">Valider</button>
+        </form>
+    </main>
+    <script>
+        const onChangeDistance = (ele)=>{
+            ele.closest(".distance").dataset.dist = ele.value
+        }
+        const getValues = ()=>{
+            const contract = document.getElementById("contract").querySelector(".dropdown_display")
+            const distance = document.getElementById("distance")
+            const lat = document.getElementById("search_lat")
+            const long = document.getElementById("search_long")
+            const minSalary = document.getElementById("minSalary")
+            const maxSalary = document.getElementById("maxSalary")
+            const fulltime = document.getElementById("fulltime").getAttribute("on") === "true" ? true : false
+            const thirdParty = document.getElementById("thirdParty").getAttribute("on") === "true" ? true : false
+            return {contract: contract.value, minSalary: minSalary.value ? parseFloat(minSalary.value) : 0, maxSalary: maxSalary.value ? parseFloat(maxSalary.value) : 0, fulltime, thirdParty, contract: contract.value, distance: parseInt(distance.value), lat: parseFloat(lat.value), long: parseFloat(long.value)}
+        }
+        
+
+        const rangeInput = document.getElementById('distance');
+        const rangeValue = document.getElementById('range-value');
+        const rangeFill = document.querySelector('.range-track-fill');
+
+        function updateRange() {
+            const value = rangeInput.value;
+            const min = rangeInput.min || 0;
+            const max = rangeInput.max || 100;
+            const percentage = (value - min) / (max - min) * 100;
+
+            rangeValue.textContent = value;
+            rangeValue.style.left = `calc(${percentage}% + (${8 - percentage * 0.15}px))`;
+            rangeFill.style.width = `calc(${percentage}%)`;
+        }
+
+        rangeInput.addEventListener('input', updateRange);
+        updateRange(); // Initialize
+    </script>
+{{end}}
+%end

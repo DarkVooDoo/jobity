@@ -1,0 +1,192 @@
+{{define "Head"}}
+    <title>Connextion</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+{{end}}
+%end
+{{define "Style"}}
+    main{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        container-type: inline-size;
+        container-name: content;
+    }
+    .login, #signup, #forgetpassword{
+        width: 95%;
+        background-color: white;
+        box-shadow: 0px 0px 5px 0px black;
+        border-radius: 25px;
+        padding: 15px;
+        opacity: 1;
+        transition: opacity .3s linear;
+        @starting-style{
+            opacity: 0;
+        }
+        @container content (width >= 678px){
+            width: 500px;
+        }
+        > *{
+            margin-bottom: 1rem;
+        }
+        .field{
+            position: relative;
+            display: flex;
+            align-items: center;
+            .icon{
+                position: absolute;
+                left: 5px;
+                width: 1rem;
+                height: 1rem;
+            }
+            .input{
+                height: 2.5rem;
+                padding-inline: calc(1rem + 10px) 5px;
+                border-radius: 10px;
+                background-color: #e9e9e9;
+                width: 100%;
+            }
+        }
+        .submitBtn{
+            height: 2rem;
+            width: 100%;
+            border-radius: 10px;
+            background-color: var(--primary_color);
+        }
+
+        .account{
+            display: flex;
+            justify-content: space-between;
+        }
+        .switchDomain{
+            height: 2rem;
+            border-radius: 5px;
+            width: 100%;
+            border: 1px solid lightgray;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+    }
+    #forgetpassword{
+
+        background-color: white;
+        border-radius: 10px;
+        padding: .5rem;
+        width: 85%;
+        @container content (width >= 678px){
+            width: 400px;
+        }
+        &::backdrop{
+            background-color: rgba(0,0,0,.2);
+        }
+        .field{
+            height: 2rem;
+            width: 100%;
+            border: 1px solid black;
+            border-radius: 5px;
+            padding: 0 5px;
+        }
+    }
+{{end}}
+%end
+{{define "Body"}}
+    <main>
+        <form class="login" hx-post="/connexion" hx-swap="none">
+            <h1 style="text-align: center;font-size: 1.3rem;" class="test">Connexion</h1>
+            <div class="field"> 
+                <svg width="800px" height="800px" class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12ZM16 12V13.5C16 14.8807 17.1193 16 18.5 16V16C19.8807 16 21 14.8807 21 13.5V12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21H16" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input id="email" placeholder="Email" class="input" type="email" autocomplete="off" name="email" />
+            </div>
+            <div class="field"> 
+                <svg fill="#000000" width="800px" height="800px" class="icon" viewBox="-13.39 0 122.88 122.88" version="1.1" enable-background="new 0 0 96.108 122.88" xml:space="preserve">
+                <g>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M2.892,56.036h8.959v-1.075V37.117c0-10.205,4.177-19.484,10.898-26.207v-0.009 C29.473,4.177,38.754,0,48.966,0C59.17,0,68.449,4.177,75.173,10.901l0.01,0.009c6.721,6.723,10.898,16.002,10.898,26.207v17.844 v1.075h7.136c1.59,0,2.892,1.302,2.892,2.891v61.062c0,1.589-1.302,2.891-2.892,2.891H2.892c-1.59,0-2.892-1.302-2.892-2.891 V58.927C0,57.338,1.302,56.036,2.892,56.036L2.892,56.036z M26.271,56.036h45.387v-1.075V36.911c0-6.24-2.554-11.917-6.662-16.03 l-0.005,0.004c-4.111-4.114-9.787-6.669-16.025-6.669c-6.241,0-11.917,2.554-16.033,6.665c-4.109,4.113-6.662,9.79-6.662,16.03 v18.051V56.036L26.271,56.036z M49.149,89.448l4.581,21.139l-12.557,0.053l3.685-21.423c-3.431-1.1-5.918-4.315-5.918-8.111 c0-4.701,3.81-8.511,8.513-8.511c4.698,0,8.511,3.81,8.511,8.511C55.964,85.226,53.036,88.663,49.149,89.448L49.149,89.448z"/>
+                
+                </g>
+                </svg>
+                <input id="password" class="input" name="password" type="password" placeholder="Mot de passe" />
+            </div>
+            <button type="submit" class="submitBtn">Connexion</button>
+            <div>
+                <div id="g_id_onload"
+                    data-client_id="432757696898-pbn4r01ut5ejpnrs342foham08ger5rp.apps.googleusercontent.com"
+                    data-login_uri="http://localhost:8000/connexion"
+                    data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                    style="display: flex;justify-content: center;"
+                    data-locale="fr"
+                    data-type="standard"
+                    data-size="large"
+                    data-theme="outline"
+                    data-text="sign_in_with"
+                    data-shape="rectangular"
+                    data-logo_alignment="left">
+                </div>
+            </div>
+            <div class="account">
+                <button type="button" popovertarget="forgetpassword"  class="forgotBtn">Mot de passe oublié?</button>
+                <button type="button" onclick="onSwitchScreen()">Vous etes nouveau?</button>
+            </div>
+            <a href="http://localhost:8000/connexion" class="switchDomain">Accéder à la page particulier</a>
+        </form>
+        <form id="signup" class="hidden" hx-put="/connexion" hx-swap="none">
+            <h1 style="text-align: center;font-size: 1.3rem;">Creer un compte</h1>
+            <div class="field"> 
+                <svg width="800px" height="800px" class="icon" viewBox="0 0 16 16" version="1.1">
+                    <g  stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g transform="translate(-382.000000, -7721.000000)" fill="#000000">
+                            <g id="icons" transform="translate(56.000000, 160.000000)">
+                                <path d="M332,7571 L336,7571 L336,7567 L332,7567 L332,7571 Z M342,7567 L342,7565 L338,7565 L338,7561 L336,7561 L336,7565 L332,7565 L332,7561 L330,7561 L330,7565 L326,7565 L326,7567 L330,7567 L330,7571 L326,7571 L326,7573 L330,7573 L330,7577 L332,7577 L332,7573 L336,7573 L336,7577 L338,7577 L338,7573 L342,7573 L342,7571 L338,7571 L338,7567 L342,7567 Z" id="number_sign-[#110]">
+
+                                </path>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+                <input id="siren" placeholder="Siret" class="input" type="text" autocomplete="off" name="siren" />
+            </div>
+            <div class="field"> 
+                <svg width="800px" height="800px" class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12ZM16 12V13.5C16 14.8807 17.1193 16 18.5 16V16C19.8807 16 21 14.8807 21 13.5V12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21H16" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input id="email-s" placeholder="Email" class="input" type="email" autocomplete="off" name="email" />
+            </div>
+            <div class="field"> 
+
+                <svg fill="#000000" width="800px" height="800px" class="icon" viewBox="-13.39 0 122.88 122.88" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  enable-background="new 0 0 96.108 122.88" xml:space="preserve">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2.892,56.036h8.959v-1.075V37.117c0-10.205,4.177-19.484,10.898-26.207v-0.009 C29.473,4.177,38.754,0,48.966,0C59.17,0,68.449,4.177,75.173,10.901l0.01,0.009c6.721,6.723,10.898,16.002,10.898,26.207v17.844 v1.075h7.136c1.59,0,2.892,1.302,2.892,2.891v61.062c0,1.589-1.302,2.891-2.892,2.891H2.892c-1.59,0-2.892-1.302-2.892-2.891 V58.927C0,57.338,1.302,56.036,2.892,56.036L2.892,56.036z M26.271,56.036h45.387v-1.075V36.911c0-6.24-2.554-11.917-6.662-16.03 l-0.005,0.004c-4.111-4.114-9.787-6.669-16.025-6.669c-6.241,0-11.917,2.554-16.033,6.665c-4.109,4.113-6.662,9.79-6.662,16.03 v18.051V56.036L26.271,56.036z M49.149,89.448l4.581,21.139l-12.557,0.053l3.685-21.423c-3.431-1.1-5.918-4.315-5.918-8.111 c0-4.701,3.81-8.511,8.513-8.511c4.698,0,8.511,3.81,8.511,8.511C55.964,85.226,53.036,88.663,49.149,89.448L49.149,89.448z"/>
+                </svg>
+                <input id="password-s" placeholder="Mot de passe" class="input" name="password" type="password" />
+            </div>
+            <div class="field"> 
+                <svg fill="#000000" width="800px" height="800px" class="icon" viewBox="-13.39 0 122.88 122.88" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  enable-background="new 0 0 96.108 122.88" xml:space="preserve">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2.892,56.036h8.959v-1.075V37.117c0-10.205,4.177-19.484,10.898-26.207v-0.009 C29.473,4.177,38.754,0,48.966,0C59.17,0,68.449,4.177,75.173,10.901l0.01,0.009c6.721,6.723,10.898,16.002,10.898,26.207v17.844 v1.075h7.136c1.59,0,2.892,1.302,2.892,2.891v61.062c0,1.589-1.302,2.891-2.892,2.891H2.892c-1.59,0-2.892-1.302-2.892-2.891 V58.927C0,57.338,1.302,56.036,2.892,56.036L2.892,56.036z M26.271,56.036h45.387v-1.075V36.911c0-6.24-2.554-11.917-6.662-16.03 l-0.005,0.004c-4.111-4.114-9.787-6.669-16.025-6.669c-6.241,0-11.917,2.554-16.033,6.665c-4.109,4.113-6.662,9.79-6.662,16.03 v18.051V56.036L26.271,56.036z M49.149,89.448l4.581,21.139l-12.557,0.053l3.685-21.423c-3.431-1.1-5.918-4.315-5.918-8.111 c0-4.701,3.81-8.511,8.513-8.511c4.698,0,8.511,3.81,8.511,8.511C55.964,85.226,53.036,88.663,49.149,89.448L49.149,89.448z"/>
+                </svg>
+                <input id="confirmation" placeholder="Confirmation" class="input"name="confirmation" type="password" />
+            </div>
+            <button type="submit" class="submitBtn">Creer un compte</button>
+            <div class="login_newuser">
+                <button type="button" onclick="onSwitchScreen()">Vous avez déjà un compte?</button>
+            </div>
+        </form>
+        <form id="forgetpassword" popover>
+            <h2 style="text-align: center;">Mot de passe oublié</h2>
+            <input type="email" class="field" name="email"  placeholder="test@gmail.com" autocomplete="off" />
+            <button type="submit" class="submitBtn">Changer mot de passe</button>
+        </form>
+    </main>
+    <script>
+        const login = document.querySelector(".login")
+        const signup = document.getElementById("signup")
+
+        const onSwitchScreen = ()=>{
+            login.classList.toggle("hidden")
+            signup.classList.toggle("hidden")
+        }
+    </script>
+{{end}}
+%end

@@ -1,0 +1,641 @@
+{{define "Head"}}
+    <title>{{.User.Firstname}} {{.User.Lastname}}</title>
+    <script src="/static/profile.js" async></script>
+{{end}}
+%end
+{{define "Style"}}
+
+    .profile_feed > *, .profile_feed_activity > *, .profile > *, .profile_editable > *, .profile_feed_application > *, .profile_cvPopover_form > *{
+        margin-bottom: .5rem;   
+    }
+    .profile_header{
+        font-size: 1.2rem;
+    }
+    #picture{
+        display: none;
+    }
+    .profile_picture{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        .profile_picture_label{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 5rem;
+            border-radius: 50%;
+            aspect-ratio: 1/1;
+            border: 1px solid black;
+            margin-bottom: .3rem;
+            overflow: hidden;
+            position: relative;
+            #picture_ele{
+                height: 100%;
+                width: 100%;
+                position: absolute;
+                z-index: 1;
+            }
+        }
+        .profile_picture_text{
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile_picture_submitBtn{
+            height: 2rem;
+            border-radius: 5px;
+            background-color: var(--primary_color);
+            padding: 0 .3rem;
+        }
+    }
+    .tabs{
+        display: flex;
+        background-color: lightgray;
+        overflow: hidden;
+        border-radius: 25px;
+        padding: 0 .5rem;
+        position: relative;
+        .tab{
+            height: 2rem;
+            padding: 0 8px;
+            z-index: 1;
+        }
+        #selected{
+            position: absolute;
+            top: -1.3rem;
+            height: 22px;
+            width: 22px;
+            background-color: white;
+            border: 5px solid transparent;
+            border-bottom: 3px solid #647583;
+            border-right: 3px solid #647583;
+            transform: rotate(45deg);
+            transition: all .3s linear;
+        }
+        #bg{
+            background-color: var(--primary_color);
+            position: absolute;
+            left: .25rem;
+            bottom: .25rem;
+            height: 1.5rem;
+            border-radius: 25px;
+            transition: all .3s linear;
+        }
+    }
+    .profile_editable{
+         .profile_editable_field{
+             display: flex;
+             flex-direction: column;
+             gap: .3rem;
+             .label{
+                 font-weight: bold;
+             }
+             .input{
+                 border: 1px solid darkgray;
+                 border-radius: 5px;
+                 height: 2rem;
+                 width: 100%;
+                 padding: 0 5px;
+                 background-color: inherit;
+             }
+         }
+         .submitBtn{
+             width: 100%;
+             height: 2rem;
+             border-radius: 5px;
+             background-color: var(--primary_color);
+        }
+    }
+    #description{
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        .label{
+            font-weight: bold;
+        }
+        .field{
+            border: 1px solid darkgray;
+            border-radius: 5px;
+            padding: 5px 10px 5px 5px;
+            height: 80px;
+            background-color: inherit;
+        }
+        #length{
+            position: absolute;
+            right: 5px;
+            bottom: 0px;
+            color: darkgray;
+        }
+    }
+    #suggest_adr{
+        position: absolute;
+        width: 100%;
+        border-radius: 5px;
+        top: 3.7rem;
+        left: 0;
+        background-color: rgb(220,220,220);
+        .item{
+            height: 2rem;
+            padding: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .item:hover{
+            background-color: rgb(200,200,200);
+        }
+    }
+    .profile_feed_application_job{
+        display: flex;
+        justify-content: space-between;
+    }
+    .profile_feed_application_job_name{
+        font-size: 1.2rem;
+    }
+    .profile_feed_activity_msg{
+        border: 1px solid lightgray;
+        border-radius: 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 .5rem;
+    }
+    .profile_feed_activity_msg_date{
+        display: flex;
+        width: 100%;
+        padding: .3rem 15px .3rem 15px;
+        justify-content: flex-end;
+        font-size: .9rem;
+    }
+    .profile_feed_activity_msg_text{
+        margin-bottom: .3rem;
+    }
+
+    /********* CV SECTION **********/
+    #cv{
+        .header{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            .title{
+                font-size: 1.5rem;
+            }
+            .submitBtn{
+                height: 2rem;
+                width: 2rem;
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+                border-radius: 5px;
+                .dot{
+                    height: 6px;
+                    width: 6px;
+                    border-radius: 50%;
+                    background-color: black;
+                }
+                &:has(+ #curriculum_action:popover-open){
+                    background-color: lightgray;
+                } 
+            }
+            #curriculum_action{
+                width: 100px;
+                position: absolute;
+                inset: unset;
+                border-radius: 5px;
+                border: 1px solid darkgray;
+                .btn{
+                    height: 2rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                }
+            }
+        }
+
+        #work, #diploma{
+            > *{
+                margin-bottom: .5rem;
+            }
+            .header{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .title{
+                    font-size: 1.1rem;
+                }
+                .newBtn{
+                    height: 2rem;
+                    padding: 0 .5rem;
+                    border-radius: 5px;
+                    background-color: var(--primary_color);
+                }
+            }
+            .card{
+                padding: 5px 10px;
+                border-radius: 10px;
+                margin-bottom: 1.5rem;
+                background-color: white;
+                -webkit-box-shadow: 0px 0px 4px 2px #A9A9A9; 
+                box-shadow: 0px 0px 4px 2px #A9A9A9;
+                opacity: 1;
+                transition: opacity .2s linear;
+                @starting-style{
+                    opacity: 0;
+                }
+                .input{
+                    height: 2rem;
+                    width: 100%;
+                    border-bottom: 1px solid darkgray;
+                    margin-bottom: .3rem;
+                }
+                .dates, .location{
+                    display: flex;
+                    gap: 1rem;
+                    margin-bottom: .3rem;
+                    .field{
+                        flex: 1;
+                        height: 2rem;
+                        width: 100%;
+                        border-bottom: 1px solid darkgray;
+                    }
+                }
+                .task{
+                    > *{
+                        margin-bottom: .3rem;
+                    }
+                    .header{
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .description{
+                        border: 1px solid darkgray;
+                        padding: 5px;
+                        border-radius: 5px;
+                        margin-bottom: .3rem;
+                        .closeBtn{
+                            float: right;
+                            height: 1.5rem;
+                            width: 1.5rem;
+                            background-color: rgba(200,200,200,.5);
+                            border-radius: 50%;
+                            font-weight: bold;
+                        }
+                    }
+                    .descriptionFadeIn{
+                        transform: translateX(-100%);
+                        animation: descriptionFadeIn .3s ease-in forwards;
+                    }
+                    .newBtn{
+                        height: 2rem;
+                        width: 2rem;
+                        font-weight: bold;
+                        color: var(--primary_color);
+                        background-color: transparent;
+                        border: 1px solid var(--primary_color);
+                    }
+                }
+                .deleteBtn{
+                    height: 2rem;
+                    width: 100%;
+                    border-radius: 5px;
+                    background-color: lightgray;
+                }
+            }
+        }
+
+        #skill, #interest{
+            margin-bottom: 1rem;
+            .title ~ .field{
+                margin-bottom: .8rem;
+            }
+            .title{
+                font-size: 1.1rem;
+                margin-bottom: .5rem;
+            }
+            .field{
+                position: relative;
+                -webkit-box-shadow: 0px 0px 4px 2px #A9A9A9; 
+                box-shadow: 0px 0px 4px 2px #A9A9A9;
+                border-radius: 5px;
+                width: 100%;
+                .input{
+                    height: 2rem;
+                    width: 100%;
+                    padding: 0 calc(2rem + 5px) 0 5px;
+                    border-radius: 5px;
+                    display: block;
+                }
+                .closeBtn{
+                    position: absolute;
+                    right: 5px;
+                    font-weight: bold;
+                    top: 0px;
+                    height: 2rem;
+                    width: 2rem;
+                }
+            }
+            #newBtn{
+                height: 2rem;
+                width: 100%;
+                border-radius: 5px;
+                background-color: lightgray;
+            }
+        }
+    }
+        @keyframes fadeInAnimation{
+            100%{opacity: 1;}
+        }
+        @keyframes descriptionFadeIn{
+            100%{transform: translateX(0%)}
+        }
+
+
+
+        .picker{
+            width:100%;
+            position: relative;
+            .picker-display {
+                width: 100%;
+                font-size: 1rem;
+                height: 2rem;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                cursor: pointer;
+                background-color: white;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        .modal {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            z-index: 1;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            padding: .5rem;
+            margin-top: .3rem;
+            border: 1px solid #888;
+            border-radius: 8px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .picker-title {
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .picker-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-height: 200px;
+            overflow: scroll;
+        }
+        .picker-item {
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .picker-item:hover {
+            background-color: #e0e0e0;
+        }
+{{end}}
+%end
+{{define "Body"}}
+    <main class="profile">
+        <form class="profile_picture" hx-put="/profile" hx-swap="none" hx-encoding="multipart/form-data">
+            <label for="picture" class="profile_picture_label">
+                <img id="picture_ele" />
+                <p class="profile_picture_label_text">Picture</p>
+            </label>
+            <input type="file" name="picture" accept="image/*" id="picture" onchange="onPictureChange(this)" />
+            <button type="submit" class="profile_picture_submitBtn">Changer votre photo</button>
+        </form>
+        <div class="tabs">
+            <button type="button"  class="tab" onclick="onChangeScene(event, 'profile')">Profile</button>
+            <button type="button" class="tab" onclick="onChangeScene(event, 'CV')">Curriculum</button>
+            <div id="bg"></div>
+        </div>
+        <form class="profile_editable scene" hx-post="/profile" hx-ext="json-enc" hx-swap="none" hx-vals='js:{...getProfileValues()}'>
+            <div class="profile_editable_field">
+                <label for="firstname" class="label">Prenom</label>
+                <input type="text" value="{{.User.Firstname}}" autocomplete="off" name="firstname" id="firstname" class="input" />
+            </div>
+            <div class="profile_editable_field">
+                <label for="lastname" class="label"> Nom</label>
+                <input type="text" value="{{.User.Lastname}}" autocomplete="off" name="lastname" id="lastname" class="input"/>
+            </div>
+            <div id="description">
+                <label class="label">Description</label>
+                <textarea name="description" maxlength="250" class="field" oninput="onDescriptionChange(this)">{{.User.Description}}</textarea>
+                <span id="length">250</span>
+            </div>
+            <div style="display: flex;gap: .5rem;justify-content: space-between;">
+                <div class="profile_editable_field">
+                    <label for="femme" class="label">Femme</label>
+                    <input type="radio" {{if eq .User.Gender "Femme"}}checked{{end}} name="gender" id="femme" value="Femme"/>
+                </div>
+                <div class="profile_editable_field">
+                    <label for="homme" class="label">Homme</label>
+                    <input type="radio" {{if eq .User.Gender "Homme"}}checked{{end}}  name="gender" id="homme" value="Homme"/>
+                </div>
+                <div class="profile_editable_field">
+                    <label for="birthDate" class="label">Date de naissance</label>
+                    <input type="date" value="{{.User.BirthDate}}" name="birthDate" id="birthDate" class="input"/>
+                </div>
+            </div>
+            <div style="display: flex;gap: .5rem;position: relative;">
+                <div class="profile_editable_field" style="flex: 1;">
+                    <label for="city" class="label">Ville</label>
+                    <input type="text" data-lat="{{.User.Lat}}" data-long="{{.User.Long}}" value="{{.User.City}}" oninput="onFetchAddr(this)" autocomplete="off" name="city" id="city" class="input"/>
+                </div>
+                <div class="profile_editable_field" style="flex: .3;">
+                    <label for="postal" class="label">Postal</label>
+                    <input type="number" value="{{.User.Postal}}" name="postal" id="postal" class="input"/>
+                </div>
+                <div id="suggest_adr" style="display: none;"></div>
+            </div>
+            <button type="submit" class="submitBtn">Modifier le profile</button>
+        </form>
+
+        <form id="cv" hx-post="/profile/cv" hx-vals='js:{...getValues()}' hx-swap="none" hx-ext="json-enc" class="hidden scene">
+            <div class="header">
+                <h1 class="title">Mon Curriculum</h1>
+                <button type="button" popovertarget="curriculum_action" class="submitBtn" onclick="calcPopoverPosition()">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </button>
+                <div id="curriculum_action" popover>
+                    <button type="submit" class="btn" onclick="onHideCurriculumAction(this)">Sauvegarder</button>
+                    <a href="/profile/cv?type=pdf" class="btn" onclick="onHideCurriculumAction(this)">Telecharger</a>
+                </div>
+            </div>
+            <div id="work">
+                <div class="header">
+                    <h2 class="title">Experience professionnelles</h2>
+                    <button type="button"  class="newBtn" onclick="onNewWork(this)">Nouvelle</button>
+                </div>
+                {{range .Curriculum.Work}}
+                    <div class="card" id="work" ondrop="onDrop(event)" ondragover="onDragOver(event)" draggable="true" ondragstart="onDragStart(event)">
+                        <div>
+                        <input type="text" value="{{.Position}}" class="input position" placeholder="Web Dev Full Stack" required />
+                        <input type="text" value="{{.Entreprise}}" class="input entreprise" placeholder="Netflix" required />
+                        <div class="dates">
+                            <div class="picker start_date">
+                                <div class="picker-display" onclick="toggleModal(this)">{{.StartDate}}</div>
+                                <div class="modal" style="display: none;">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="toggleModal(this)">&times;</span>
+                                        <div class="picker-header">
+                                            <span class="picker-title">Select Month</span>
+                                        </div>
+                                        <div class="picker-grid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="picker end_date">
+                                <div class="picker-display" onclick="toggleModal(this)">{{.EndDate}}</div>
+                                <div class="modal" style="display: none;">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="toggleModal()">&times;</span>
+                                        <div class="picker-header">
+                                            <span class="picker-title">Select Month</span>
+                                        </div>
+                                        <div class="picker-grid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="task">
+                            <div class="header">
+                                <h2 >Description du poste</h2>
+                                <button type="button" class="newBtn" onclick="onAddDescription(this)">+</button>
+                            </div>
+                            {{range .Description}}
+                                <div class="description">
+                                    <button type="button" class="closeBtn" onclick="onDeleteCard(this)">X</button>
+                                    <div contenteditable="true" class="field" required placeholder="Backend testing">{{.}}</div>
+                                </div>
+                            {{end}}
+                        </div>
+                        <button type="button" class="deleteBtn" onclick="onDeleteCard(this)">Supprimer</button>
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+            <div id="diploma">
+                <div class="header">
+                    <h2 class="title">Diplomes</h2>
+                    <button type="button" class="newBtn" onclick="onNewSchool(this)">Nouveau</button>
+                </div>
+                {{range .Curriculum.School}}
+                    <div class="card" id="school"  ondrop="onDrop(event)" ondragover="onDragOver(event)" draggable="true" ondragstart="onDragStart(event)">
+                        <div>
+                        <input type="text" value="{{.Name}}" class="input name" placeholder="Baccalauréat" required /> 
+                        <input type="text" value="{{.Establishment}}" class="input establishment" placeholder="Lycée Jean Villar" required /> 
+                        <div class="dates">
+                            <div class="picker start_date">
+                                <div class="picker-display" onclick="toggleModal(this)">{{.StartDate}}</div>
+                                <div class="modal" style="display: none;">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="toggleModal(this)">&times;</span>
+                                        <div class="picker-header">
+                                            <span class="picker-title">Select Month</span>
+                                        </div>
+                                        <div class="picker-grid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="picker end_date">
+                                <div class="picker-display" onclick="toggleModal(this)">{{.EndDate}}</div>
+                                <div class="modal" style="display: none;">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="toggleModal()">&times;</span>
+                                        <div class="picker-header">
+                                            <span class="picker-title">Select Month</span>
+                                        </div>
+                                        <div class="picker-grid"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="deleteBtn" onclick="onDeleteCard(this)">Supprimer</button>
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+            <div id="skill">
+                <h2 class="title">Compétences</h2>
+                {{range .Curriculum.Skill}}
+                    <div class="field">
+                        <input type="text" value="{{.}}" placeholder="Autonomie" class="input skill" autocomplete="off" />
+                        <button type="button" class="closeBtn" onclick="onRemoveLangue(this)">X</button>
+                    </div>
+                {{end}}
+                <button type="button" id="newBtn" onclick="onNewSkill(this, 'skill')">Nouvelle compétence</button>
+            </div>
+            <div id="interest">
+                <h2 class="title">Centres d'intérêt</h2>
+                {{range .Curriculum.Interest}}
+                    <div class="field">
+                        <input type="text" value="{{.}}" placeholder="Football" class="input interest" autocomplete="off" />
+                        <button type="button" class="closeBtn" onclick="onRemoveLangue(this)">X</button>
+                    </div>
+                {{end}}
+                <button type="button" id="newBtn" onclick="onNewSkill(this, 'interest')">Nouveau Intérêt</button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        const activity = `
+        <div class="profile_feed">
+            <div class="profile_feed_activity">
+                <h1 class="profile_header">Activité</h1>
+                <div class="profile_feed_activity_msg">
+                    <p class="profile_feed_activity_msg_date">Il y a 5 jours</p>
+                    <p class="profile_feed_activity_msg_text">Vous avez change votre curriculum</p>
+                </div>
+                <div class="profile_feed_activity_msg">
+                    <p class="profile_feed_activity_msg_date">Il y a 10 jours</p>
+                    <p class="profile_feed_activity_msg_text">Le recruteur Total energie a vu votre postulation</p>
+                </div>
+            </div>
+        </div>
+        `
+    </script>
+{{end}}
+%end

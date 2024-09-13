@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/static/Notification.js" type="module"></script>
+    <script src="/static/htmx.js" defer></script>
+    <link rel="stylesheet" href="/static/globals.css" />
+    {{template "Head" .}}
+    <style id="style">
+        {{template "Style"}}
+    </style>
+</head>
+<body>
+    <notification-ele type="error" msg="Hello World" id="notif" hx-swap-oob="true"></notification-ele>
+    <nav>
+        <div class="nav_blur"></div>
+        <div class="nav_content">
+            <a href="/" class="nav_home">Home</a>
+            <button type="button" class="nav_userBtn" popovertarget="nav_userBtn_menu">
+                <!-- <img src="/static/eye.svg" class="nav_userBtn_icon"  /> -->
+                <p>MD</p>
+            </button>
+            <div id="nav_userBtn_menu" popover>
+                <button type="button" class="nav_userBtn_menu_item" hx-delete="/connexion" hx-swap="none">
+                    <img src="/static/signout.svg" style="height:1.5rem;width: 1.5rem;" />
+                    Se Déconnecter
+                </button>
+            </div>
+        </div>
+    </nav>
+    {{template "Body" .}}
+</body>
+</html>

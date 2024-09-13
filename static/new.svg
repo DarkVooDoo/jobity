@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="128"
+   height="46.046291"
+   viewBox="0 0 33.866667 12.183082"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="new.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-46.189577,-123.0756)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.5833px;font-family:'MV Boli';-inkscape-font-specification:'MV Boli';letter-spacing:2.38125px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.13771;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="47.639103"
+       y="133.04803"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.5833px;font-family:'MV Boli';-inkscape-font-specification:'MV Boli';letter-spacing:2.38125px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1.13771;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         x="47.639103"
+         y="133.04803">NEW</tspan></text>
+  </g>
+</svg>
