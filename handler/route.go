@@ -183,8 +183,8 @@ func (r *Route) Get(handlerFunc func()) {
 
 func (r *Route) Render(payload interface{}, files ...string){
     temp, err := template.ParseFiles(files...)
-    style, _ := compressCSS(files...)
-    temp.New("Style").Parse(style)
+    //style, _ := compressCSS(files...)
+    //temp.New("Style").Parse(style)
     //temp.New("Body").Parse(body)
     if err != nil{
         log.Println(err)

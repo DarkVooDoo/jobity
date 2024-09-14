@@ -51,38 +51,38 @@
                 }
                 .card-info {
                     flex-grow: 1;
+                    .card-title {
+                        font-size: 1rem;
+                        font-weight: 600;
+                        min-height: 3.9rem;
+                        align-content: center;
+                        
+                    }
+                    .card-company-info {
+                        .company-name, .card-location, .card-salary {
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            color: #666;
+                            margin-bottom: .2rem;
+                            .salary, .location, .name{
+                                font-size: .85rem;
+                            }
+                        }
+                        .card-salary{
+                            height: 2.4rem;
+                            text-wrap: balance;
+                        }
+                    }
+                    .card-meta {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        margin-top: 8px;
+                    }
                 }
             }
         }
-    }
-    .card-title {
-        font-size: 1rem;
-        font-weight: 600;
-        min-height: 3.9rem;
-        align-content: center;
-        
-    }
-    .card-company-info {
-        .company-name, .card-location, .card-salary {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            margin-bottom: .2rem;
-            .salary, .location, .name{
-                font-size: .85rem;
-            }
-        }
-        .card-salary{
-            height: 2.4rem;
-            text-wrap: balance;
-        }
-    }
-    .card-meta {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 8px;
     }
     .badge {
         background-color: #e2e8f0;

@@ -2,6 +2,7 @@ package main
 
 import (
 	"job/handler"
+	"job/store"
 	"log"
 	"net/http"
 )
@@ -42,8 +43,8 @@ func Maindomain(){
         mux.HandleFunc("/connexion", handler.SignHandler)
         mux.HandleFunc("/job/{id}", handler.JobHandler)
         mux.HandleFunc("/mes-postulations", handler.ApplicationHandler)
-        mux.HandleFunc("/ile", handler.ProfileHandler)
-        mux.HandleFunc("/ile/cv", handler.CurriculumHandler)
+        mux.HandleFunc("/profile", handler.ProfileHandler)
+        mux.HandleFunc("/profile/cv", handler.CurriculumHandler)
         mux.HandleFunc("/entreprise/{id}", handler.CompanyHandler)
         mux.HandleFunc("/search", handler.SearcHandler)
         mux.HandleFunc("/", handler.HomepageRoute)
@@ -54,6 +55,9 @@ func Maindomain(){
 }
 
 func main() {
+    if err := store.InitDB(); err != nil{
+        log.Fatalf("error db init\n %v", err)
+    }
 	finish := make(chan bool)
     go Maindomain()
     go Subdomain()

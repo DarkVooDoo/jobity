@@ -57,7 +57,7 @@ nav{
     content: "";
     position: absolute;
     inset: 0;
-    background-color: rgba(119, 182, 234, .6);
+    background-color: rgba(119, 182, 234, .8);
     backdrop-filter: blur(4px);
 }
 
@@ -84,7 +84,7 @@ nav{
     background-color: transparent;
     backdrop-filter: blur(4px);
     border-radius: 10px;
-    background-color: rgba(119, 182, 234, .6);
+    background-color: rgba(119, 182, 234, .8);
     transition: opacity 100ms linear, display 100ms linear allow-discrete;
     opacity: 0;
     &:popover-open{
@@ -382,6 +382,7 @@ a{
 }
 
 button{
+    color: black;
     border: none;
     background-color: transparent;
 }
