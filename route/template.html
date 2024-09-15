@@ -86,7 +86,7 @@
                 }
             }, 500)
         }
-        window.addEventListener("click", (ev)=>{
+        window.addEventListener("touchstart", (ev)=>{
             const popovers = document.querySelectorAll("[popover]")
             const modal = ev.target.closest("[popover]")
             if (!modal){
