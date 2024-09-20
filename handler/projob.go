@@ -9,7 +9,9 @@ import (
 type ProjobPage struct{
     RequireData
     Job store.Job
-    Application []store.Curriculum
+    Candidate []store.Curriculum
+    Possible []store.Curriculum
+    Interview []store.Curriculum
 }
 
 var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
@@ -27,11 +29,13 @@ var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
             log.Println(err)
             return
         }
-        curriculum := store.GetJobCurriculum(job.Id)
+        candidates, possible, interview := store.GetJobCurriculum(job.Id)
         page := ProjobPage{
             RequireData{Search: SearchQuery{Query: ""}},
             job,
-            curriculum,
+            candidates,
+            possible,
+            interview,
         }
         route.Render(page, "route/protemplate.html", "route/projob.html")
     })

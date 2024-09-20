@@ -5,6 +5,10 @@
 {{end}}
 
 {{define "Style"}}
+    main{
+        container-type: inline-size;
+        container-name: main_section;
+    }
     .newjob > * , .title, .newjob_section > *, #template_save > *{
         margin-bottom: .5rem;
     }
@@ -18,10 +22,19 @@
         align-items: center;
         margin-bottom: .5rem;
     }
+    .newjob, #application{
+        transition: opacity 500ms , transform 500ms linear(.2, 0.5, 1, .7, 1, .85, 1);
+        opacity: 1;
+        transform: translateY(0px);
+        @starting-style{
+            opacity: 0;
+            transform: translateY(40px);
+        }
+    }
     .newjob{
         container-type: inline-size;
         container-name: advantagesAncSKill;
-
+        padding-top: 1rem;
         .bottomContent{
             display: flex;
             gap: 1rem;
@@ -153,24 +166,35 @@
         border: 2px solid var(--primary_color);
     }
 
-    .job_tab{
-        display: flex;
+    .header{
+        display: grid;
+        grid-template-columns: 1fr .5fr;
         gap: .5rem;
-        justify-content: center;
-        margin-bottom: .5rem;
-    }
-    .job_tab_btn{
-        height: 2rem;
-        padding: 0 .5rem;
-        border-radius: 5px;
-        background-color: rgb(220,220,220);
-    }
-    .selected_tab{
-        background: rgb(240,240,240);
-        background: radial-gradient(circle, rgba(240,240,240,1) 25%, rgba(112,112,112,1) 100%);
-        background-position: 50% -28%;
-        background-size: 100% 250%;
-        animation: tabAnimation .2s linear forwards; 
+        align-items: center;
+        padding-block: 1rem;
+        border-bottom: 1px solid lightgray;
+        .preview{
+            .title{
+                font-size: 1.1rem;
+            }  
+        }
+        .tab{
+            display: flex;
+            gap: .5rem;
+            .button{
+                height: 3rem;
+                padding: 0 .5rem;
+                border-radius: 5px;
+                background-color: rgb(220,220,220);
+            }
+            .selected{
+                background: rgb(240,240,240);
+                background: radial-gradient(circle, rgba(240,240,240,1) 25%, rgba(112,112,112,1) 100%);
+                background-position: 50% -28%;
+                background-size: 100% 250%;
+                animation: tabAnimation .2s linear forwards; 
+            }
+        }
     }
     @keyframes tabAnimation{
         100%{
@@ -219,66 +243,119 @@
             }
         }
     }
-    
-    .application_card{
-        padding: 10px;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-        -webkit-box-shadow: 0px 0px 15px 2px darkgray; 
-        box-shadow: 0px 0px 15px 2px darkgray;
-        & .person > *{
-            margin-bottom: .2rem;
+
+    #application{
+        margin-top: 1rem;
+        @container main_section (width >= 950px){
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            .cvBtn{
+                display: none;
+            }
+            .ls-cvBtn{
+                display: block !important;
+                padding: .5rem !important;
+            }
+
+            .metadata:has(+ .ls-cvBtn){
+                margin-bottom: .3rem;
+            }
         }
-        & .person{
-            & .visual{
-                display: flex;
-                gap: .5rem;
-                & .photo{
-                    height: 4rem;
-                    width: 4rem;
-                    border: 1px solid darkgray;
-                    border-radius: 50%;
+        .section{
+            .inner{
+                border-radius: 5px;
+                margin-bottom: 1rem;
+                .card{
+                    margin-block: 1rem;
+                    border: 1px solid lightgray;
+                    padding-inline: .5rem;
+                    transition: opacity 1000ms linear;
+                    background-color: white;
+                    .photo{
+                        height: 4rem;
+                        aspect-ratio: 1/1;
+                        border-radius: 50%;
+                    }
+                    .content{
+                        display: flex;
+                        align-items: center;
+                        margin-block: 1rem;
+                        gap: .5rem;
+                        .info{
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            width: 100%;
+                            .name{
+                                font-size: 1rem;
+                            }
+                            .addr, .date{
+                                color: #4b4b4b;
+                            }
+                            .cvBtn, .ls-cvBtn{
+                                border-radius: 5px;
+                                padding: 1rem;
+                                background-color: var(--primary_color);
+                                color: white;
+                                font-weight: bold;
+                            }
+                            .ls-cvBtn{
+                                display: none;
+                            }
+                        }
+                    }
+                    .footer{
+                        border-top: 1px solid lightgray;
+                        padding-block: 1rem;
+                        display: flex;
+                        justify-content: space-between;
+                        .actionBtn{
+                            height: 2rem;
+                            padding-inline: 1rem;
+                            color: white;
+                            font-weight: bold;
+                            border-radius: 5px;
+                        }
+                    }
                 }
-                & .name{
-                    font-size: 1.1rem;
+            }
+            &[open]{
+                .application_header::after{
+                    bottom: -7px;
+                }
+            }
+            .application_header{
+                position: relative;
+                list-style: none;
+                text-align: center;
+                font-size: 1.2rem;
+                font-weight: bold;
+                border: 1px solid lightgray;
+                margin-bottom: 1rem;
+                border-radius: 5px;
+                padding-block: 1rem;
+                background-color: white;
+                &::after{
+                    content: "";
+                    position: absolute;
+                    height: 0px;
+                    width: 0px;
+                    bottom: 7px;
+                    left: calc(50% - 2.5px);
+                    border: 7px solid transparent ;
+                    border-bottom: 7px solid darkgray;
+                    border-right: 7px solid darkgray;
+                    z-index: -1;
+                    transition: bottom 150ms linear;
+                    rotate: 45deg;
+                    border-bottom-right-radius: 3px;
+                    
                 }
             }
         }
     }
-    .application_card_view{
-        height: 2rem;
-        width: 2rem;
-        border-radius: 5px;
-        border: 1px solid lightgray;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .application_card_control_btn{
-        height: 1.5rem;
-        padding: 0 .5rem;
-        font-weight: bold;
-        border-radius: 5px;
-    }
-    .template_save_input{
-        height: 2rem;
-        display: block;
-        padding: 0 5px;
-        border-radius: 5px;
-        border: 1px solid black;
-    }
-    .template_save_btn{
-        height: 2rem;
-        width: 100%;
-        border-radius: 5px;
-        background-color: var(--primary_color);
-    }
-
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+    
 
 .btn {
     padding: 8px 16px;
@@ -298,44 +375,19 @@
     background-color: #f0f0f0;
 }
 
-.btn-delete {
-    background-color: #ff4d4f;
-    border: none;
-    color: white;
-}
-
-.btn-delete:hover {
-    background-color: #ff7875;
-}
-
-#status-select {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 0.875rem;
-    background-color: white;
-}
-
-@media only screen and (min-width: 768px) {
-    main{
-        width: 750px;
-    }
-}
-
-
-@media only screen and (min-width: 992px) {
-    main{
-        width: 1000px
-    }
-}
-
 {{end}}
 
 {{define "Body"}}
     <main>
-        <div class="job_tab">
-            <button type="button" class="job_tab_btn selected_tab" onclick="onChangeScene(this, 'offert')">Annonce</button>
-            <button type="button" class="job_tab_btn" onclick="onChangeScene(this, 'application')">Candidates</button>
+        <div class="header">
+            <div class="preview">
+                <h1 class="title">{{.Job.Title}}</h1>
+                <p>{{slice .Job.Postal 0 2}} - {{.Job.City}}</p>
+            </div>
+            <div class="tab">
+                <button type="button" class="button selected" onclick="onChangeScene(this, 'offert')">Annonce</button>
+                <button type="button" class="button" onclick="onChangeScene(this, 'application')">Candidates</button>
+            </div>
         </div>
         <form class="newjob" id="offert" hx-patch="/job/{{.Job.Id}}" hx-ext="json-enc" hx-vals='js:{...getJobValues()}'  hx-swap="none">
             <div class="newjob_field">
@@ -365,7 +417,7 @@
             </div>
             <h2 class="subheader">Contrat</h2>
             <div class="newjob_flex">
-                <dropdown-ele id="contract" value="{{.Job.Contract}}"  array='[{"id": "32", "value": "CDD a object defini"}]'></dropdown-ele>
+                <dropdown-ele id="contract" value="{{.Job.Contract}}"  array="{{.Job.ContractArray}}"></dropdown-ele>
                 <div class="newjob_field">
                     <input type="number" value="{{.Job.WeeklyWorkTime}}" placeholder="35" id="weeklyWorkTime" name="weeklyWorkTime" class="newjob_field_input newjob_field_input_withLabel" />
                     <label for="weeklyWorkTime" class="newjob_field_label">Heures</label>
@@ -465,7 +517,7 @@
             </div>
             <div class="action">
                 <button type="button" popovertarget="delete_modal" class="newjob_submitBtn deleteModalBtn">Supprimer</button>
-                <button type="button" popovertarget="template_save" class="newjob_submitBtn newjob_modelBtn">Creer un modele</button>
+                <button type="button" popovertarget="template_save" class="newjob_submitBtn newjob_modelBtn">Modele</button>
                 <button type="submit" class="newjob_submitBtn" >Modifier</button>
             </div>
         </form>
@@ -481,23 +533,78 @@
             <button type="submit" class="template_save_btn" onclick="onSaveTemplate(this)">Enregistrer</button>
         </form>
         <div id="application" class="hidden">
-            {{range .Application}}
-                <div class="application_card">
-                    <div class="person">
-                        <div class="visual">
-                            <img class="photo" src="/static/profile-picture.jpeg"></img>
-                            <h1 class="name">{{.Name}}</h1>
+            <details class="section" name="candidate">
+                <summary class="application_header">Candidates</summary>
+                <div class="inner">
+                    {{range .Candidate}}
+                    <div class="card">
+                        <div class="content">
+                            <img src="/static/profile-picture.jpeg" class="photo" />
+                            <div class="info">
+                                <div>
+                                    <h1 class="name">{{.Name}}</h1>
+                                    <p class="metadata">{{.Adresse}}</p>
+                                    <p class="metadata">{{.Gender}}, {{.Age}}</p>
+                                    <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="ls-cvBtn">Voir CV</a>
+                                </div>
+                                <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="cvBtn">Voir CV</a>
+                            </div>
                         </div>
-                        <p>{{.Gender}}, {{.Age}}</p>
-                        <p>{{.Adresse}}</p>
-                        <p>Tel: 0622442593</p>
+                        <div class="footer">
+                            <button type="button" class="actionBtn" style="background-color: var(--delete_color);" hx-delete="/job/{{.JobId}}/cv/{{.UserId}}" hx-swap="delete" hx-target="closest .card">Reject</button>
+                            <button type="button" class="actionBtn" style="background-color: var(--success_border_color);">Possible</button>
+                        </div>
                     </div>
-                    <div class="card-footer">
-                        <dropdown-ele height="2rem" id="status" array='[{"id": "", "value": "Pending"}, {"id": "", "value":"Rejected"}, {"id": "", "value": "Reviewed"}]'></dropdown-ele>
-                        <a id="view-cv-btn" href="/job/{{.JobId}}/cv/{{.UserId}}" class="btn btn-outline">Voir CV</a>
-                    </div>
+                    {{end}}
                 </div>
-            {{end}}
+            </details>
+            <details class="section" name="candidate">
+                <summary class="application_header">Possible</summary>
+                <div class="inner">
+                    {{range .Possible}}
+                    <div class="card">
+                        <div class="content">
+                            <img src="/static/profile-picture.jpeg" class="photo" />
+                            <div class="info">
+                                <div>
+                                    <h1 class="name">{{.Name}}</h1>
+                                    <p class="metadata">{{.Adresse}}</p>
+                                    <p class="metadata">{{.Gender}}, {{.Age}}</p>
+                                    <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="ls-cvBtn">Voir CV</a>
+                                </div>
+                                <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="cvBtn">Voir CV</a>
+                            </div>
+                        </div>
+                        <div class="footer">
+                            <button type="button" class="actionBtn" style="background-color: var(--delete_color);" hx-delete="/job/{{.JobId}}/cv/{{.UserId}}" hx-swap="delete" hx-target="closest .card">Reject</button>
+                            <button type="button" class="actionBtn" style="background-color: var(--success_border_color);">Planifier interview</button>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            </details>
+            <details class="section" name="candidate">
+                <summary class="application_header">Interview</summary>
+                <div class="inner">
+                    {{range .Interview}}
+                    <div class="card">
+                        <div class="content">
+                            <img src="/static/profile-picture.jpeg" class="photo" />
+                            <div class="info">
+                                <div>
+                                    <h1 class="name">{{.Name}}</h1>
+                                    <p class="metadata">{{.Adresse}}</p>
+                                    <p class="metadata">{{.Gender}}, {{.Age}}</p>
+                                </div>
+                                <a href="/job/{{.JobId}}/cv/{{.UserId}}" class="cvBtn">Voir CV</a>
+                            </div>
+                        </div>
+                        <div class="footer">
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            </details>
         </div>
     </main>
     <script>
@@ -514,7 +621,7 @@
         const workTime = document.getElementById("weeklyWorkTime")
         const offert = document.getElementById("offert")
         const applications = document.getElementById("application")
-        const tabs = document.getElementsByClassName("job_tab_btn")
+        const tabs = document.getElementsByClassName("button")
         const salary = document.getElementsByClassName('salary')
 
         const onDeleteOffert = (ele)=>{
@@ -523,9 +630,9 @@
 
         const onChangeScene = (ele, scene)=>{
             for(const tab of tabs){
-                tab.classList.remove("selected_tab")
+                tab.classList.remove("selected")
             }
-            ele.classList.add("selected_tab")
+            ele.classList.add("selected")
             if(scene === "offert"){
                 offert.classList.remove("hidden")
                 applications.classList.add("hidden")

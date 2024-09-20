@@ -6,6 +6,45 @@
     .offert > *, .picture_form > *, .form > *{
         margin-bottom: .5rem;   
     }
+    .actionPath{
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        .actionBtn{
+            width: 100%;
+            max-width: 150px;
+            aspect-ratio: 1/1;
+            border: 1px solid lightgray;
+            border-radius: 10px;
+        }
+    }
+    .offert{
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        border-radius: 10px;
+        background-color: #f0f0f0;
+        width: 90%;
+        max-width: 650px;
+        padding: 10px;
+        border: none;
+        transition: opacity 300ms linear, transform 300ms ease, display 300ms linear allow-discrete, overlay 300ms linear allow-discrete;
+        transform: translateY(100px);
+        opacity: 0;
+        &:popover-open{
+            transition: opacity 300ms linear, transform 300ms ease;
+            transform: translateY(0px);
+            opacity: 1;
+            @starting-style{
+                opacity: 0;
+                transform: translateY(100px);
+            }
+        }
+        .offert_container{
+            height: 310px;
+            overflow-y: scroll;
+        }
+    }
     .picture_form{
         display: flex;
         flex-direction: column;
@@ -22,6 +61,7 @@
     }
     .picture_submitBtn{
         height: 2rem;
+        padding-inline: 1rem;
         border-radius: 5px;
         background-color: var(--primary_color);
     }
@@ -47,7 +87,6 @@
         border: 1px solid lightgray;
         padding: 10px;
         background-color: white;
-        box-shadow: var(--card_shadow);
         border-radius: 10px;
         margin-bottom: 1rem;
         & .data > *{
@@ -68,25 +107,21 @@
         & .reqAmount{
             height: 2rem;
             width: 2rem;
-            background-color: #C7002E;
+            background-color: #204767;
             display: flex;
             color: white;
             font-weight: bold;
             align-items: center;
             border-radius: 50%;
             justify-content: center;
+            font-size: .6rem;
         }
     }
     .offert_newBtn{
         font-weight: bold;
-        color: var(--primary_color);
-        font-size: 1.2rem;
-        height: 1.5rem;
-        width: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
+        padding: .5rem;
+        border-radius: 5px;
+        background-color: var(--primary_color);
     }
 
     .deleteBtn{
@@ -120,30 +155,41 @@
                 <div contenteditable="true" class="description_field">{{.Profile.Description}}</div>
             </div>
         </form>
-        <div class="offert">
+        <div class="actionPath">
+            <button type="button" class="actionBtn" popovertarget="offert">
+                <h3>Mes annonces</h3>
+            </button>
+
+            <button type="button" class="actionBtn">
+                <h3>Mes employées</h3>
+            </button>
+        </div>
+        <div class="offert" popover id="offert">
             <div style="display: flex;justify-content: space-between;align-items: center;">
                 <h2>Mes Annonces</h2>
-                <a href="/job/creer" class="offert_newBtn"><img src="/static/plus.svg" style="width: 80%;height: 80%;" /></a>
+                <a href="/job/creer" class="offert_newBtn">Nouveau</a>
             </div>
-            {{range .Job}}
-                <a class="offert_card" href="/job/{{.Id}}">
-                    <div class="data">
-                        <h3>{{.Title}}</h3>
-                        <div class="metadata">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                <circle cx="12" cy="10" r="3"></circle>
-                            </svg>
-                            <p>{{.City}}, {{.Postal}}</p>
+            <div class="offert_container">
+                {{range .Job}}
+                    <a class="offert_card" href="/job/{{.Id}}">
+                        <div class="data">
+                            <h3>{{.Title}}</h3>
+                            <div class="metadata">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <p>{{.City}}, {{.Postal}}</p>
+                            </div>
+                            <div class="metadata">
+                                <img src="/static/contract.svg" class="icon"></img>
+                                <p>{{.Contract}}</p>
+                            </div>
                         </div>
-                        <div class="metadata">
-                            <img src="/static/contract.svg" class="icon"></img>
-                            <p>{{.Contract}}</p>
-                        </div>
-                    </div>
-                    <p class="reqAmount">{{.ApplicationCount}}</p>
-                </a>
-            {{end}}
+                        <p class="reqAmount">{{.ApplicationCount}}</p>
+                    </a>
+                {{end}}
+            </div>
         </div>
         <button class="deleteBtn" type="button">Supprimer votre compte</button>
     </main>

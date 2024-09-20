@@ -88,11 +88,7 @@ func (c *Curriculum) Save(userId string)error{
     defer conn.Close()
     work, _ := json.Marshal(c.Work)
     school, _ := json.Marshal(c.School)
-    interest, _ := json.Marshal(c.Interest)
-    skill, _ := json.Marshal(c.Skill)
-    skillPostgres := fmt.Sprintf("{%v}", string(skill)[1:len(skill)-1])
-    interestPostgres := fmt.Sprintf("{%v}", string(interest)[1:len(interest)-1])
-    _, err = conn.ExecContext(context.Background(), `UPDATE Users SET interest=$1, skill=$2, school=$3, work=$4 WHERE id=$5`, interestPostgres, skillPostgres, string(school), string(work), userId)
+    _, err = conn.ExecContext(context.Background(), `UPDATE Users SET interest=$1, skill=$2, school=$3, work=$4 WHERE id=$5`, pq.Array(c.Interest), pq.Array(c.Skill), string(school), string(work), userId)
     if err != nil{
         log.Println(err)    
         return errors.New("error in the query")
@@ -240,33 +236,38 @@ func printCurriculumAbout(pdf *gofpdf.Fpdf, width float64, header string, data [
     pdf.Ln(10)
 }
 
-func GetJobCurriculum(jobId string)[]Curriculum{
-    var id, name, userId string
+func GetJobCurriculum(jobId string)(candidates []Curriculum, possible []Curriculum, interview []Curriculum){
+    var id, name, userId, status string
     var adresse, workString, schoolString, gender sql.NullString 
     var age sql.NullInt16
     var skill, interest []string
-    var curriculums []Curriculum
     var school []School
     var work []Work
     conn, err := GetDBConn()
     if err != nil{
         log.Println(err)
-        return curriculums
+        return 
     }
     defer conn.Close()
-    curriculumRows, err := conn.QueryContext(context.Background(), `SELECT c.id, u.id, CONCAT(u.firstname, ' ', u.lastname), CONCAT(u.City, ', ', u.Postal), DATE_PART('year', AGE(NOW(), u.birthdate)), u.gender, u.skill, u.interest, u.school,u.work FROM JobApplication AS c LEFT JOIN Users AS u ON u.id=c.user_id WHERE c.job_id=$1`, jobId)
+    curriculumRows, err := conn.QueryContext(context.Background(), `SELECT c.id, u.id, CONCAT(u.firstname, ' ', u.lastname), CONCAT(u.City, ', ', u.Postal), DATE_PART('year', AGE(NOW(), u.birthdate)), u.gender, u.skill, u.interest, u.school,u.work, c.status FROM JobApplication AS c LEFT JOIN Users AS u ON u.id=c.user_id WHERE c.job_id=$1 AND c.status < 'Reject'`, jobId)
     if err != nil{
         log.Println(err)
-        return curriculums
+        return 
     }
     for curriculumRows.Next(){
-        curriculumRows.Scan(&id, &userId, &name, &adresse, &age, &gender, pq.Array(&skill), pq.Array(&interest), &schoolString, &workString)
+        curriculumRows.Scan(&id, &userId, &name, &adresse, &age, &gender, pq.Array(&skill), pq.Array(&interest), &schoolString, &workString, &status)
         json.Unmarshal([]byte(string(schoolString.String)), &school)
         json.Unmarshal([]byte(string(workString.String)), &work)
         userId = EncryptCurriculumId(userId)
-        curriculums = append(curriculums, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
+        if status == "Possible"{
+            possible = append(possible, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
+        }else if status == "Interview"{
+            interview = append(interview, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
+        }else{
+            candidates = append(candidates, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
+        }
     }
-    return curriculums
+    return 
 }
 
 func EncryptCurriculumId(id string)string{

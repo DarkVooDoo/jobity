@@ -1,14 +1,14 @@
 customElements.define("job-card", class JobCard extends HTMLElement{
     constructor(){
         super()
+        this.picture = !this.getAttribute("picture") ? "hidden" : ""
         this.innerHTML = `
             <div class="card">
                 <div class="card-content">
                     <div class="card-header">
-                        <img src="/static/euro.svg" alt="DesignWave logo" class="company-photo w-photo">
                         <div class="card-info">
-                            <div style="display:flex;gap:1rem;align-items:center"> 
-                                <img src="/static/euro.svg" alt="DesignWave logo" class="company-photo m-photo">
+                            <div class="card-top" style=""> 
+                                <img src="/static/netflix.webp" alt="DesignWave logo" class="company-photo m-photo ${this.picture}"/>
                                 <h3 class="card-title">${this.getAttribute("title")}</h3>
                             </div>
                             <div class="card-company-info">
@@ -50,7 +50,7 @@ customElements.define("job-card", class JobCard extends HTMLElement{
                         </svg>
                         <span>${this.getAttribute("date")}</span>
                     </div>
-                    <a href="/job/${this.getAttribute("id")}?tp=${this.getAttribute("isThirdParty") === "true" ? "true" : "false"}" class="button">Postuler
+                    <a href="/job/${this.getAttribute("id")}?tp=${this.getAttribute("isThirdParty") === "true" ? "true" : "false"}" class="button">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>

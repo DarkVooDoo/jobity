@@ -1,10 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 :root{
-    --primary_color: #77B6EA;    
+    --primary_color: oklch(69.58% 0.1213 246.23);    
     --warning_color: #f9eed7;
     --warning_border_color: #fec022;
     --success_color: #AFFFC2;
-    --success_border_color: #4fd56e;
+    --success_border_color: #4ad169;
     --error_color: #fde2d9;
     --error_border_color: #FF726E;
     --input_color: #dddddd;
@@ -17,7 +16,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", serif;
+    font-family: system-ui, serif;
     font-size: .9rem;
 }
 
@@ -40,6 +39,7 @@ nav{
     top: 0;
     width: 100%;
     z-index: 10;
+    border-bottom: 1px solid lightgray;
 }
 
 .nav_content{
@@ -57,8 +57,8 @@ nav{
     content: "";
     position: absolute;
     inset: 0;
-    background-color: rgba(119, 182, 234, .8);
-    backdrop-filter: blur(4px);
+    background-color: rgba(255, 255, 255, .8);
+    backdrop-filter: blur(10px);
 }
 
 .nav_search{
@@ -70,7 +70,7 @@ nav{
 
 :popover-open{
     margin: auto;
-    border-style: none;
+    border: none;
 }
 
 #search-pop{
@@ -80,11 +80,10 @@ nav{
     top: 2.8rem;
     left: calc((100% - 97%) / 2);
     padding: .5rem;
-    border: none;
-    background-color: transparent;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(10px);
     border-radius: 10px;
-    background-color: rgba(119, 182, 234, .8);
+    background-color: rgba(255,255,255, .8);
+    border: 1px solid lightgray;
     transition: opacity 100ms linear, display 100ms linear allow-discrete;
     opacity: 0;
     &:popover-open{
@@ -93,6 +92,9 @@ nav{
         @starting-style{
             opacity: 0;
         }
+    }
+    &::backdrop{
+        background-color: transparent;
     }
     .fields{
         display: grid;
@@ -105,6 +107,7 @@ nav{
             border: 1px solid lightgray;
             padding: 0 .3rem;
             border-radius: 5px;
+            background-color: rgb(220, 220, 220);
         }
     }
     #suggest{
@@ -162,12 +165,7 @@ nav{
     font-weight: bold;
     border: 1px solid white;
     text-decoration: none;
-    background: hsla(207, 73%, 69%, 1);
-    background: linear-gradient(135deg, hsla(207, 73%, 69%, 1) 0%, hsla(207, 20%, 82%, 1) 50%, hsla(207, 73%, 69%, 1) 100%);
-    background: -moz-linear-gradient(135deg, hsla(207, 73%, 69%, 1) 0%, hsla(207, 20%, 82%, 1) 50%, hsla(207, 73%, 69%, 1) 100%);
-    background: -webkit-linear-gradient(135deg, hsla(207, 73%, 69%, 1) 0%, hsla(207, 20%, 82%, 1) 50%, hsla(207, 73%, 69%, 1) 100%);
-    background-size:150% 150%;
-    animation: signBtnAnimation 2s linear infinite alternate;
+    border: 1px solid black;
 }
 
 .nav_userBtn{
@@ -204,6 +202,9 @@ nav{
         }
 
     }
+    &::backdrop{
+        background-color: transparent;
+    }
 }
 
 .nav_userBtn_menu_item{
@@ -219,15 +220,6 @@ nav{
 .nav_userBtn_icon{
     width: 100%;
     height: 100%;
-}
-
-@keyframes signBtnAnimation{
-    50%{
-        background-position: 50% 0%;
-    }
-    100%{
-        background-position: 100% 0%;
-    }
 }
 
 #alert{
@@ -365,7 +357,7 @@ nav{
 
 
 .hidden{
-    display: none;
+    display: none !important;
 }
 
 input{
@@ -384,7 +376,12 @@ a{
 button{
     color: black;
     border: none;
+    cursor: pointer;
     background-color: transparent;
+}
+
+*::backdrop{
+    background-color: rgba(0, 0, 0, .6);
 }
 
 @media only screen and (min-width: 768px) {

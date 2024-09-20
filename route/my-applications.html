@@ -1,30 +1,131 @@
 {{define "Head"}}
     <title>Mes postulation</title>
+    <script src="/static/JobCard.js" type="module"></script>
 {{end}}
-
-
+%end
 {{define "Style"}}
 
+main{
+    container-type: inline-size;
+    .header{
+        margin-bottom: .5lh;
+        font-size: 1.2rem;
+    }
+    .container{
+        @container (width <= 677px){
+            #favorite-cards-container{
+                white-space: nowrap;
+                margin-bottom: 2lh;
+                overflow-x: scroll;
+                scroll-snap-type: x mandatory;
+                padding-block: .3rem;
+                .favorite-card{
+                    display: inline-flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    height: 8lh;
+                    padding: 1rem;
+                    aspect-ratio: 3/1;
+                    margin-right: 1rem;
+                    scroll-snap-align: center;
+                    margin-bottom: 0;
+                    scroll-snap-align: start;
+                    &:last-child{
+                        margin-right: 0;
+                    }
+                }
+                &::-webkit-scrollbar{
+                    height: 5px;
+                }
+                &::-webkit-scrollbar-track{
+                    background: rgb(200,200,200);
+                    border-radius: 25px;
+                }
+                &::-webkit-scrollbar-thumb{
+                    background: #5b5b5b;
+                    border-radius: 25px;
+                }
+            }
+            .card{
+                margin-bottom: 1rem;
+            }
+        }
+        @container (width >= 678px){
+            #favorite-cards-container, .application{
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            #favorite-cards-container{
+                white-space: normal;
+                margin-bottom: .5lh;
+                .favorite-card{
+                    display: block;
+                    height: fit-content;
+                    width: 100%;
+                    padding: 10px;
+                }
+            }
+        }
+        #favorite{
+            width: 100%;
+            #favorite-cards-container{
+                width: 100%;
+                .favorite-card{
+                    border-radius: 10px;
+                    border: 1px solid lightgray;
+                    background-color: white;
+                }
+                .favorite-title{
+                    font-size: 1rem;
+                }
+                .favorite-addr{
+                    color: #5b5b5b;
+                }
+                .favorite-addr, .favorite-title{
+                    margin-bottom: .3lh;
+                }
+                .item{
+                    display: inline-block;
+                    margin-right: .5rem;
+                    border-radius: 25px;
+                    background-color: var(--primary_color);
+                    padding: .3rem .5rem;
+                    font-size: .8rem;
+                }
+                .favorite-noitem{
+                    height: 8lh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.1rem;
+                }
+            }
+        }
+    }
+}
+
 .application{
-    & .card{
+    .card{
         position: relative;
-        top: 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
         gap: .3rem;
-        background-color: rgb(220,220,220);
+        background-color: white;
+        border: 1px solid lightgray;
         padding: 10px;
         border-radius: 10px;
-        margin-bottom: .5rem;
-        height: 80px;
-
-        & .title{
-            font-size: 1.1rem;
-            margin-bottom: .3rem;
+        .title, .application-addr{
+            margin-bottom: .3lh;
         }
-
-        & .cancelBtn{
+        .title{
+            font-size: 1.1rem;
+        }
+        .application-footer{
+            border-top: 1px solid lightgray;
+            padding-top: .3lh;
+            display: flex;
+            justify-content: space-between;
+        }
+        .cancelBtn{
             height: 1.5rem;
             padding: 0 5px;
             border-radius: 5px;
@@ -33,7 +134,7 @@
             font-weight: bold;
         }
         
-        & .status{
+        .status{
             position: relative;
             font-weight: bold;
             display: flex;
@@ -43,7 +144,7 @@
         }
     }
 }
-.waiting::before, .validate::before{
+.waiting::before, .validate::before, .warning::before{
     content: "";
     height: .8rem;
     width: .8rem;
@@ -55,6 +156,9 @@
 }
 .validate::before{
     background-color: #00c749;
+}
+.warning::before{
+    background-color: var(--delete_color);
 }
 
 .fade{
@@ -74,26 +178,51 @@
 }
 
 {{end}}
-
+%end
 {{define "Body"}}
     <main>
-        <h1 style="margin-bottom: .5rem;">Mes Postulations</h1>
-        <div class="application">
-            {{range $i, $v := .Apps}}
-            <div class="card" data-index="{{$i}}">
-                <div>
-                    <h1 class="title">{{$v.Title}}</h1>
-                    <button 
-                        type="button" 
-                        hx-delete="/mes-postulations" 
-                        hx-vals='{"id": "{{$v.Id}}"}'
-                        hx-swap="none"
-                        hx-target="closest .card"
-                        class="cancelBtn">Se retirer</button>
+        <div class="container">
+            <h1 class="header">Mes Favorites</h1>
+            <div id="favorite">
+                <div id="favorite-cards-container">
+                    {{if gt (len .Fav) 0}}
+                        {{range .Fav}}
+                            <a class="favorite-card" href="/job/{{if .IsThirdParty}}{{.ThirdPartyId}}?tp=true{{else}}{{.JobId}}?tp=false{{end}}">
+                                <h1 class="favorite-title">{{.Title}}</h1>
+                                <p class="favorite-addr">{{.Addr}}</p>
+                                <div class="metadata">
+                                    {{range .Metadata}}
+                                        <p class="item">{{.}}</p>
+                                    {{end}}
+                                </div>
+                            </a>
+                        {{end}}
+                    {{else}}
+                        <h1 class="favorite-noitem">Vous n'avez pas de favorite</h1>
+                    {{end}}
                 </div>
-                <p class="status validate" >En Attente</p>
             </div>
-            {{end}}
+            <div>
+                <h1 class="header">Mes Postulations</h1>
+                <div class="application">
+                    {{range $i, $v := .Apps}}
+                    <div class="card" data-index="{{$i}}">
+                        <h1 class="title">{{$v.Title}}</h1>
+                        <p class="application-addr">{{$v.Addr}}</p>
+                        <div class="application-footer">
+                            <button 
+                                type="button" 
+                                hx-delete="/mes-postulations" 
+                                hx-vals='{"id": "{{$v.Id}}"}'
+                                hx-swap="none"
+                                hx-target="closest .card"
+                                class="cancelBtn">Se retirer</button>
+                            <p class='status {{if or (eq $v.Status "Non vue") (eq $v.Status "Vue")}}waiting{{else if eq $v.Status "Reject"}}warning{{else}}validate{{end}}' >{{$v.Status}}</p>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
         </div>
     </main>
     <script>

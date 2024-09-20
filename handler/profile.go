@@ -8,7 +8,7 @@ import (
 
 type ProfilePage struct{
     RequireData
-    User store.User
+    ProfileUser store.User
     Curriculum store.Curriculum
 }
 
@@ -25,7 +25,7 @@ var ProfileHandler = func(res http.ResponseWriter, req *http.Request){
         user.GetProfile()
         curriculum.Get(store.EncryptCurriculumId(route.User.Id))
         data := ProfilePage{
-            RequireData{Search: SearchQuery{Query: ""}},
+            RequireData{Search: SearchQuery{Query: ""}, User: route.User},
             user,
             curriculum,
         }

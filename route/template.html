@@ -24,7 +24,7 @@
                     {{if .User.Id}}
                         <button type="button" class="nav_userBtn" popovertarget="nav_userBtn_menu">
                             <!-- <img src="/static/eye.svg" class="nav_userBtn_icon"  /> -->
-                            <p>MD</p>
+                            <p>{{.User.ShortName}}</p>
                         </button>
                     {{else}}
                         <a href="/connexion" class="nav_sign">Connexion</a>
@@ -83,12 +83,21 @@
                     }
                     suggest.style.display = "block"
                     suggest.innerHTML = innerHtml
+                    if(jsonAddr.features.length > 0){
+                        const firstELement = jsonAddr.features[0]
+                        city.value = firstELement.properties.name
+                        postal.value = firstELement.properties.citycode
+                        lat.value = firstELement.geometry.coordinates[1]
+                        long.value = firstELement.geometry.coordinates[0]
+                    }
                 }
             }, 500)
         }
         window.addEventListener("touchstart", (ev)=>{
             const popovers = document.querySelectorAll("[popover]")
-            const modal = ev.target.closest("[popover]")
+            const modal = ev.target.closest("[popover]")     
+            const targetBtn = ev.target.closest("[popovertarget]")
+            if (targetBtn) return
             if (!modal){
                 for (let i = 0; i < popovers.length; i++){
                     popovers[i].hidePopover()

@@ -1,6 +1,8 @@
 {{define "Head"}}
     <title>Goland + HTMX by momo</title>
+    <link rel="stylesheet" href="/static/job-card.css" />
     <script src="/static/JobCard.js" type="module"></script>
+    <script src="/static/Dropdown.js" type="module"></script>
 {{end}}
 %end
 {{define "Style"}}
@@ -11,128 +13,11 @@
         font-size: 1.2rem;
         margin-bottom: .5rem;
     }
-    .job_section{
-        width: 100%;
-        display: flex;
-        align-items: center;
-        padding: 0 10px; 
-        overflow-x: scroll;
-        margin-bottom: .5rem;
-        scroll-snap-type: x mandatory;
-    }
-    .job_section_inner{
-        display: flex;
-        gap: 1rem;
-    }
-
-    .job_section_inner > *{
-        scroll-snap-align: start center;
-    }
-
-    .card {
-        width: 100%;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: var(--card_shadow);
-        margin-bottom: 20px;
-        overflow: hidden;
-        .card-content {
-            padding: 20px;
-            .card-header {
-                display: flex;
-                gap: 16px;
-                .company-photo {
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 8px;
-                    object-fit: cover;
-                    border: 1px solid black;
-                    border-radius: 50%;
-                }
-                .card-info {
-                    flex-grow: 1;
-                    .card-title {
-                        font-size: 1rem;
-                        font-weight: 600;
-                        min-height: 3.9rem;
-                        align-content: center;
-                        
-                    }
-                    .card-company-info {
-                        .company-name, .card-location, .card-salary {
-                            display: flex;
-                            align-items: center;
-                            gap: 8px;
-                            color: #666;
-                            margin-bottom: .2rem;
-                            .salary, .location, .name{
-                                font-size: .85rem;
-                            }
-                        }
-                        .card-salary{
-                            height: 2.4rem;
-                            text-wrap: balance;
-                        }
-                    }
-                    .card-meta {
-                        display: flex;
-                        align-items: center;
-                        gap: 12px;
-                        margin-top: 8px;
-                    }
-                }
-            }
-        }
-    }
-    .badge {
-        background-color: #e2e8f0;
-        color: #4a5568;
-        font-size: 0.75rem;
-        padding: 2px 8px;
-        border-radius: 9999px;
-    }
-    .card-footer {
-        background-color: #c9d6e1;
-        padding: 16px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .card-posted {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.875rem;
-        color: #666;
-    }
-    .button {
-        background-color: transparent;
-        color: #3182ce;
-        border: none;
-        padding: 8px 16px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-weight: bold;
-    }
-    .button:hover {
-    background-color: #b2c4d3;
-    }
-    .icon {
-    width: 16px;
-    height: 16px;
-    }
-    .w-photo{
-        display: none;
-    }
     .grid{
         display: grid;
-        gap: 1rem;
         @container (width >= 678px){
             grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
         }
         @container (width >= 970px){
             grid-template-columns: repeat(3, 1fr);
@@ -146,9 +31,9 @@
         
         <div class="grid">
         {{range .Job}}
-            <job-card id="{{.Id}}" salary="{{.SalaryString}}" entreprise="{{.EntrepriseName}}" isThirdParty="{{.IsThirdParty}}"  contract="{{.Contract}}" title="{{.Title}}" fulladdr="{{.FullAdresse}}" date="{{.Date}}" fulltime="{{.FulltimeString}}" ></job-card>
+            <job-card id="{{.Id}}" picture="/static/netflix.webp"  salary="{{.SalaryString}}" entreprise="{{.EntrepriseName}}" isThirdParty="{{.IsThirdParty}}"  contract="{{.Contract}}" title="{{.Title}}" fulladdr="{{.FullAdresse}}" date="{{.Date}}" fulltime="{{.FulltimeString}}" ></job-card>
         {{end}}
-        </div>
+        </div> 
     </main>
 {{end}}
 %end

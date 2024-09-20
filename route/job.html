@@ -4,101 +4,124 @@
 {{end}}
 
 {{define "Style"}}
-    .job > *, .job_info > *, #application > *{
-        margin-bottom: .5rem;
+    .job_info > *, #application > *{
+        margin-bottom: 1rem;
     }
-    .job_header{
-        margin-bottom: .5rem;
-    }
-    .job_title{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        & .text{
-            font-size: 1.3rem;
-            flex: 1;
+    .job{
+        container-type: inline-size;
+        container-name: job;
+        .job_header{
+            margin-bottom: .5rem;
         }
-        & .bookmark{
-            position:relative;
-            width: 1.5rem;
-            aspect-ratio: 1/1.2;
-            border: 2px solid black;
-            border-radius: 5px 5px 0 0;
-            background-color: white;
+        .job_title{
             display: flex;
-            justify-content: center;
-            overflow: hidden;
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
-            transition: all .3s linear; 
-            &::after{
-                content: "";
-                position: absolute;
-                bottom: 0;
-                width: 1.5rem;
-                aspect-ratio: 1/1;
-                transform: translateY(1.4rem) rotate(45deg);
-                background-color: #f0f0f0;
-                border: 2px solid transparent;
-                border-top: 2px solid black;
-                border-left: 2px solid black;
-                pointer-event: none;
-            }
-        }
-        & .fill{
-            background-color: var(--primary_color);
-        }
-    }
-    .job_entreprise{
-        display: flex;
-        justify-content: flex-end;
-    }
-    .job_info{
-        padding: .3rem;
-        border-radius: 5px;
-        background: rgb(119,182,234);
-        background: linear-gradient(145deg, rgba(119,182,234,1) 0%, rgba(119,173,208,1) 42%, rgba(200,206,210,1) 100%);
-        
-        & > *:last-child{
-            margin-bottom: 0px;
-        }
-
-        & .job_info_data{
-            display: flex;
-            gap: .3rem;
             align-items: center;
-        }
-        & .job_info_data_icon{
-            height: 1.5rem;
-            width: 1.5rem;
-        }
-    }
-    .job_entreprise_name{
-        font-size: 1rem;
-        text-decoration: underline;
-    }
-    .job_header{
-        font-size: 1.2rem;
-    }
-    .job_description_text{
-        text-wrap: wrap;
-    }
-    .job_avantage, .job_skill{
-        & .job_avantage_list, & .job_skill_list{
-            list-style: inside;
-
-            & .job_avantage_list_value, & .job_skill_list_value{
-                margin-bottom: .3rem;
+            justify-content: space-between;
+            & .text{
+                font-size: 1.3rem;
+                flex: 1;
+                margin-block: 1rem;
+            }
+            .bookmark{
+                height: 3lh;
+                aspect-ratio: 1/2;
+                .bookmark-icon{
+                    width: 100%;
+                    height: 100%;
+                    .bookmark-path{
+                        transition: fill 300ms linear;
+                        fill: none;
+                    }
+                    .fill{
+                        fill: var(--primary_color);
+                    }
+                }
             }
         }
-    }
-    .job_submitBtn{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 2rem;
-        border-radius: 25px;
-        background: hsla(207, 73%, 69%, 1);
+
+        .job_info, .description, .job_avantage, .job_skill{
+            padding: 1rem;
+            background-color: white;
+            border-radius: 20px;
+            border: 1px solid lightgray;
+        }
+        .job_entreprise{
+            display: flex;
+            justify-content: flex-end;
+        }
+        .job_info{
+            @container job (width >= 678px) {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                .job_info_data{
+                    margin-bottom: 0;
+                }
+            }
+            & > *:last-child{
+                margin-bottom: 0px;
+            }
+
+            .job_info_data{
+                display: flex; 
+                align-items: center;
+                gap: .5rem;
+                .icon{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 3rem;
+                    aspect-ratio: 1/1;
+                    border-radius: 10px;
+                    background-color: rgb(220, 200, 250);
+                    .icon_svg{
+                        height: 2rem;
+                        aspect-ratio: 1/1;
+                    }
+                }
+                .label{
+                    color: #494949;
+                }
+                .entreprise{
+                    font-size: 1rem;
+                    text-decoration: underline;
+                    font-weight: bold;
+                }
+            }
+            & .job_info_data_icon{
+                height: 1.5rem;
+                width: 1.5rem;
+            }
+        }
+
+        .job_header{
+            font-size: 1.2rem;
+        }
+        .description{
+            margin-block: 1rem;
+            .text{
+                text-wrap: wrap;
+            }
+        }
+        .job_avantage, .job_skill{
+            margin-bottom: 1rem;
+            & .job_avantage_list, & .job_skill_list{
+                list-style: inside;
+
+                & .job_avantage_list_value, & .job_skill_list_value{
+                    margin-bottom: .3rem;
+                }
+            }
+        }
+        .job_submitBtn{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 2rem;
+            border-radius: 25px;
+            background: var(--primary_color);
+        }
     }
     #application{
         margin: auto !important;
@@ -139,7 +162,6 @@
             background-color: var(--primary_color);
         }
         &::backdrop{
-            background-color: rgba(0,0,0,.4);
         }
     }
 
@@ -224,41 +246,108 @@
     <main class="job">
         <div class="job_title">
             <h1 class="text">{{.Job.Title}}</h1>
-            <button class="bookmark" onclick="onBookmarkClick(this)"></button>
+            <button class="bookmark" onclick="onBookmarkClick(this)" {{if .Job.BookmarkId}} hx-delete="/bookmark" hx-vals='{"bookmarkId": "{{.Job.BookmarkId}}", "jobId": "{{.Job.Id}}"}'{{else}}hx-put="/bookmark" hx-vals='{"jobId": "{{.Job.Id}}", "isThirdParty": "{{.Job.IsThirdParty}}"}' hx-swap="outerHTML"{{end}}>
+                <svg
+                    class="bookmark-icon"
+                    width="12.837221mm"
+                    height="16.933336mm"
+                    viewBox="0 0 12.837221 16.933336"
+                    version="1.1">
+                    <g transform="translate(-74.365777,-89.4474)">
+                    <path class="bookmark-path {{if .Job.BookmarkId}}fill{{end}}" style="stroke:#000000;stroke-width:0.998655;stroke-dasharray:none"
+                        d="m 76.15008,90.744212 h 9.268616 a 1,1 45 0 1 1,1 l 0,12.805038 a 0.54317256,0.54317256 151.4904 0 1 -0.838853,0.45564 l -4.795455,-3.11192 -4.795455,3.11192 A 0.54317256,0.54317256 28.509595 0 1 75.15008,104.54925 V 91.744212 a 1,1 135 0 1 1,-1 z"/>
+                    </g>
+                </svg>
+            </button>
         </div>
         <div class="job_info">
             <div class="job_info_data">
-                <svg class="job_info_data_icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                </svg>
-                <a class="job_entreprise_name" href="{{with .Job.IsThirdParty}}#{{else}}/entreprise/4{{end}}">{{.EntrepriseName}}</a>
+                <div class="icon">
+
+                    <svg class="icon_svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <div>
+                    <p class="label">Enterprise</p>
+                    <a class="entreprise" href="{{with .Job.IsThirdParty}}#{{else}}/entreprise/4{{end}}">{{.EntrepriseName}}</a>
+                </div>
             </div>
             <div class="job_info_data">
-                <img src="/static/location.svg" class="job_info_data_icon" />
-                <p>{{.FullAdresse}}</p>
+                <div class="icon">
+                    <svg class="icon_svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </div>
+                <div>
+                    <p class="label">Adresse</p>
+                    <b>{{.FullAdresse}}</b>
+                </div>
             </div>
             <div class="job_info_data">
-                <img src="/static/contract.svg" class="job_info_data_icon" />
-                <p>{{.Contract}}</p>
+                <div class="icon">
+                    <img src="/static/contract.svg" class="icon_svg" />
+                </div>
+                <div>
+                    <p class="label">Contract</p>
+                    <b>{{.Contract}}</b>
+                </div>
             </div>
             {{if .SalaryString}}
                 <div class="job_info_data">
-                    <img src="/static/euro.svg" class="job_info_data_icon" />
-                    <p>{{.SalaryString}}</p>
+                    <div class="icon">
+                        <svg class="icon_svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="label">Salaire</p>
+                        <b>{{.SalaryString}}</b>
+                    </div>
                 </div>
             {{end}}
             {{if .WeeklyWorkTime}}
                 <div class="job_info_data">
-                    <img src="/static/clock.svg" class="job_info_data_icon" />
-                    <p>{{.WeeklyWorkTime}}H</p>
+                    <div class="icon">
+                        <svg class="icon_svg" width="127.99999" height="128.00006" viewBox="0 0 33.866664 33.866682">
+                            <g transform="translate(-78.394371,-112.55541)">
+                            <circle
+                            style="fill:none;stroke:#000000;stroke-width:2.43843;stroke-dasharray:none;stroke-opacity:1"
+                            cx="95.327705"
+                            cy="129.48874"
+                            r="15.184959" />
+                            <rect
+                            style="fill:none;stroke:#000000;stroke-width:2.34762;stroke-dasharray:none;stroke-opacity:1"
+                            id="rect1"
+                            width="0.33770394"
+                            height="9.5379772"
+                            x="95.158867"
+                            y="120.0871"
+                            ry="0.083666474" />
+                            <rect
+                            style="fill:none;stroke:#000000;stroke-width:2.04988;stroke-dasharray:none;stroke-opacity:1"
+                            id="rect2"
+                            width="0.29440054"
+                            height="8.341773"
+                            x="33.80965"
+                            y="-168.17717"
+                            ry="0.073173441"
+                            transform="matrix(-0.72187665,0.69202175,-0.74856193,-0.66306488,0,0)"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <p class="label">Temps de travail</p>
+                    <b>{{.WeeklyWorkTime}}H</b>
                 </div>
             {{end}}
         </div>
-        <div>
+        <div class="description">
             <h2 class="job_header">Description</h2>
-            <pre class="job_description_text">{{.Job.Description}}</pre>
+            <pre class="text">{{.Job.Description}}</pre>
         </div>
         {{if .Advantage}}
             <div class="job_avantage">
@@ -308,6 +397,25 @@
         </form>
     </main>
     <script>
+
+        /**
+            * @param {number} min
+            * @param {number} max
+            * @param {number} amount
+        */
+        const generateRandomNumber = (min, max, amount)=>{
+            const numbers = []
+            for (let i = 0; i < amount; i++){
+                const number = Math.random() * (max - min) + min;
+                numbers.push(number)
+            }
+            return numbers
+        }
+        const icons = document.getElementsByClassName("icon")
+        for(const icon of icons){
+            const [red, green, blue] = generateRandomNumber(190, 240, 3) 
+            icon.style.backgroundColor = `rgb(${red},${green},${blue})`
+        }
         const cvName = document.getElementById("application_cv_name")
         const onNewCv = (event)=>{
             if(event.target.files.length > 0){
@@ -316,8 +424,10 @@
         }
 
         const onBookmarkClick = (ele)=>{
-            ele.classList.toggle("fill")
+            const path = ele.querySelector(".bookmark-path")
+            path.classList.toggle("fill")
         }
+
 
     </script>
 {{end}}

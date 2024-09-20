@@ -1,5 +1,5 @@
 {{define "Head"}}
-    <title>{{.User.Firstname}} {{.User.Lastname}}</title>
+    <title>{{.ProfileUser.Firstname}} {{.ProfileUser.Lastname}}</title>
     <script src="/static/profile.js" async></script>
 {{end}}
 %end
@@ -52,38 +52,36 @@
     }
     .tabs{
         display: flex;
-        background-color: lightgray;
-        overflow: hidden;
-        border-radius: 25px;
+        gap: 1rem;
         padding: 0 .5rem;
-        position: relative;
         .tab{
+            position: relative;
             height: 2rem;
             padding: 0 8px;
             z-index: 1;
-        }
-        #selected{
-            position: absolute;
-            top: -1.3rem;
-            height: 22px;
-            width: 22px;
             background-color: white;
-            border: 5px solid transparent;
-            border-bottom: 3px solid #647583;
-            border-right: 3px solid #647583;
-            transform: rotate(45deg);
-            transition: all .3s linear;
-        }
-        #bg{
-            background-color: var(--primary_color);
-            position: absolute;
-            left: .25rem;
-            bottom: .25rem;
-            height: 1.5rem;
             border-radius: 25px;
-            transition: all .3s linear;
+            outline: 1px solid lightgray;
+            &:has(> .selected){
+                outline: none;
+            }
+        }
+        .selected{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2rem;
+            width: 100%;
+            scale: 1;
+            z-index: -1;
+            border: 2px solid #5387b1;
+            background-color: var(--primary_color);
+            transform-origin: center;
+            border-radius: 25px;
+            animation: tabAnim 150ms linear forwards;
         }
     }
+
     .profile_editable{
          .profile_editable_field{
              display: flex;
@@ -93,12 +91,12 @@
                  font-weight: bold;
              }
              .input{
-                 border: 1px solid darkgray;
+                 border: 1px solid lightgray;
                  border-radius: 5px;
                  height: 2rem;
                  width: 100%;
                  padding: 0 5px;
-                 background-color: inherit;
+                 background-color: white;
              }
          }
          .submitBtn{
@@ -116,11 +114,11 @@
             font-weight: bold;
         }
         .field{
-            border: 1px solid darkgray;
+            border: 1px solid lightgray;
             border-radius: 5px;
             padding: 5px 10px 5px 5px;
             height: 80px;
-            background-color: inherit;
+            background-color: white;
         }
         #length{
             position: absolute;
@@ -175,6 +173,7 @@
 
     /********* CV SECTION **********/
     #cv{
+        container: flexContainer / inline-size;
         .header{
             display: flex;
             justify-content: space-between;
@@ -205,6 +204,18 @@
                 inset: unset;
                 border-radius: 5px;
                 border: 1px solid darkgray;
+                transform-origin: top right;
+                scale: 0;
+                transition: scale 200ms linear, display 100ms linear allow-discrete, overlay 100ms linear allow-discrete;
+                &:popover-open{
+                    scale: 1;
+                    @starting-style{
+                        scale: 0;
+                    }
+                }
+                &::backdrop{
+                    background-color: transparent;
+                }
                 .btn{
                     height: 2rem;
                     display: flex;
@@ -215,101 +226,140 @@
             }
         }
 
-        #work, #diploma{
-            > *{
-                margin-bottom: .5rem;
+        .flex-container{
+            @container flexContainer (width >= 678px){
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
             }
-            .header{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                .title{
-                    font-size: 1.1rem;
+            #work, #diploma{
+                margin-bottom: 2rem;
+                > *{
+                    margin-bottom: .5rem;
                 }
-                .newBtn{
-                    height: 2rem;
-                    padding: 0 .5rem;
-                    border-radius: 5px;
-                    background-color: var(--primary_color);
-                }
-            }
-            .card{
-                padding: 5px 10px;
-                border-radius: 10px;
-                margin-bottom: 1.5rem;
-                background-color: white;
-                -webkit-box-shadow: 0px 0px 4px 2px #A9A9A9; 
-                box-shadow: 0px 0px 4px 2px #A9A9A9;
-                opacity: 1;
-                transition: opacity .2s linear;
-                @starting-style{
-                    opacity: 0;
-                }
-                .input{
-                    height: 2rem;
-                    width: 100%;
-                    border-bottom: 1px solid darkgray;
-                    margin-bottom: .3rem;
-                }
-                .dates, .location{
+                .header{
                     display: flex;
-                    gap: 1rem;
-                    margin-bottom: .3rem;
-                    .field{
-                        flex: 1;
+                    justify-content: space-between;
+                    align-items: center;
+                    .title{
+                        font-size: 1.1rem;
+                    }
+                }
+                .card{
+                    padding: 5px 10px;
+                    border-radius: 10px;
+                    margin-bottom: 1.5rem;
+                    background-color: white;
+                    -webkit-box-shadow: 0px 0px 4px 2px #A9A9A9; 
+                    box-shadow: 0px 0px 4px 2px #A9A9A9;
+                    opacity: 1;
+                    transition: opacity .2s linear;
+                    @starting-style{
+                        opacity: 0;
+                    }
+                    .input{
                         height: 2rem;
                         width: 100%;
                         border-bottom: 1px solid darkgray;
-                    }
-                }
-                .task{
-                    > *{
                         margin-bottom: .3rem;
                     }
-                    .header{
+                    .dates, .location{
                         display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    }
-
-                    .description{
-                        border: 1px solid darkgray;
-                        padding: 5px;
-                        border-radius: 5px;
+                        gap: 1rem;
                         margin-bottom: .3rem;
-                        .closeBtn{
-                            float: right;
-                            height: 1.5rem;
-                            width: 1.5rem;
-                            background-color: rgba(200,200,200,.5);
-                            border-radius: 50%;
-                            font-weight: bold;
+                        .field{
+                            flex: 1;
+                            height: 2rem;
+                            width: 100%;
+                            border-bottom: 1px solid darkgray;
                         }
                     }
-                    .descriptionFadeIn{
-                        transform: translateX(-100%);
-                        animation: descriptionFadeIn .3s ease-in forwards;
+                    .task{
+                        > *{
+                            margin-bottom: .3rem;
+                        }
+                        .header{
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+
+                        .description{
+                            border: 1px solid darkgray;
+                            padding: 5px;
+                            border-radius: 5px;
+                            margin-bottom: .3rem;
+                            min-height: 2.2rem;
+                            .closeBtn{
+                                float: right;
+                                height: 1.5rem;
+                                width: 1.5rem;
+                                background-color: rgba(200,200,200,.5);
+                                border-radius: 50%;
+                                font-weight: bold;
+                            }
+                        }
+                        .descriptionFadeIn{
+                            opacity: 0;
+                            transform: translateX(-100%);
+                            animation: descriptionFadeIn 500ms ease-in forwards;
+                        }
+                        .newDescriptionPlaceholder{
+                            height: 2rem;
+                            width: 100%;
+                            font-weight: bold;
+                            border: 2px dashed darkgray;
+                            background-color: transparent;
+                            display: flex;
+                            justify-content: center;
+                            border-radius: 5px;
+                            align-items: center;
+                            &::after{
+                                content: "+";
+                                width: 1rem;
+                                aspect-ratio: 1/1;
+                                border-radius: 50%;
+                                border: 2px solid black;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                        }
                     }
-                    .newBtn{
+                    .deleteBtn{
                         height: 2rem;
-                        width: 2rem;
-                        font-weight: bold;
-                        color: var(--primary_color);
-                        background-color: transparent;
-                        border: 1px solid var(--primary_color);
+                        width: 100%;
+                        border-radius: 5px;
+                        background-color: lightgray;
                     }
                 }
-                .deleteBtn{
-                    height: 2rem;
+                .templateBtn{
+                    height: 150px;
                     width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    border: 2px dashed darkgray;
+                    padding: 0 .5rem;
                     border-radius: 5px;
-                    background-color: lightgray;
+                    &::before{
+                        content: "+";
+                        width: 1rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        aspect-ratio: 1/1;
+                        border-radius: 50%;
+                        margin-bottom: .3rem;
+                        border: 2px solid black;
+                    }
                 }
             }
         }
 
         #skill, #interest{
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             .title ~ .field{
                 margin-bottom: .8rem;
             }
@@ -351,9 +401,11 @@
             100%{opacity: 1;}
         }
         @keyframes descriptionFadeIn{
-            100%{transform: translateX(0%)}
+            40%{opacity: .5; transform: translateX(-50%)}
+            60%{opacity: 1; transform: translateX(0%)}
+            80%{opacity: 1; transform: translateX(-30%)}
+            100%{transform: translateX(0%); opacity: 1}
         }
-
 
 
         .picker{
@@ -431,9 +483,15 @@
         .picker-item:hover {
             background-color: #e0e0e0;
         }
+        @keyframes tabAnim{
+            from{scale: 0}
+            to{scale: 1}
+        }
 {{end}}
 %end
 {{define "Body"}}
+{{$workLength := len .Curriculum.Work}}
+{{$diplomaLength := len .Curriculum.School}}
     <main class="profile">
         <form class="profile_picture" hx-put="/profile" hx-swap="none" hx-encoding="multipart/form-data">
             <label for="picture" class="profile_picture_label">
@@ -444,46 +502,51 @@
             <button type="submit" class="profile_picture_submitBtn">Changer votre photo</button>
         </form>
         <div class="tabs">
-            <button type="button"  class="tab" onclick="onChangeScene(event, 'profile')">Profile</button>
-            <button type="button" class="tab" onclick="onChangeScene(event, 'CV')">Curriculum</button>
-            <div id="bg"></div>
+            <button type="button" class="tab" onclick="onChangeScene(event, 'profile')">
+                <div class="selected bg"></div>
+                <p>Profile</p>
+            </button>
+            <button type="button" class="tab" onclick="onChangeScene(event, 'CV')">
+                <div class="bg"></div>
+                <p>Curriculum</p>
+            </button>
         </div>
         <form class="profile_editable scene" hx-post="/profile" hx-ext="json-enc" hx-swap="none" hx-vals='js:{...getProfileValues()}'>
             <div class="profile_editable_field">
                 <label for="firstname" class="label">Prenom</label>
-                <input type="text" value="{{.User.Firstname}}" autocomplete="off" name="firstname" id="firstname" class="input" />
+                <input type="text" value="{{.ProfileUser.Firstname}}" autocomplete="off" name="firstname" id="firstname" class="input" />
             </div>
             <div class="profile_editable_field">
                 <label for="lastname" class="label"> Nom</label>
-                <input type="text" value="{{.User.Lastname}}" autocomplete="off" name="lastname" id="lastname" class="input"/>
+                <input type="text" value="{{.ProfileUser.Lastname}}" autocomplete="off" name="lastname" id="lastname" class="input"/>
             </div>
             <div id="description">
                 <label class="label">Description</label>
-                <textarea name="description" maxlength="250" class="field" oninput="onDescriptionChange(this)">{{.User.Description}}</textarea>
+                <textarea name="description" maxlength="250" class="field" oninput="onDescriptionChange(this)">{{.ProfileUser.Description}}</textarea>
                 <span id="length">250</span>
             </div>
             <div style="display: flex;gap: .5rem;justify-content: space-between;">
                 <div class="profile_editable_field">
                     <label for="femme" class="label">Femme</label>
-                    <input type="radio" {{if eq .User.Gender "Femme"}}checked{{end}} name="gender" id="femme" value="Femme"/>
+                    <input type="radio" {{if eq .ProfileUser.Gender "Femme"}}checked{{end}} name="gender" id="femme" value="Femme"/>
                 </div>
                 <div class="profile_editable_field">
                     <label for="homme" class="label">Homme</label>
-                    <input type="radio" {{if eq .User.Gender "Homme"}}checked{{end}}  name="gender" id="homme" value="Homme"/>
+                    <input type="radio" {{if eq .ProfileUser.Gender "Homme"}}checked{{end}}  name="gender" id="homme" value="Homme"/>
                 </div>
                 <div class="profile_editable_field">
                     <label for="birthDate" class="label">Date de naissance</label>
-                    <input type="date" value="{{.User.BirthDate}}" name="birthDate" id="birthDate" class="input"/>
+                    <input type="date" value="{{.ProfileUser.BirthDate}}" name="birthDate" id="birthDate" class="input"/>
                 </div>
             </div>
             <div style="display: flex;gap: .5rem;position: relative;">
                 <div class="profile_editable_field" style="flex: 1;">
                     <label for="city" class="label">Ville</label>
-                    <input type="text" data-lat="{{.User.Lat}}" data-long="{{.User.Long}}" value="{{.User.City}}" oninput="onFetchAddr(this)" autocomplete="off" name="city" id="city" class="input"/>
+                    <input type="text" data-lat="{{.ProfileUser.Lat}}" data-long="{{.ProfileUser.Long}}" value="{{.ProfileUser.City}}" oninput="onFetchAddr(this)" autocomplete="off" name="city" id="city" class="input"/>
                 </div>
                 <div class="profile_editable_field" style="flex: .3;">
                     <label for="postal" class="label">Postal</label>
-                    <input type="number" value="{{.User.Postal}}" name="postal" id="postal" class="input"/>
+                    <input type="number" value="{{.ProfileUser.Postal}}" name="postal" id="postal" class="input"/>
                 </div>
                 <div id="suggest_adr" style="display: none;"></div>
             </div>
@@ -503,119 +566,119 @@
                     <a href="/profile/cv?type=pdf" class="btn" onclick="onHideCurriculumAction(this)">Telecharger</a>
                 </div>
             </div>
-            <div id="work">
-                <div class="header">
-                    <h2 class="title">Experience professionnelles</h2>
-                    <button type="button"  class="newBtn" onclick="onNewWork(this)">Nouvelle</button>
-                </div>
-                {{range .Curriculum.Work}}
-                    <div class="card" id="work" ondrop="onDrop(event)" ondragover="onDragOver(event)" draggable="true" ondragstart="onDragStart(event)">
+            <div class="flex-container">
+                <div id="work">
+                    <div class="header">
+                        <h2 class="title">Expérience professionnelles</h2>
+                    </div>
+                    {{range .Curriculum.Work}}
+                    <div class="card" data-name="work" ondrop="onDrop(event)" ondragover="onDragOver(event)" draggable="true" ondragstart="onDragStart(event)">
                         <div>
-                        <input type="text" value="{{.Position}}" class="input position" placeholder="Web Dev Full Stack" required />
-                        <input type="text" value="{{.Entreprise}}" class="input entreprise" placeholder="Netflix" required />
-                        <div class="dates">
-                            <div class="picker start_date">
-                                <div class="picker-display" onclick="toggleModal(this)">{{.StartDate}}</div>
-                                <div class="modal" style="display: none;">
-                                    <div class="modal-content">
-                                        <span class="close" onclick="toggleModal(this)">&times;</span>
-                                        <div class="picker-header">
-                                            <span class="picker-title">Select Month</span>
+                            <input type="text" value="{{.Position}}" class="input position" placeholder="Web Dev Full Stack" required />
+                            <input type="text" value="{{.Entreprise}}" class="input entreprise" placeholder="Netflix" required />
+                            <div class="dates">
+                                <div class="picker start_date">
+                                    <div class="picker-display" onclick="toggleModal(this)">{{.StartDate}}</div>
+                                    <div class="modal" style="display: none;">
+                                        <div class="modal-content">
+                                            <span class="close" onclick="toggleModal(this)">&times;</span>
+                                            <div class="picker-header">
+                                                <span class="picker-title">Select Month</span>
+                                            </div>
+                                            <div class="picker-grid"></div>
                                         </div>
-                                        <div class="picker-grid"></div>
+                                    </div>
+                                </div>
+                                <div class="picker end_date">
+                                    <div class="picker-display" onclick="toggleModal(this)">{{.EndDate}}</div>
+                                    <div class="modal" style="display: none;">
+                                        <div class="modal-content">
+                                            <span class="close" onclick="toggleModal()">&times;</span>
+                                            <div class="picker-header">
+                                                <span class="picker-title">Select Month</span>
+                                            </div>
+                                            <div class="picker-grid"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="picker end_date">
-                                <div class="picker-display" onclick="toggleModal(this)">{{.EndDate}}</div>
-                                <div class="modal" style="display: none;">
-                                    <div class="modal-content">
-                                        <span class="close" onclick="toggleModal()">&times;</span>
-                                        <div class="picker-header">
-                                            <span class="picker-title">Select Month</span>
-                                        </div>
-                                        <div class="picker-grid"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="task">
-                            <div class="header">
+                            <div class="task">
                                 <h2 >Description du poste</h2>
-                                <button type="button" class="newBtn" onclick="onAddDescription(this)">+</button>
-                            </div>
-                            {{range .Description}}
+                                {{range .Description}}
                                 <div class="description">
-                                    <button type="button" class="closeBtn" onclick="onDeleteCard(this)">X</button>
+                                    <button type="button" class="closeBtn" onclick="onDeleteWorkDescription(this)">X</button>
                                     <div contenteditable="true" class="field" required placeholder="Backend testing">{{.}}</div>
                                 </div>
-                            {{end}}
-                        </div>
-                        <button type="button" class="deleteBtn" onclick="onDeleteCard(this)">Supprimer</button>
+                                {{end}}
+                                <button type="button" class="newDescriptionPlaceholder" onclick="onAddDescription(this)"></button>
+                            </div>
+                            <button type="button" class="deleteBtn" onclick="onDeleteCard(this)">Supprimer</button>
                         </div>
                     </div>
-                {{end}}
-            </div>
-            <div id="diploma">
-                <div class="header">
-                    <h2 class="title">Diplomes</h2>
-                    <button type="button" class="newBtn" onclick="onNewSchool(this)">Nouveau</button>
+                    {{end}}
+                    <button type="button" class="templateBtn {{if eq $workLength 3 }}hidden{{end}}" onclick="onNewWork(this)">Expérience professionnelles</button>
                 </div>
-                {{range .Curriculum.School}}
-                    <div class="card" id="school"  ondrop="onDrop(event)" ondragover="onDragOver(event)" draggable="true" ondragstart="onDragStart(event)">
+                <div id="diploma">
+                    <div class="header">
+                        <h2 class="title">Diplomes</h2>
+                    </div>
+                    {{range .Curriculum.School}}
+                    <div class="card" data-name="school" ondrop="onDrop(event)" ondragover="onDragOver(event)" draggable="true" ondragstart="onDragStart(event)">
                         <div>
-                        <input type="text" value="{{.Name}}" class="input name" placeholder="Baccalauréat" required /> 
-                        <input type="text" value="{{.Establishment}}" class="input establishment" placeholder="Lycée Jean Villar" required /> 
-                        <div class="dates">
-                            <div class="picker start_date">
-                                <div class="picker-display" onclick="toggleModal(this)">{{.StartDate}}</div>
-                                <div class="modal" style="display: none;">
-                                    <div class="modal-content">
-                                        <span class="close" onclick="toggleModal(this)">&times;</span>
-                                        <div class="picker-header">
-                                            <span class="picker-title">Select Month</span>
+                            <input type="text" value="{{.Name}}" class="input name" placeholder="Baccalauréat" required /> 
+                            <input type="text" value="{{.Establishment}}" class="input establishment" placeholder="Lycée Jean Villar" required /> 
+                            <div class="dates">
+                                <div class="picker start_date">
+                                    <div class="picker-display" onclick="toggleModal(this)">{{.StartDate}}</div>
+                                    <div class="modal" style="display: none;">
+                                        <div class="modal-content">
+                                            <span class="close" onclick="toggleModal(this)">&times;</span>
+                                            <div class="picker-header">
+                                                <span class="picker-title">Select Month</span>
+                                            </div>
+                                            <div class="picker-grid"></div>
                                         </div>
-                                        <div class="picker-grid"></div>
+                                    </div>
+                                </div>
+                                <div class="picker end_date">
+                                    <div class="picker-display" onclick="toggleModal(this)">{{.EndDate}}</div>
+                                    <div class="modal" style="display: none;">
+                                        <div class="modal-content">
+                                            <span class="close" onclick="toggleModal()">&times;</span>
+                                            <div class="picker-header">
+                                                <span class="picker-title">Select Month</span>
+                                            </div>
+                                            <div class="picker-grid"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="picker end_date">
-                                <div class="picker-display" onclick="toggleModal(this)">{{.EndDate}}</div>
-                                <div class="modal" style="display: none;">
-                                    <div class="modal-content">
-                                        <span class="close" onclick="toggleModal()">&times;</span>
-                                        <div class="picker-header">
-                                            <span class="picker-title">Select Month</span>
-                                        </div>
-                                        <div class="picker-grid"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" class="deleteBtn" onclick="onDeleteCard(this)">Supprimer</button>
+                            <button type="button" class="deleteBtn" onclick="onDeleteCard(this)">Supprimer</button>
                         </div>
                     </div>
-                {{end}}
-            </div>
-            <div id="skill">
-                <h2 class="title">Compétences</h2>
-                {{range .Curriculum.Skill}}
+                    {{end}}
+                    <button type="button" class="templateBtn {{if eq $diplomaLength 3 }}hidden{{end}}" onclick="onNewSchool(this)">Diplome</button>
+                </div>
+                <div id="skill">
+                    <h2 class="title">Compétences</h2>
+                    {{range .Curriculum.Skill}}
                     <div class="field">
                         <input type="text" value="{{.}}" placeholder="Autonomie" class="input skill" autocomplete="off" />
                         <button type="button" class="closeBtn" onclick="onRemoveLangue(this)">X</button>
                     </div>
-                {{end}}
-                <button type="button" id="newBtn" onclick="onNewSkill(this, 'skill')">Nouvelle compétence</button>
-            </div>
-            <div id="interest">
-                <h2 class="title">Centres d'intérêt</h2>
-                {{range .Curriculum.Interest}}
+                    {{end}}
+                    <button type="button" id="newBtn" onclick="onNewSkill(this, 'skill')">Nouvelle compétence</button>
+                </div>
+                <div id="interest">
+                    <h2 class="title">Centres d'intérêt</h2>
+                    {{range .Curriculum.Interest}}
                     <div class="field">
                         <input type="text" value="{{.}}" placeholder="Football" class="input interest" autocomplete="off" />
                         <button type="button" class="closeBtn" onclick="onRemoveLangue(this)">X</button>
                     </div>
-                {{end}}
-                <button type="button" id="newBtn" onclick="onNewSkill(this, 'interest')">Nouveau Intérêt</button>
+                    {{end}}
+                    <button type="button" id="newBtn" onclick="onNewSkill(this, 'interest')">Nouveau Intérêt</button>
+                </div>
             </div>
         </form>
     </main>

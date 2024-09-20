@@ -45,6 +45,7 @@ type Job struct{
     ApplicationCount int
     ThirdPartyLink string
     TemplateName string `json:"tname"`
+    BookmarkId string
 }
 
 type Filter struct{
@@ -257,7 +258,7 @@ func (j *Job) DeleteJob()error{
 }
 
 func (j *Job) GetJobById()error{
-    var skill, sal, applicationId sql.NullString
+    var skill, sal, applicationId, bookmarkId  sql.NullString
     var dateAge string
     conn, err := GetDBConn()
     if err != nil{
@@ -269,15 +270,17 @@ func (j *Job) GetJobById()error{
         log.Println(err)
         return errors.New("error transction")
     }
-    jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, j.contract, j.city, j.postal,  CONCAT(LEFT(j.postal, 2), ' - ', J.city), j.salary, j.advantage, j.skill, j.worktime, j.fulltime, ja.id FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobApplication AS ja ON ja.job_id=j.id WHERE j.id=$1`, j.Id)
-    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &j.FullAdresse, &sal, pq.Array(&j.Advantage), &skill, &j.WeeklyWorkTime, &j.Fulltime, &applicationId); err != nil{
+    jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, j.contract, j.city, j.postal,  CONCAT(LEFT(j.postal, 2), ' - ', J.city), j.salary, j.advantage, j.skill, j.worktime, j.fulltime, ja.id, b.id FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobApplication AS ja ON ja.job_id=j.id LEFT JOIN Bookmark AS b ON j.id=b.job_id WHERE j.id=$1`, j.Id)
+    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &j.FullAdresse, &sal, pq.Array(&j.Advantage), &skill, &j.WeeklyWorkTime, &j.Fulltime, &applicationId, &bookmarkId); err != nil{
         log.Println(err)
         return errors.New("error scanning job")
     }
     if applicationId.String != "" {j.Applied = true}
     j.Description = strings.ReplaceAll(j.Description, `\n`, "\n")
+    j.BookmarkId = bookmarkId.String
     j.Date = PostgresIntervalIntoString(strings.Split(dateAge, "-"))
     j.SalaryString, j.Salary = postgresSalaryIntoString(sal.String)
+    j.ContractArray =  GetContracts()
     if err := json.Unmarshal([]byte(skill.String), &j.SkillNeeded); err != nil{
         log.Println(err)
         return errors.New("error making skill into json")
@@ -294,7 +297,7 @@ func GetEntrepriseJobs(entrepriseId string)[]Job{
         log.Println(err)
         return jobs
     }
-    entrepriseJobRows, err := conn.QueryContext(context.Background(), `SELECT j.title, j.id, LEFT(j.postal, 2), j.city, COUNT(ja.id), j.contract FROM Job AS j LEFT JOIN JobApplication AS ja ON ja.job_id=j.id WHERE j.entreprise_id=$1 GROUP BY j.title, j.id, j.postal, j.city, ja.id`, entrepriseId)
+    entrepriseJobRows, err := conn.QueryContext(context.Background(), `SELECT j.title, j.id, LEFT(j.postal, 2), j.city, (SELECT count(id) FROM JobApplication WHERE status < 'Possible' AND j.id=job_id), j.contract FROM Job AS j WHERE j.entreprise_id=$1`, entrepriseId)
     if err != nil{
         log.Println(err)
         return jobs
@@ -538,6 +541,7 @@ func TemplatesIntoString(templates []EntrepriseTemplates)string{
 func GetFranceTravailJobById(id string)(Job, error){
     var job FranceTravailJob
     var convertedJob Job
+    var bookmarkId sql.NullString
     if err := GetFranceTravailToken(); err != nil{
         log.Println(err)
         return convertedJob, errors.New("error request token")
@@ -562,6 +566,16 @@ func GetFranceTravailJobById(id string)(Job, error){
     if job.WeeklyWorkTime != ""{
         weeklyWorkTime, _ = strconv.ParseFloat(job.WeeklyWorkTime[:len(job.WeeklyWorkTime)-1], 64)
     }
+    conn, err := GetDBConn()
+    if err != nil{
+        log.Printf("error conn db")
+    }
+    defer conn.Close()
+    bookmarkRow := conn.QueryRowContext(context.Background(), `SELECT id FROM Bookmark WHERE id_third_party=$1`, id)
+    if err := bookmarkRow.Scan(&bookmarkId); err != nil{
+        log.Println(err)
+    }
+    convertedJob.BookmarkId = bookmarkId.String
     convertedJob.Title = job.Title
     convertedJob.Id = job.Id
     convertedJob.Description = job.Description

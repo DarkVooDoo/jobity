@@ -43,6 +43,7 @@ func Maindomain(){
         mux.HandleFunc("/connexion", handler.SignHandler)
         mux.HandleFunc("/job/{id}", handler.JobHandler)
         mux.HandleFunc("/mes-postulations", handler.ApplicationHandler)
+        mux.HandleFunc("/bookmark", handler.BookmarkHandler)
         mux.HandleFunc("/profile", handler.ProfileHandler)
         mux.HandleFunc("/profile/cv", handler.CurriculumHandler)
         mux.HandleFunc("/entreprise/{id}", handler.CompanyHandler)

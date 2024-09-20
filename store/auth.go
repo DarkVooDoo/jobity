@@ -32,8 +32,8 @@ func SigninUser(email string, password string)(ConnectedUser, error){
     if err !=  nil{
         log.Println(err)
         return user, errors.New("error conn to the db")
-    
     }
+    defer conn.Close()
     userRow := conn.QueryRowContext(context.Background(), `SELECT id, CONCAT(LEFT(firstname, 1), LEFT(lastname, 1)), picture, password, salt FROM Users WHERE email=$1`, email)
     if err := userRow.Scan(&user.Id, &user.ShortName, &picture, &cryptPassword, &salt); err != nil{
         log.Println(err)
@@ -58,7 +58,8 @@ func SigninProUser(email string, password string)(ConnectedUser, error){
         return user, errors.New("error conn to the db")
     
     }
-    userRow := conn.QueryRowContext(context.Background(), `SELECT id, name, picture, password, salt FROM Entreprise WHERE email=$1`, email)
+    defer conn.Close()
+    userRow := conn.QueryRowContext(context.Background(), `SELECT id, LEFT(name, 1), picture, password, salt FROM Entreprise WHERE email=$1`, email)
     if err := userRow.Scan(&user.Id, &user.ShortName, &picture, &cryptPassword, &salt); err != nil{
         log.Println(err)
         return user, errors.New("error selecting users")

@@ -10,6 +10,7 @@ import (
 type ApplicationPage struct{
     RequireData
     Apps []store.JobApplication
+    Fav []store.Bookmark
 }
 
 var ApplicationHandler = func(res http.ResponseWriter, req *http.Request){
@@ -18,12 +19,15 @@ var ApplicationHandler = func(res http.ResponseWriter, req *http.Request){
     route.Get(func() {
         jobApplication := store.JobApplication{UserId: route.User.Id}
         applications := jobApplication.GetUserApplications()
+        bookmarkStruct :=  store.Bookmark{UserId: route.User.Id}
+        bookmark := bookmarkStruct.Get()
         page := ApplicationPage{
             RequireData{
                 Search: SearchQuery{Query: ""},
                 User: route.User,
             },
             applications,
+            bookmark,
         }
         route.Render(page, "route/template.html", "route/my-applications.html")
     })

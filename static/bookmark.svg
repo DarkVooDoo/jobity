@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="12.837221mm"
+   height="16.933336mm"
+   viewBox="0 0 12.837221 16.933336"
+   version="1.1"
+   id="svg5"
+   inkscape:export-filename="bookmark.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false" />
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect1176"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,1,0,1 @ F,0,0,1,0,1,0,1 @ F,0,0,1,0,1,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,1,0,1"
+       unit="px"
+       method="auto"
+       mode="F"
+       radius="0"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+  </defs>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-74.365777,-89.4474)">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.998655;stroke-dasharray:none"
+       d="m 76.15008,90.744212 h 9.268616 a 1,1 45 0 1 1,1 l 0,12.805038 a 0.54317256,0.54317256 151.4904 0 1 -0.838853,0.45564 l -4.795455,-3.11192 -4.795455,3.11192 A 0.54317256,0.54317256 28.509595 0 1 75.15008,104.54925 V 91.744212 a 1,1 135 0 1 1,-1 z"
+       id="path186"
+       sodipodi:nodetypes="cccccc"
+       inkscape:path-effect="#path-effect1176"
+       inkscape:original-d="m 75.15008,90.744212 h 11.268616 v 14.805038 l -5.634308,-3.65628 -5.634308,3.65628 z" />
+  </g>
+</svg>

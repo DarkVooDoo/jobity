@@ -37,17 +37,32 @@ const onFetchAddr = (ele)=>{
             }
             suggestAdr.innerHTML = fetchAdresseHtml
             suggestAdr.style.display = "block"
+            if(result.features.length > 0){
+                const firstELement = result.features[0]
+                propagateProfileAddr(firstELement.properties.city, firstELement.properties.postcode, firstELement.geometry.coordinates[1], firstELement.geometry.coordinates[0])
+            }
         }catch(err){}
     }, 500)
+}
+
+/**
+* @param {string} city    
+* @param {string} postal    
+* @param {string} lat    
+* @param {string} long    
+* */
+const propagateProfileAddr = (city, postal, lat, long)=>{
+    postalField.value = parseInt(postal)
+    cityField.value = city
+    cityField.dataset.lat = lat
+    cityField.dataset.long = long
+
 }
 
 /**@param {HTMLParagraphElement} ele */
 const onSelectAdresse = (ele)=>{
     const [city, postal] = ele.textContent.split(",")
-    postalField.value = parseInt(postal.trim())
-    cityField.value = city
-    cityField.dataset.lat = ele.dataset.lat
-    cityField.dataset.long = ele.dataset.long
+    propagateProfileAddr(city, postal.trim(), ele.dataset.lat, ele.dataset.long)
     suggestAdr.style.display = "none"
 }
 
@@ -64,16 +79,10 @@ const onCloseCVDialog = ()=>{
 
 const profile = document.querySelector(".profile_editable")
 const scenes = document.getElementsByClassName("scene")
-const tabTrack = document.getElementById("bg")
 const tabs = document.getElementsByClassName("tab")
 const description = document.querySelector("#description textarea")
 const descriptionLength = document.getElementById("length")
 descriptionLength.textContent = 250 - description.textContent.length
-const {width} = tabs[0].getBoundingClientRect()
-tabTrack.style.width = `${width+4}px`
-tabTrack.style.left = "7px"
-const rectInitialPos = tabs[0].offsetLeft + (width / 2) - 11
-
 
 const calcPopoverPosition = ()=>{
     const curriculumActionBtn = document.querySelector("#cv .submitBtn")
@@ -96,12 +105,15 @@ const onDescriptionChange = (ele)=>{
     descriptionLength.textContent = 250 - length
 }
 const onChangeScene = (ev, scene)=>{
-    const {width} = ev.target.getBoundingClientRect()
+    const currentTab = ev.target.closest(".tab")
     for(const tab of tabs){
-        tab.style.color = "black"
+        const selection = tab.querySelector(".bg")
+        selection.classList.remove("selected")
+        tab.style.outline = "1px solid lightgray"
     }
-    tabTrack.style.left = `${ev.target.offsetLeft}px`
-    tabTrack.style.width = `${width}px`
+    const selectedTab = currentTab.querySelector(".bg")
+    selectedTab.classList.add("selected")
+    currentTab.style.outline = "none"
     for(const scene of scenes){
         scene.classList.add("hidden")
     }
@@ -121,13 +133,23 @@ const onDateChange = (ele)=>{
     }
 
 }
+
+const isFullCapacity = (type)=>{
+    const cards = document.querySelectorAll(`#${type} .card`)
+    const newBtn = document.querySelector(`#${type} .templateBtn`)
+    if (cards.length === 3){
+        newBtn.classList.add("hidden")
+    }else{
+        newBtn.classList.remove("hidden")
+    }
+}
+
 const onNewWork = (ele)=>{
     const cards = document.querySelectorAll("#work .card")
     if (cards.length > 2) return
-    const parent = ele.parentElement
     const card = document.createElement("div")
     card.classList.add("card")
-    card.id = "work"
+    card.dataset.name = "work"
     card.setAttribute("ondrop", "onDrop(event)")
     card.setAttribute("ondragover", "onDragOver(event)")
     card.setAttribute("draggable", "true")
@@ -163,29 +185,36 @@ const onNewWork = (ele)=>{
             </div>
         </div>
         <div class="task">
-            <div class="header">
-                <h2 >Description du poste</h2>
-                <button type="button" class="newBtn" onclick="onAddDescription(this)">+</button>
-            </div>
+            <h2 >Description du poste</h2>
             <div class="description">
-                <button type="button" class="closeBtn" onclick="onDeleteCard(this)">X</button>
+                <button type="button" class="closeBtn" onclick="onDeleteWorkDescription(this)">X</button>
                 <div contenteditable="true" class="field" required placeholder="Backend testing"></div>
             </div>
+            <button type="button" class="newDescriptionPlaceholder" onclick="onAddDescription(this)"></button>
         </div>
         <button type="button" class="deleteBtn" onclick="onDeleteCard(this)">Supprimer</button>
         </div>`
-    parent.after(card)
+    ele.insertAdjacentElement('beforebegin', card)
+    isFullCapacity('work')
 }
+
 const onDeleteCard = (ele)=>{
-    ele.parentElement.remove()
+    const card = ele.closest(".card")
+    const parentName = card.parentElement.id
+    card.remove()
+    isFullCapacity(parentName)
 }
+const onDeleteWorkDescription = (ele)=>{
+    const description = ele.closest(".description")
+    description.remove()
+}
+
 const onNewSchool = (ele)=>{
     const cards = document.querySelectorAll("#diploma .card")
     if (cards.length > 2) return
-    const parent = ele.closest("#diploma")
     const schoolCard = document.createElement("div")
-    schoolCard.id = "school"
     schoolCard.classList.add("card")
+    schoolCard.dataset.name = "school"
     schoolCard.setAttribute("ondrop", "onDrop(event)")
     schoolCard.setAttribute("ondragover", "onDragOver(event)")
     schoolCard.setAttribute("draggable", "true")
@@ -222,16 +251,20 @@ const onNewSchool = (ele)=>{
             </div>
         <button type="button" class="deleteBtn" onclick="onDeleteCard(this)">Supprimer</button>
         </div>`
-    parent.insertAdjacentElement('beforeend',schoolCard)
+    ele.insertAdjacentElement('beforebegin', schoolCard)
+    isFullCapacity('diploma')
 }
 const onAddDescription = (ele)=>{
     const newDescription = document.createElement("div")
     newDescription.classList.add("description", "descriptionFadeIn")
     newDescription.innerHTML = `
-        <button type="button" class="closeBtn" onclick="onDeleteCard(this)">X</button>
+        <button type="button" class="closeBtn" onclick="onDeleteWorkDescription(this)">X</button>
         <div contenteditable="true" class="field" required placeholder="Backend testing"></div>
         `
-    ele.parentElement.after(newDescription)
+    newDescription.addEventListener("animationend", ()=>{
+        newDescription.classList.remove("descriptionFadeIn")
+    })
+    ele.insertAdjacentElement('beforebegin', newDescription)
 }
 const onNewSkill = (ele, name)=>{
     const newSkill = document.createElement("div")
@@ -298,22 +331,19 @@ const getValues = ()=>{
 let lastDrag
 const onDragStart = (ev)=>{
     lastDrag = ev.target
-    ev.dataTransfer.setData("text/plain", ev.target.id)
-    ev.dataTransfer.dropEffect = "move"
+    ev.dataTransfer.setData("text/plain", ev.target.dataset.name)
 }
 const onDragOver = (ev)=>{
     ev.preventDefault()
-    ev.dataTransfer.dropEffect = "move"
 }
 const onDrop = (ev)=>{
     ev.preventDefault()
     ev.stopPropagation()
-    ev.dataTransfer.dropEffect = "move"
     const type = ev.dataTransfer.getData("text/plain")
     const dropZone = ev.target.closest(".card") || ev.target
     const lastData = lastDrag.firstElementChild
     const dropData = dropZone.firstElementChild
-    if (dropZone.id === type){
+    if (dropZone.dataset.name === type){
         lastDrag.replaceChild(dropData, lastData)
         dropZone.appendChild(lastData)
     }

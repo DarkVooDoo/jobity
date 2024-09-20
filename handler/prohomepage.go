@@ -9,6 +9,7 @@ import (
 )
 
 type HomepageData struct{
+    User store.ConnectedUser
     Profile store.ProUser
     Job []store.Job
 }
@@ -62,6 +63,7 @@ var ProHomepageHandler = func(res http.ResponseWriter, req *http.Request){
         jobs := store.GetEntrepriseJobs(route.User.Id)
         pageData.Profile = entreprise
         pageData.Job = jobs
+        pageData.User = route.User
         route.Render(pageData, "route/protemplate.html", "route/prohomepage.html")
     })
 }

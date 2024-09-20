@@ -14,8 +14,9 @@ type CurriculumPage struct{
 var CurriculumHandler = func(res http.ResponseWriter, req *http.Request){
     route, _ := NewRoute(res, req)
 
-    var cv store.Curriculum
+    var cv store.Curriculum = store.Curriculum{UserId: route.Request.PathValue("userId"), JobId: route.Request.PathValue("id")}
     route.Get(func() {
+        //Handle if the user isnt connected
         //Download Curriculum format pdf
         format := route.Request.URL.Query().Get("type")
         if format == "pdf"{
@@ -28,11 +29,12 @@ var CurriculumHandler = func(res http.ResponseWriter, req *http.Request){
             pdf.Close()
             return
         }
-        userId := route.Request.PathValue("userId")
-        if err := cv.Get(userId); err != nil{
+        if err := cv.Get(cv.UserId); err != nil{
             log.Println(err)
             return
         }
+        application := store.JobApplication{UserId: store.DecryptCurriculumId(route.Request.PathValue("userId")), JobId: route.Request.PathValue("id")}
+        application.UpdateStatus("Vue")
         pageData := CurriculumPage{Curriculum: cv}
         route.Render(pageData, "route/protemplate.html", "route/curriculum.html")
     })
@@ -46,5 +48,14 @@ var CurriculumHandler = func(res http.ResponseWriter, req *http.Request){
         }
         route.Notification("success", "Curriculum sauvegarder")
 
+    })
+
+    route.Delete(nil, func() {
+        application := store.JobApplication{UserId: store.DecryptCurriculumId(route.Request.PathValue("userId")), JobId: route.Request.PathValue("id")}
+        if err := application.UpdateStatus("Reject"); err != nil{
+            route.Notification("error", "error requete impossible")
+            return
+        }
+        route.Response.WriteHeader(http.StatusOK)
     })
 }
