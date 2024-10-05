@@ -164,7 +164,7 @@ var ProHomepageHandler = func(res http.ResponseWriter, req *http.Request){
 
                         <dialog class="interview-modal">
                             <h1 style="margin-bottom: .5rem;text-align: center;">Modifier interview</h1>
-                            <form hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
+                            <form hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
                                 hx-swap="none">
                                 <div style="display: flex;justify-content: space-between;gap: .5rem;">
                                     <div>

@@ -55,7 +55,7 @@ var CurriculumHandler = func(res http.ResponseWriter, req *http.Request){
 
     })
 
-    route.Post(nil, func() {
+    route.Put(nil, func() {
         application := store.JobApplication{Id: route.UrlEncoded["id"], InterviewDate: route.UrlEncoded["interview_date"], Addr: route.UrlEncoded["location"], Type: route.UrlEncoded["type"]}
         if err := application.UpdateStatus(route.UrlEncoded["status"]); err != nil{
             route.Notification("error", "error requete impossible")

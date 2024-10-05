@@ -616,7 +616,7 @@
                 <button type="button" class="deleteBtn" hx-delete="/job/{{.Job.Id}}" onclick="onDeleteOffert(this)" hx-swap="none">Supprimer</button>
             </div>
         </div>
-        <form hx-post="/job/{{.Job.Id}}" hx-swap="none" id="template_save" popover> <h1 style="text-align: center;font-size: 1.2rem;">Enregistrer ce modele</h1>
+        <form hx-put="/job/{{.Job.Id}}" hx-swap="none" id="template_save" popover> <h1 style="text-align: center;font-size: 1.2rem;">Enregistrer ce modele</h1>
             <input type="text" placeholder="CDD Compable H/F" name="tname" autocomplete="off" class="template_save_input"/>
             <button type="submit" class="template_save_btn" onclick="onSaveTemplate(this)">Enregistrer</button>
         </form>
@@ -641,12 +641,12 @@
                             </div>
                         </div>
                         <div class="footer" >
-                            <button type="button" class="actionBtn deleteBtn"  hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Reject"}' hx-swap="delete" hx-target="closest .card">Supprimer</button>
-                            <button type="button" class="actionBtn laterBtn" hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "A revoir"}' hx-swap="delete" hx-target="closest .card">A revoir</button>
+                            <button type="button" class="actionBtn deleteBtn"  hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Reject"}' hx-swap="delete" hx-target="closest .card">Supprimer</button>
+                            <button type="button" class="actionBtn laterBtn" hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "A revoir"}' hx-swap="delete" hx-target="closest .card">A revoir</button>
                         </div>
                         <dialog class="interviewModal">
                             <h1 style="margin-bottom: .5rem;text-align: center;">Creer Interview</h1>
-                            <form hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
+                            <form hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
                                 hx-swap="delete" hx-target="closest .card" >
                                 <div style="display: flex;justify-content: space-between;gap: .5rem;">
                                     <div>
@@ -697,11 +697,11 @@
                             </div>
                         </div>
                         <div class="footer" style="justify-content: flex-end;">
-                            <button type="button" class="actionBtn deleteBtn" hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Reject"}' hx-swap="delete" hx-target="closest .card">Supprimer</button>
+                            <button type="button" class="actionBtn deleteBtn" hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Reject"}' hx-swap="delete" hx-target="closest .card">Supprimer</button>
                         </div>
                         <dialog class="interviewModal">
                             <h1 style="margin-bottom: .5rem;text-align: center;">Creer Interview</h1>
-                            <form hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
+                            <form hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
                                 hx-swap="delete" hx-target="closest .card" >
                                 <div style="display: flex;justify-content: space-between;gap: .5rem;">
                                     <div>
