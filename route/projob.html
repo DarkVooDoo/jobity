@@ -1,7 +1,8 @@
 {{define "Head"}}
     <title>{{.Job.Title}}</title>
-    <script src="/static/Dropdown.js" type="module"></script>
+    <script src="/static/Dropdown.mjs" type="module"></script>
     <script src="/static/ToggleBtn.js" type="module"></script>
+    <script src="/static/Calendar.js" type="module"></script>
 {{end}}
 
 {{define "Style"}}
@@ -202,6 +203,48 @@
         }
     }
 
+    #create-interview{
+        padding: 10px;
+        overflow: visible;
+        border-radius: 10px;
+        margin: auto;
+        border: none;
+        transition: all 150ms linear, display 150ms linear allow-discrete, overlay 150ms linear allow-discrete;
+        opacity: 0;
+        transform: translateY(100px);
+        &:popover-open{
+            transition: all 150ms linear;
+            opacity: 1;
+            transform: translateY(0px);
+            @starting-style{
+                opacity: 0;
+                transform: translateY(100px);
+            }
+        }
+        .create-interview-title{
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: .5rem;
+        }
+        .create-interview-btn{
+            display: flex;
+            justify-content: space-between;
+            margin-top: .5rem;
+            .create-interview-btn-button{
+                padding: .5rem 1rem;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+            .create-interview-btn-submit{
+                color: var(--success_border_color);
+                border: 1px solid var(--success_border_color);
+            }
+            .create-interview-btn-delete{
+                color: var(--delete_color);
+                border:1px solid var(--delete_color);
+            }
+        }
+    }
     #delete_modal, #template_save{
         background-color: white;
         border-radius: 10px;
@@ -248,19 +291,8 @@
         margin-top: 1rem;
         @container main_section (width >= 950px){
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
-            .cvBtn{
-                display: none;
-            }
-            .ls-cvBtn{
-                display: block !important;
-                padding: .5rem !important;
-            }
-
-            .metadata:has(+ .ls-cvBtn){
-                margin-bottom: .3rem;
-            }
         }
         .section{
             .inner{
@@ -283,25 +315,32 @@
                         margin-block: 1rem;
                         gap: .5rem;
                         .info{
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
                             width: 100%;
                             .name{
                                 font-size: 1rem;
+                                margin-bottom: 3px;
                             }
-                            .addr, .date{
+                            .metadata{
                                 color: #4b4b4b;
+                                margin-bottom: 3px;
                             }
-                            .cvBtn, .ls-cvBtn{
-                                border-radius: 5px;
-                                padding: 1rem;
-                                background-color: var(--primary_color);
-                                color: white;
-                                font-weight: bold;
-                            }
-                            .ls-cvBtn{
-                                display: none;
+                            .info-step{
+                                display: flex;
+                                justify-content: space-between;
+                                .info-step-btn{
+                                   font-weight: bold;
+                                   place-self: flex-start;
+                                   border-radius: 5px;
+                                   padding: .5lh;
+                                   color: white;
+                                }
+                                .cvBtn{
+                                   color: black;
+                                   border: 1px solid black;
+                                }
+                                .interviewBtn{
+                                    background-color: black;
+                                }
                             }
                         }
                     }
@@ -311,11 +350,17 @@
                         display: flex;
                         justify-content: space-between;
                         .actionBtn{
-                            height: 2rem;
-                            padding-inline: 1rem;
-                            color: white;
-                            font-weight: bold;
+                            padding: .5lh 1lh;
                             border-radius: 5px;
+                            font-weight: bold;
+                        }
+                        .deleteBtn{
+                            color: var(--delete_color);
+                            border: 1px solid var(--delete_color);
+                        }
+                        .laterBtn{
+                            color: var(--primary_color);
+                            border: 1px solid var(--primary_color);
                         }
                     }
                 }
@@ -357,6 +402,49 @@
     }
     
 
+    .interviewModal{
+        background: white;
+        border-radius: 10px;
+        border: none;
+        margin: auto;
+        padding: 10px;
+        width: 350px;
+        overflow: visible;
+        .interview-input{
+            height: 2rem;
+            padding-inline: 5px;
+            border-radius: 5px;
+            border: 1px solid lightgray;
+            margin-bottom: .5rem;
+            display: block;
+            width: 100%;
+        }
+        .input-label{
+            margin-bottom: .3rem;
+            display: inline-block;
+        }
+        .interviewModal-location-suggest{
+            position: absolute;
+            left: 0;
+            top: 3.5lh;
+            width: 100%;
+            box-shadow: 0 0 5px 2px darkgray;
+            background: white;
+            border-radius: 5px;
+            .interviewModal-location-item{
+                padding: .5lh 5px;
+            }
+        }
+        .interview-buttons{
+            display: flex;
+            justify-content: space-between;
+            .interview-btn{
+                padding: .4rem 1rem;
+                border: 1px solid black;
+                border-radius: 5px;
+            }
+        }
+    }
 .btn {
     padding: 8px 16px;
     border-radius: 4px;
@@ -378,7 +466,7 @@
 {{end}}
 
 {{define "Body"}}
-    <main>
+        {{$InterviewType := .InterviewType}}
         <div class="header">
             <div class="preview">
                 <h1 class="title">{{.Job.Title}}</h1>
@@ -417,7 +505,7 @@
             </div>
             <h2 class="subheader">Contrat</h2>
             <div class="newjob_flex">
-                <dropdown-ele id="contract" value="{{.Job.Contract}}"  array="{{.Job.ContractArray}}"></dropdown-ele>
+                <dropdown-ele id="contract" value="{{.Job.Contract}}" items="{{.Job.ContractArray}}"></dropdown-ele>
                 <div class="newjob_field">
                     <input type="number" value="{{.Job.WeeklyWorkTime}}" placeholder="35" id="weeklyWorkTime" name="weeklyWorkTime" class="newjob_field_input newjob_field_input_withLabel" />
                     <label for="weeklyWorkTime" class="newjob_field_label">Heures</label>
@@ -539,52 +627,58 @@
                     {{range .Candidate}}
                     <div class="card">
                         <div class="content">
-                            <img src="/static/profile-picture.jpeg" class="photo" />
+                            <div>
+                                <img src="/static/profile-picture.jpeg" class="photo" />
+                            </div>
                             <div class="info">
-                                <div>
-                                    <h1 class="name">{{.Name}}</h1>
-                                    <p class="metadata">{{.Adresse}}</p>
-                                    <p class="metadata">{{.Gender}}, {{.Age}}</p>
-                                    <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="ls-cvBtn">Voir CV</a>
+                                <h1 class="name">{{.Name}}</h1>
+                                <p class="metadata">{{.Adresse}}</p>
+                                <p class="metadata">{{.Gender}}, {{.Age}}</p>
+                                <div class="info-step">
+                                    <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="info-step-btn cvBtn">Voir CV</a>
+                                    <button type="button" onclick="onOpenCreateInterview(this)" class="info-step-btn interviewBtn">Creer interview</button>
                                 </div>
-                                <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="cvBtn">Voir CV</a>
                             </div>
                         </div>
-                        <div class="footer">
-                            <button type="button" class="actionBtn" style="background-color: var(--delete_color);" hx-delete="/job/{{.JobId}}/cv/{{.UserId}}" hx-swap="delete" hx-target="closest .card">Reject</button>
-                            <button type="button" class="actionBtn" style="background-color: var(--success_border_color);">Possible</button>
+                        <div class="footer" >
+                            <button type="button" class="actionBtn deleteBtn"  hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Reject"}' hx-swap="delete" hx-target="closest .card">Supprimer</button>
+                            <button type="button" class="actionBtn laterBtn" hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "A revoir"}' hx-swap="delete" hx-target="closest .card">A revoir</button>
                         </div>
+                        <dialog class="interviewModal">
+                            <h1 style="margin-bottom: .5rem;text-align: center;">Creer Interview</h1>
+                            <form hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
+                                hx-swap="delete" hx-target="closest .card" >
+                                <div style="display: flex;justify-content: space-between;gap: .5rem;">
+                                    <div>
+                                        <b class="input-label">Date</b>
+                                        <input type="datetime-local" name="interview_date" class="interview-input" />
+                                    </div>
+                                    <div>
+                                        <b class="input-label">Type</b>
+                                        <select name="type" class="interview-input">
+                                            {{range $InterviewType}}
+                                                <option value="{{.}}">{{.}}</option>
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="interviewModal-location hidden" style="position: relative;">
+                                    <b class="input-label">Location</b>
+                                    <input type="text" autocomplete="off" name="location" class="interview-input" oninput="onFetchAddr(this)"/>
+                                    <div class="interviewModal-location-suggest hidden"></div>
+                                </div>
+                                <div class="interview-buttons">
+                                    <button type="button" class="interview-btn" onclick="onCloseCreateInterview(this)">Cancel</button>
+                                    <button type="submit" class="interview-btn">Creer</button>
+                                </div>
+                            </form>
+                        </dialog>
                     </div>
                     {{end}}
                 </div>
             </details>
             <details class="section" name="candidate">
-                <summary class="application_header">Possible</summary>
-                <div class="inner">
-                    {{range .Possible}}
-                    <div class="card">
-                        <div class="content">
-                            <img src="/static/profile-picture.jpeg" class="photo" />
-                            <div class="info">
-                                <div>
-                                    <h1 class="name">{{.Name}}</h1>
-                                    <p class="metadata">{{.Adresse}}</p>
-                                    <p class="metadata">{{.Gender}}, {{.Age}}</p>
-                                    <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="ls-cvBtn">Voir CV</a>
-                                </div>
-                                <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="cvBtn">Voir CV</a>
-                            </div>
-                        </div>
-                        <div class="footer">
-                            <button type="button" class="actionBtn" style="background-color: var(--delete_color);" hx-delete="/job/{{.JobId}}/cv/{{.UserId}}" hx-swap="delete" hx-target="closest .card">Reject</button>
-                            <button type="button" class="actionBtn" style="background-color: var(--success_border_color);">Planifier interview</button>
-                        </div>
-                    </div>
-                    {{end}}
-                </div>
-            </details>
-            <details class="section" name="candidate">
-                <summary class="application_header">Interview</summary>
+                <summary class="application_header">A revoir</summary>
                 <div class="inner">
                     {{range .Interview}}
                     <div class="card">
@@ -596,18 +690,109 @@
                                     <p class="metadata">{{.Adresse}}</p>
                                     <p class="metadata">{{.Gender}}, {{.Age}}</p>
                                 </div>
-                                <a href="/job/{{.JobId}}/cv/{{.UserId}}" class="cvBtn">Voir CV</a>
+                                <div class="info-step">
+                                    <a href="/job/{{.JobId}}/cv/{{.UserId}}" target="_blank" class="info-step-btn cvBtn">Voir CV</a>
+                                    <button type="button" onclick="onOpenCreateInterview(this)" class="info-step-btn interviewBtn">Creer interview</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="footer">
+                        <div class="footer" style="justify-content: flex-end;">
+                            <button type="button" class="actionBtn deleteBtn" hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Reject"}' hx-swap="delete" hx-target="closest .card">Supprimer</button>
                         </div>
+                        <dialog class="interviewModal">
+                            <h1 style="margin-bottom: .5rem;text-align: center;">Creer Interview</h1>
+                            <form hx-post="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
+                                hx-swap="delete" hx-target="closest .card" >
+                                <div style="display: flex;justify-content: space-between;gap: .5rem;">
+                                    <div>
+                                        <b class="input-label">Date</b>
+                                        <input type="datetime-local" name="interview_date" class="interview-input" />
+                                    </div>
+                                    <div>
+                                        <b class="input-label">Type</b>
+                                        <select name="type" class="interview-input">
+                                            {{range $InterviewType}}
+                                                <option value="{{.}}">{{.}}</option>
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="interviewModal-location hidden" style="position: relative;">
+                                    <b class="input-label">Location</b>
+                                    <input type="text" autocomplete="off" name="location" class="interview-input" oninput="onFetchAddr(this)"/>
+                                    <div class="interviewModal-location-suggest hidden"></div>
+                                </div>
+                                <div class="interview-buttons">
+                                    <button type="button" class="interview-btn" onclick="onCloseCreateInterview(this)">Cancel</button>
+                                    <button type="submit" class="interview-btn">Creer</button>
+                                </div>
+                            </form>
+                        </dialog>
                     </div>
                     {{end}}
                 </div>
             </details>
         </div>
-    </main>
     <script>
+
+        let fetchTimer
+        const onCloseCreateInterview = (ele)=>{
+            const modal =  ele.closest(".interviewModal")
+            modal.close()
+        }
+        const onOpenCreateInterview = (ele)=>{
+            const card =  ele.closest(".card")
+            const modal = card.querySelector(".interviewModal")
+            modal.showModal()
+        }
+
+        const dropdown = document.querySelectorAll("[name='type']")
+        for (const drop of dropdown){
+            drop.addEventListener("change", function(e){
+                const location = drop.closest(".interviewModal").querySelector(".interviewModal-location")
+                if (drop.value === "En personne"){
+                    location.classList.remove("hidden")
+                }else{
+                    location.classList.add("hidden")
+                }
+            })
+        }
+
+        const onSelectAdresse = (adresseElement)=>{
+            const modal = adresseElement.closest(".interviewModal-location")
+            const input = modal.querySelector(".interview-input")
+            input.value = `${adresseElement.textContent}`
+            adresseElement.parentElement.classList.add("hidden")
+        }
+
+        const onFetchAddr = (ele)=>{
+            const modal = ele.closest(".interviewModal-location")
+            const input = modal.querySelector(".interview-input")
+            const suggest = modal.querySelector(".interviewModal-location-suggest")
+            fetchAdresseHtml = ""
+            if (fetchTimer) clearTimeout(fetchTimer)
+            fetchTimer = setTimeout(async ()=>{
+                try{
+                    const fetchAddr = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${ele.value}&limit=5`)
+                    const result = await fetchAddr.json()
+                    for(const adr of result.features){
+                        fetchAdresseHtml += `<p class="interviewModal-location-item" onclick="onSelectAdresse(this)">${adr.properties.name}, ${adr.properties.postcode}</p>` 
+                    }
+                    suggest.innerHTML = fetchAdresseHtml
+                    suggest.classList.remove("hidden")
+                    if(result.features.length > 0){
+                        const firstELement = result.features[0]
+                        input.value = `${firstELement.properties.name}, ${firstELement.properties.postcode}`
+                    }
+                }catch(err){}
+            }, 500)
+        }
+
+        const getDateValue = (name)=>{
+            const calendar = document.getElementById(name)
+            const input = calendar.shadowRoot.querySelector(".date-input")
+            return input.value
+        }
 
         //<div style="display: flex;gap: .5rem;">
         //    <button type="button" style="border: 1px solid red;color: red;" class="deleteBtn"
@@ -705,7 +890,7 @@
             const profilWanted = []
             const advantageList = []
             const salaryList = []
-            const contractValue = contract.querySelector(".dropdown_display")
+            const contractValue = contract.shadowRoot.querySelector(".dropdown-input")
             const profilNeeded = document.getElementsByClassName("content")
             const advantage = document.getElementsByClassName("advantage")
 
@@ -721,6 +906,7 @@
                 salaryList.push(parseFloat(sal.value))
             }
             return {
+                contract: contractValue.value,
                 salary: salaryList,
                 description: description.innerText, 
                 weeklyWorkTime: parseFloat(weeklyWorkTime.value),

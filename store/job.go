@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"job/lib"
 	"log"
 	"math/rand"
 	"net/http"
@@ -28,6 +27,7 @@ type Job struct{
     ContractArray string
     EntrepriseName string
     EntrepriseId string 
+    Experience int `json:"exp"`
     Advantage []string `json:"advantage"`
     SkillNeeded []Skill `json:"skill"`
     Date string
@@ -121,10 +121,10 @@ var cache struct{
     ExpireIn int
 }
 
-func GetEmplois(recomendation lib.RecomendationToken) (ftJobs []Job, ftRecomendationJobs []Job, jobs []Job){
+func GetEmplois(recomendation []float64) (ftJobs []Job, ftRecomendationJobs []Job, jobs []Job){
     jobs = GetAppJobs(recomendation)
-    ftJobs, ftRecomendationJobs, _ = GetFranceTravailEmplois(recomendation, len(jobs))
-    jobs = append(jobs, ftRecomendationJobs...)
+    ftJobs, ftRecomendationJobs, _ = GetFranceTravailEmplois(len(jobs))
+    jobs = append(jobs, ftJobs...)
     rand.Shuffle(len(jobs), func(i, j int) {{jobs[i], jobs[j] = jobs[j], jobs[i]}})
     return ftJobs, ftRecomendationJobs, jobs
 }
@@ -135,7 +135,8 @@ func GetRecomendationJobs()[]Job{
     return jobs
 }
 
-func GetAppJobs(filter lib.RecomendationToken)[]Job{
+func GetAppJobs(recomendationVector []float64)[]Job{
+    var jobRows *sql.Rows
     var jobs []Job
     var sal sql.NullString
     var fulltime bool
@@ -146,27 +147,28 @@ func GetAppJobs(filter lib.RecomendationToken)[]Job{
         return jobs
     }
     defer conn.Close()
-    query := `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city, j.contract, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id WHERE `
-    if filter.Label != ""{
-        query += fmt.Sprintf("j.ts @@ websearch_to_tsquery('french', '%v') AND ", filter.Label)
-    }
-    if filter.Postal != ""{
-        query += fmt.Sprintf("LEFT(j.postal, 2)='%v' AND ", filter.Postal)
-    }
-    if filter.Contract != ""{
-        query += fmt.Sprintf("j.contract='%v' AND ", filter.Contract)
-    }
-    var jobRows *sql.Rows
-    if !strings.HasSuffix(query, "WHERE "){
-        query = query[:len(query)-4]+"ORDER BY RANDOM() LIMIT 5"
-        jobRows, err = conn.QueryContext(context.Background(), query)
+    query := ""
+    if len(recomendationVector) > 0{
+        query = `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city, j.contract, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id WHERE Test($1,vector) >= 0.8 LIMIT 10`
+        rows, err := conn.QueryContext(context.Background(), query, pq.Array(recomendationVector))
+        if err != nil{
+            log.Println(err)
+        }
+        jobRows = rows
     }else{
-        jobRows, err = conn.QueryContext(context.Background(), `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city , j.contract, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id ORDER BY RANDOM() LIMIT 5`)
-
+        query = `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city, j.contract, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id ORDER BY RANDOM() LIMIT 10`
+        rows, err := conn.QueryContext(context.Background(), query)
+        if err != nil{
+            log.Println(err)
+        }
+        jobRows = rows
     }
-
     if err != nil{
         log.Println(err)
+        return jobs
+    }
+    if err != nil{
+        log.Printf("Query error %v", err)
         return jobs
     }
     for jobRows.Next(){
@@ -195,6 +197,19 @@ func GetAppJobs(filter lib.RecomendationToken)[]Job{
     return jobs
 }
 
+func(j *Job) Vector()[]float64{
+    var recomendationVector []float64
+    if j.Contract == "CDI"{
+        recomendationVector = append(recomendationVector, 1)   
+    }else if j.Contract == "CDD"{
+        recomendationVector = append(recomendationVector, 2)
+    }else{
+        recomendationVector = append(recomendationVector, 0)
+    }
+    recomendationVector = append(recomendationVector, j.WeeklyWorkTime / 35, j.Salary[0] / 1000, float64(j.Experience))
+    return recomendationVector
+}
+
 func (j *Job) CreateJob()(string, error){
     conn, err := GetDBConn()   
     if err != nil{
@@ -208,7 +223,8 @@ func (j *Job) CreateJob()(string, error){
     if j.WeeklyWorkTime >= 35{
         j.Fulltime = true
     }
-    jobRow := conn.QueryRowContext(context.Background(), `INSERT INTO Job(title, description, salary, city, postal, contract, worktime, advantage, skill, fulltime, lat, long, entreprise_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`, j.Title, j.Description, h, j.City, j.Postal, j.Contract, j.WeeklyWorkTime, pq.Array(j.Advantage), string(skill), j.Fulltime, j.Lat, j.Long, j.EntrepriseId)
+    recomendationVector := j.Vector()
+    jobRow := conn.QueryRowContext(context.Background(), `INSERT INTO Job(title, description, salary, city, postal, contract, worktime, advantage, skill, fulltime, lat, long, experience, vector, entreprise_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$15,$14) RETURNING id`, j.Title, j.Description, h, j.City, j.Postal, j.Contract, j.WeeklyWorkTime, pq.Array(j.Advantage), string(skill), j.Fulltime, j.Lat, j.Long, j.Experience, pq.Array(recomendationVector), j.EntrepriseId)
     if err = jobRow.Scan(&j.Id); err != nil{
         log.Println(err)
         return "", errors.New("error inserting job to the db")
@@ -270,8 +286,8 @@ func (j *Job) GetJobById()error{
         log.Println(err)
         return errors.New("error transction")
     }
-    jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, j.contract, j.city, j.postal,  CONCAT(LEFT(j.postal, 2), ' - ', J.city), j.salary, j.advantage, j.skill, j.worktime, j.fulltime, ja.id, b.id FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobApplication AS ja ON ja.job_id=j.id LEFT JOIN Bookmark AS b ON j.id=b.job_id WHERE j.id=$1`, j.Id)
-    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &j.FullAdresse, &sal, pq.Array(&j.Advantage), &skill, &j.WeeklyWorkTime, &j.Fulltime, &applicationId, &bookmarkId); err != nil{
+    jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, j.contract, j.city, j.postal,  CONCAT(LEFT(j.postal, 2), ' - ', J.city), j.salary, j.advantage, j.skill, j.worktime, j.fulltime, j.lat, j.long, j.experience , ja.id, b.id FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobApplication AS ja ON ja.job_id=j.id LEFT JOIN Bookmark AS b ON j.id=b.job_id WHERE j.id=$1`, j.Id)
+    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &j.FullAdresse, &sal, pq.Array(&j.Advantage), &skill, &j.WeeklyWorkTime, &j.Fulltime, &j.Lat, &j.Long,&j.Experience, &applicationId, &bookmarkId); err != nil{
         log.Println(err)
         return errors.New("error scanning job")
     }
@@ -297,7 +313,7 @@ func GetEntrepriseJobs(entrepriseId string)[]Job{
         log.Println(err)
         return jobs
     }
-    entrepriseJobRows, err := conn.QueryContext(context.Background(), `SELECT j.title, j.id, LEFT(j.postal, 2), j.city, (SELECT count(id) FROM JobApplication WHERE status < 'Possible' AND j.id=job_id), j.contract FROM Job AS j WHERE j.entreprise_id=$1`, entrepriseId)
+    entrepriseJobRows, err := conn.QueryContext(context.Background(), `SELECT j.title, j.id, LEFT(j.postal, 2), j.city, (SELECT count(id) FROM JobApplication WHERE status <= 'Vue' AND j.id=job_id), j.contract FROM Job AS j WHERE j.entreprise_id=$1`, entrepriseId)
     if err != nil{
         log.Println(err)
         return jobs
@@ -564,7 +580,10 @@ func GetFranceTravailJobById(id string)(Job, error){
     }
     var weeklyWorkTime float64 = 0
     if job.WeeklyWorkTime != ""{
-        weeklyWorkTime, _ = strconv.ParseFloat(job.WeeklyWorkTime[:len(job.WeeklyWorkTime)-1], 64)
+        weeklyWorkTime, err = strconv.ParseFloat(job.WeeklyWorkTime[:2], 64)
+        if err != nil{
+            weeklyWorkTime = 0
+        }
     }
     conn, err := GetDBConn()
     if err != nil{
@@ -624,12 +643,12 @@ func GetFranceTravailToken()( error){
     return nil
 }
 
-func GetFranceTravailEmplois(recomendation lib.RecomendationToken, jobLength int)(mostRecentJobs []Job, recomendationJobs []Job,  requestError error){
-    //mostRecentJobs, requestError = getFranceTravailFrontpageJobs("https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?origineOffre=1&range=0-9")
-    //if requestError != nil{
-    //    log.Println(requestError)
-    //}
-    recomendationJobs, requestError = getFranceTravailFrontpageJobs(fmt.Sprintf("https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?origineOffre=1&range=0-%v&departement=%v&typeContrat=%v", 9-jobLength, recomendation.Postal, recomendation.Contract))
+func GetFranceTravailEmplois(jobLength int)(mostRecentJobs []Job, recomendationJobs []Job,  requestError error){
+    mostRecentJobs, requestError = getFranceTravailFrontpageJobs(fmt.Sprintf("https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?origineOffre=1&range=0-%v", 9-jobLength))
+    if requestError != nil{
+        log.Println(requestError)
+    }
+    //recomendationJobs, requestError = getFranceTravailFrontpageJobs(fmt.Sprintf("https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search?origineOffre=1&range=0-%v&departement=%v&typeContrat=%v", 9-jobLength, recomendation.Postal, recomendation.Contract))
     return mostRecentJobs, recomendationJobs, nil
 }
 

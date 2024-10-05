@@ -12,6 +12,10 @@ main{
         font-size: 1.2rem;
     }
     .container{
+        padding: 1rem;
+        background-color: white;
+        border-radius: 20px;
+        border: 1px solid lightgray;
         @container (width <= 677px){
             #favorite-cards-container{
                 white-space: nowrap;
@@ -33,17 +37,6 @@ main{
                     &:last-child{
                         margin-right: 0;
                     }
-                }
-                &::-webkit-scrollbar{
-                    height: 5px;
-                }
-                &::-webkit-scrollbar-track{
-                    background: rgb(200,200,200);
-                    border-radius: 25px;
-                }
-                &::-webkit-scrollbar-thumb{
-                    background: #5b5b5b;
-                    border-radius: 25px;
                 }
             }
             .card{
@@ -110,9 +103,9 @@ main{
         position: relative;
         gap: .3rem;
         background-color: white;
-        border: 1px solid lightgray;
         padding: 10px;
         border-radius: 10px;
+        box-shadow: 0 0 6px 2px darkgray;
         .title, .application-addr{
             margin-bottom: .3lh;
         }

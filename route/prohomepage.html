@@ -1,11 +1,222 @@
 {{define "Head"}}
     <title>Dashboard</title>
+    <script src="/static/Dropdown.mjs" type="module"></script>
 {{end}}
 %end
 {{define "Style"}}
     .offert > *, .picture_form > *, .form > *{
         margin-bottom: .5rem;   
     }
+    main{
+        .tab{
+            background-color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid lightgray;
+            height: fit-content;
+            margin-bottom: 1rem;
+            .tab-entreprise{
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+            .tab-paths{
+                display: flex;
+                gap: 1rem;
+                .tab-paths-link{
+                    padding: 5px 10px;
+                    border: 1px solid black;
+                    align-self: flex-start;
+                    border-radius: 25px;
+                }
+            }
+        }
+        #content{
+            flex: 1;
+            .offert-container{
+                .create-offert{
+                    width: 100%;
+                    display: block;
+                    padding-block: 1.5lh;
+                    text-align: center;
+                    border: 2px dashed black;
+                    border-radius: 10px;
+                    margin-bottom: 1rem;
+                }
+                .offert-card{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border: 1px solid lightgray;
+                    padding: 10px;
+                    background-color: white;
+                    border-radius: 10px;
+                    margin-bottom: 1rem;
+                    & .data > *{
+                        margin-bottom: .3rem;
+                    }
+
+                    & .metadata{
+                        display: flex;
+                        gap: .3rem;
+                        align-items: center;
+
+                        & .icon{
+                            width: 1rem;
+                            height: 1rem;
+                        }
+                    }
+
+                    & .reqAmount{
+                        height: 2rem;
+                        width: 2rem;
+                        background-color: #204767;
+                        display: flex;
+                        color: white;
+                        font-weight: bold;
+                        align-items: center;
+                        border-radius: 50%;
+                        justify-content: center;
+                        font-size: .6rem;
+                    }
+                }
+            }
+            .interview-card{
+                margin-bottom: 1rem;
+                border-radius: 10px;
+                background-color: white;
+                padding: 10px;
+                border: 1px solid lightgray;
+                .interview-card-info{
+                    padding-bottom: 1rem;
+                    border-bottom: 1px solid lightgray;
+                    display: flex;
+                    align-items: center;
+                    gap: .5rem;
+                    .interview-photo{
+                        height: 50px;
+                        aspect-ratio: 1/1;
+                        border-radius: 50%;
+                    }
+                    .interview-type{
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                        height: 1.5lh;
+                        aspect-ratio: 1/1;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                    }
+                    .interview-row{
+                        padding: .3rem 1.5lh .3rem 0;
+                        display: flex;
+                        gap: 5px;
+                        align-items: center;
+                        .interview-user-name{
+                            font-size: 1rem;
+                        }
+                        .interview-card-info-icon{
+                             height: 1lh;
+                             aspect-ratio: 1/1;
+                        }
+                    }
+                }
+                .interview-card-footer{
+                    padding-top: 1rem;
+                    display: flex;
+                    gap: .5rem;
+                    justify-content: space-between;
+                    align-items: center;
+                    .card-footer-user{
+                        display: flex;
+                        gap: .5rem;
+
+                        .card-footer-photo{
+                            width: 30px;
+                            aspect-ratio: 1/1;
+                            border-radius: 50%;
+                        }
+                    }
+                    .interview-footer-edit{
+                        height: 2lh;
+                        aspect-ratio: 1/1;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                    }
+                }
+                .interview-modal{
+                    background: white;
+                    border-radius: 10px;
+                    border: none;
+                    margin: auto;
+                    padding: 10px;
+                    width: 350px;
+                    overflow: visible;
+                    .interview-input{
+                        height: 2rem;
+                        padding-inline: 5px;
+                        border-radius: 5px;
+                        border: 1px solid lightgray;
+                        margin-bottom: .5rem;
+                        display: block;
+                        width: 100%;
+                    }
+                    .input-label{
+                        margin-bottom: .3rem;
+                        display: inline-block;
+                    }
+                    .interviewModal-location-suggest{
+                        position: absolute;
+                        left: 0;
+                        top: 3.5lh;
+                        width: 100%;
+                        box-shadow: 0 0 5px 2px darkgray;
+                        background: white;
+                        border-radius: 5px;
+                        .interviewModal-location-item{
+                            padding: .5lh 5px;
+                        }
+                    }
+                    .interview-buttons{
+                        display: flex;
+                        justify-content: space-between;
+                        .interview-btn{
+                            padding: .4rem 1rem;
+                            border: 1px solid black;
+                            border-radius: 5px;
+                        }
+                    }
+                }
+            }
+            .select{
+                background-color: black;
+                color: white;
+            }
+        }
+    }
+
+
+    @media only screen and (min-width: 650px){
+       main{
+            display: flex;
+            gap: 1rem;
+       }
+       .tab{
+           width: fit-content;
+           flex: .5;
+           .tab-entreprise{
+               flex-direction: column;
+           }
+           .tab-paths{
+                flex-direction: column;
+           }
+       }
+    } 
+
+
     .actionPath{
         display: flex;
         justify-content: space-between;
@@ -17,38 +228,6 @@
             border: 1px solid lightgray;
             border-radius: 10px;
         }
-    }
-    .offert{
-        position: absolute;
-        inset: 0;
-        margin: auto;
-        border-radius: 10px;
-        background-color: #f0f0f0;
-        width: 90%;
-        max-width: 650px;
-        padding: 10px;
-        border: none;
-        transition: opacity 300ms linear, transform 300ms ease, display 300ms linear allow-discrete, overlay 300ms linear allow-discrete;
-        transform: translateY(100px);
-        opacity: 0;
-        &:popover-open{
-            transition: opacity 300ms linear, transform 300ms ease;
-            transform: translateY(0px);
-            opacity: 1;
-            @starting-style{
-                opacity: 0;
-                transform: translateY(100px);
-            }
-        }
-        .offert_container{
-            height: 310px;
-            overflow-y: scroll;
-        }
-    }
-    .picture_form{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
     }
     #picture_label{
         height: 4rem;
@@ -80,43 +259,6 @@
         border-radius: 5px;
         padding: 5px;
     }
-    .offert_card{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: 1px solid lightgray;
-        padding: 10px;
-        background-color: white;
-        border-radius: 10px;
-        margin-bottom: 1rem;
-        & .data > *{
-            margin-bottom: .3rem;
-        }
-
-        & .metadata{
-            display: flex;
-            gap: .3rem;
-            align-items: center;
-
-            & .icon{
-                width: 1rem;
-                height: 1rem;
-            }
-        }
-
-        & .reqAmount{
-            height: 2rem;
-            width: 2rem;
-            background-color: #204767;
-            display: flex;
-            color: white;
-            font-weight: bold;
-            align-items: center;
-            border-radius: 50%;
-            justify-content: center;
-            font-size: .6rem;
-        }
-    }
     .offert_newBtn{
         font-weight: bold;
         padding: .5rem;
@@ -135,63 +277,100 @@
 {{end}}
 %end
 {{define "Body"}}
-    <main>
-        <form class="picture_form">
+
+    <section class="tab">
+        <div class="tab-entreprise">
             <label for="picture" id="picture_label">Picture</label>
             <input type="file" name="picture" id="picture" class="hidden" />
-            <button type="submit" class="picture_submitBtn">Enregistrer la photo</button>
-        </form>
-        <form class="form">
             <div>
-                <p>Nom</p>
-                <input type="text" readonly value="{{.Profile.Name}}" class="form_field form_readonly_field" />
+                <h1>Test Entreprise</h1>
+                <p>3 Avenue fotch, 75005</p>
             </div>
-            <div>
-                <p>Siret</p>
-                <input type="number" value="{{.Profile.Siren}}" class="form_field form_readonly_field" />
-            </div>
-            <div>
-                <p>Description</p>
-                <div contenteditable="true" class="description_field">{{.Profile.Description}}</div>
-            </div>
-        </form>
-        <div class="actionPath">
-            <button type="button" class="actionBtn" popovertarget="offert">
-                <h3>Mes annonces</h3>
-            </button>
+            <!--<button type="submit" class="picture_submitBtn">Enregistrer la photo</button>-->
+        </div>
+        <div class="tab-paths">
+            <button hx-post="/" hx-target="#content" hx-swap="innerHTML" type="button" class="tab-paths-link select">Annonces</button>
+            <button type="button" hx-put="/" hx-target="#content" hx-swap="innerHTML"  class="tab-paths-link">Interview</button>
+            <a href="#" class="tab-paths-link">Messages</a>
+            <a href="#" class="tab-paths-link">Mission</a>
+            <a href="#" class="tab-paths-link">Mon compte</a>
+        </div>
+    </section>
+    <div id="content">
+        <div class="offert-container">
+            <a class="create-offert" href="/job/creer">Creer une annonce</a>
+            {{range .Job}}
+            <a class="offert-card" href="/job/{{.Id}}">
+                <div class="data">
+                    <h3>{{.Title}}</h3>
+                    <div class="metadata">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <p>{{.City}}, {{.Postal}}</p>
+                    </div>
+                    <div class="metadata">
+                        <img src="/static/contract.svg" class="icon"></img>
+                        <p>{{.Contract}}</p>
+                    </div>
+                </div>
+                <p class="reqAmount">{{.ApplicationCount}}</p>
+            </a>
+            {{end}}
+        </div>
+    </div>
+    <script>
 
-            <button type="button" class="actionBtn">
-                <h3>Mes employées</h3>
-            </button>
-        </div>
-        <div class="offert" popover id="offert">
-            <div style="display: flex;justify-content: space-between;align-items: center;">
-                <h2>Mes Annonces</h2>
-                <a href="/job/creer" class="offert_newBtn">Nouveau</a>
-            </div>
-            <div class="offert_container">
-                {{range .Job}}
-                    <a class="offert_card" href="/job/{{.Id}}">
-                        <div class="data">
-                            <h3>{{.Title}}</h3>
-                            <div class="metadata">
-                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                <p>{{.City}}, {{.Postal}}</p>
-                            </div>
-                            <div class="metadata">
-                                <img src="/static/contract.svg" class="icon"></img>
-                                <p>{{.Contract}}</p>
-                            </div>
-                        </div>
-                        <p class="reqAmount">{{.ApplicationCount}}</p>
-                    </a>
-                {{end}}
-            </div>
-        </div>
-        <button class="deleteBtn" type="button">Supprimer votre compte</button>
-    </main>
+        let fetchTimer
+        const onEditInterview = (ele)=>{
+            const modal = ele.closest(".interview-card").querySelector(".interview-modal")
+            modal.showModal()
+        }
+
+        const onCloseInterview = (ele)=>{
+            const modal =  ele.closest(".interview-modal")
+            modal.close()
+        }
+
+        const onTypeChange = (ele)=>{
+            const location = ele.closest(".interview-modal").querySelector(".interviewModal-location")
+            if (ele.value === "En personne"){
+                location.classList.remove("hidden")
+            }else{
+                location.classList.add("hidden")
+            }
+        }
+
+        const onSelectAdresse = (adresseElement)=>{
+            const modal = adresseElement.closest(".interviewModal-location")
+            const input = modal.querySelector(".interview-input")
+            input.value = `${adresseElement.textContent}`
+            adresseElement.parentElement.classList.add("hidden")
+        }
+
+        const onFetchAddr = (ele)=>{
+            const modal = ele.closest(".interviewModal-location")
+            const input = modal.querySelector(".interview-input")
+            const suggest = modal.querySelector(".interviewModal-location-suggest")
+            fetchAdresseHtml = ""
+            if (fetchTimer) clearTimeout(fetchTimer)
+            fetchTimer = setTimeout(async ()=>{
+                try{
+                    const fetchAddr = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${ele.value}&limit=5`)
+                    const result = await fetchAddr.json()
+                    for(const adr of result.features){
+                        fetchAdresseHtml += `<p class="interviewModal-location-item" onclick="onSelectAdresse(this)">${adr.properties.name}, ${adr.properties.postcode}</p>` 
+                    }
+                    suggest.innerHTML = fetchAdresseHtml
+                    suggest.classList.remove("hidden")
+                    if(result.features.length > 0){
+                        const firstELement = result.features[0]
+                        input.value = `${firstELement.properties.name}, ${firstELement.properties.postcode}`
+                    }
+                }catch(err){}
+            }, 500)
+        }
+    </script>
 {{end}}
 %end

@@ -10,8 +10,8 @@ type ProjobPage struct{
     RequireData
     Job store.Job
     Candidate []store.Curriculum
-    Possible []store.Curriculum
     Interview []store.Curriculum
+    InterviewType []string
 }
 
 var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
@@ -29,13 +29,13 @@ var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
             log.Println(err)
             return
         }
-        candidates, possible, interview := store.GetJobCurriculum(job.Id)
+        candidates, interview := store.GetJobCurriculum(job.Id)
         page := ProjobPage{
             RequireData{Search: SearchQuery{Query: ""}},
             job,
             candidates,
-            possible,
             interview,
+            store.GetInterviewType(),
         }
         route.Render(page, "route/protemplate.html", "route/projob.html")
     })
@@ -46,6 +46,11 @@ var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
             return
         }
         route.Notification("success", "modéle enregistrer")
+    })
+
+    route.Put(nil, func() {
+        //var application = store.JobApplication{}       
+        //application.UpdateStatus()
     })
 
     route.Patch(&job, func() {

@@ -1,6 +1,5 @@
 
 ## TODe
-    - Save offert as template
 
 travay.fr
 fjob.fr
@@ -10,12 +9,19 @@ hostinger code BENAWAD
 
 # Profile page
 Activités
-CV
-Waiting jobs (status)
 
 horaire de travail: (matin_apres-midi_soir)
 
 # Features
 
-5GB of application storage
-recruteur peuvent restreint les postulation (ex. seulement laisser postuler les gens de certeine location)
+selectioner les jours disponible pour un possible entretien
+
+# Cosine Similarity
+
+for recomendation to non connected user the vector position
+
+1. Contract
+2. WorkHour
+3. Latitude
+4. Long 
+5. Experience

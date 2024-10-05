@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"job/store"
 	"log"
 	"math"
 	"reflect"
@@ -16,6 +17,40 @@ type Recom struct{
     Postal string
     Contract string
     Fulltime bool
+}
+
+var categories = []string{"Vente", "Informatique", "Marketing", "Comptabilité, RH",  "Logistic", "Mécanique", "Electronique", "Maintenance - Entretien", "Hôtellerie et Restauration", "Finances - Assurances", "Artisant d'art", "Santé", "Sport", ""}
+
+func TestRecCookie (t *testing.T){
+    vector := "0101"
+    job := store.Job{Fulltime: true, Contract: "CDI"}   
+    if job.Fulltime{
+        vector += "10"
+    }else{
+        vector += "01"
+    }
+    if job.Contract == "CDD"{
+        vector += "10"
+    }else{
+        vector += "01"
+    }
+}
+
+func TestRecomendation(t *testing.T){
+    vec1 := []float64{ 1, 3}
+    vec2 := []float64{3, 1}
+    var vt, vec1Pow, vec2Pow float64
+    for i := 0; i < len(vec1); i++{
+        vt += vec1[i] * vec2[i]
+        vec1Pow += math.Pow(float64(vec1[i]), 2)
+        vec2Pow += math.Pow(float64(vec2[i]), 2)
+    }
+
+    vec1Sqrt := math.Sqrt(float64(vec1Pow))
+    vec2Sqrt := math.Sqrt(float64(vec2Pow))
+    twoVector := vt / (vec1Sqrt * vec2Sqrt)
+    log.Printf("result: %v",twoVector)
+
 }
 
 func TestContext(t *testing.T){

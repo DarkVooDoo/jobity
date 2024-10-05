@@ -3,11 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"html/template"
-	"job/lib"
 	"job/store"
 	"log"
 	"net/http"
-	"strings"
 )
 
 type PagePayload struct{
@@ -29,16 +27,15 @@ var HomepageRoute = func(res http.ResponseWriter, req *http.Request) {
     }
     route, _ := NewRoute(res, req)
 	route.Get(func() {
-        var recomendation []lib.RecomendationToken
-        var myRecomendation lib.RecomendationToken
-        cookie, err := route.Request.Cookie("foryou")
+        var recomendation []float64
+        cookie, err := route.Request.Cookie("pref")
         if err == nil{
-            if err = json.Unmarshal([]byte(strings.ReplaceAll(cookie.Value, "%22", `"`)), &recomendation); err != nil{
+            if err = json.Unmarshal([]byte(cookie.Value), &recomendation); err != nil{
                 log.Println(err)
             }
-            myRecomendation = lib.MostSearch(recomendation)
+            //myRecomendation = lib.MostSearch(recomendation)
         }
-        ftJobs, ftRecomendationJobs, jobs := store.GetEmplois(myRecomendation)
+        ftJobs, ftRecomendationJobs, jobs := store.GetEmplois(recomendation)
         data.User = route.User
         data.Job = jobs
         data.FTJob = ftJobs

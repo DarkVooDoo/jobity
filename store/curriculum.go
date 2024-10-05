@@ -236,7 +236,7 @@ func printCurriculumAbout(pdf *gofpdf.Fpdf, width float64, header string, data [
     pdf.Ln(10)
 }
 
-func GetJobCurriculum(jobId string)(candidates []Curriculum, possible []Curriculum, interview []Curriculum){
+func GetJobCurriculum(jobId string)(candidates []Curriculum, interview []Curriculum){
     var id, name, userId, status string
     var adresse, workString, schoolString, gender sql.NullString 
     var age sql.NullInt16
@@ -259,15 +259,37 @@ func GetJobCurriculum(jobId string)(candidates []Curriculum, possible []Curricul
         json.Unmarshal([]byte(string(schoolString.String)), &school)
         json.Unmarshal([]byte(string(workString.String)), &work)
         userId = EncryptCurriculumId(userId)
-        if status == "Possible"{
-            possible = append(possible, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
-        }else if status == "Interview"{
+        if status == "Interview"{
             interview = append(interview, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
         }else{
             candidates = append(candidates, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
         }
     }
     return 
+}
+
+func GetInterviewType()[]string{
+    var interviewType []string
+    var name string
+    conn, err := GetDBConn()
+    if err != nil{
+        log.Println(err)
+        return interviewType
+    }
+    defer conn.Close()
+    row, err := conn.QueryContext(context.Background(), `SELECT unnest(enum_range(NULL::interview_type))`)
+    if err != nil{
+        log.Println(err)
+        return interviewType
+    }
+    for row.Next(){
+        if err := row.Scan(&name); err != nil{
+            log.Println(err)
+            return interviewType
+        }
+        interviewType = append(interviewType, name)
+    }
+    return interviewType
 }
 
 func EncryptCurriculumId(id string)string{

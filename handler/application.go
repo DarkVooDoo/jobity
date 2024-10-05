@@ -31,11 +31,6 @@ var ApplicationHandler = func(res http.ResponseWriter, req *http.Request){
         }
         route.Render(page, "route/template.html", "route/my-applications.html")
     })
-
-    route.Post(nil, func() {
-              
-    })
-
     route.Put(nil, func() {
         jobApplication := store.JobApplication{UserId: route.User.Id, JobId: route.Multipart.Body["jobId"]}
         if err := jobApplication.CreateJobApplication(); err != nil{

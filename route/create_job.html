@@ -1,129 +1,153 @@
 {{define "Head"}}
     <script src="/static/Dropdown.js" type="module"></script>
     <script src="/static/ToggleBtn.js" type="module"></script>
+    <script src="/static/Calendar.js" type="module"></script>
     <title>Pro job creation</title>
 {{end}}
 %end
 {{define "Style"}}
-    .title{
-        font-size: 1.2rem;
+.form{
+    .form-header{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        .title{
+            font-size: 1.4rem;
+        }
     }
     .template{
         display: flex;
-        justify-content: flex-end;
         gap: .5rem;
         align-items: center;
-        margin-bottom: .5rem;
     }
-    .newjob, .title, .newjob_section{ 
-        > *{
-            margin-bottom: .5rem;
-        }
-        .flex{
-            display: flex;
-            gap: .3rem;
-            position: relative;
-        }
-        .subheader{
-            font-size: 1rem;
-        }
-        .field{
-            position: relative;
-            height: 2.5rem;
-            width: 100%;
-            .label{
-                position: absolute;
-                left: 5px;
-                top: .5rem;
+    .newjob{
+        container: form / inline-size;
+        counter-reset: section;
+        .newjob-section{
+            counter-increment: section;
+            margin-bottom: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid lightgray;
+            &::before{
+                font-size: 1rem;
                 font-weight: bold;
-                font-size: .9rem;
-                transition: all .2s linear;
+                content: counter(section) ".";
             }
-            .input{
-                height: 100%;
+            .newjob-section-name{
+                font-size: 1.2rem;
+                display: inline-block;
+                margin-bottom: 1rem;
+            }
+            .newjob-flex-form{
+                display: flex;
+                column-gap: .8rem;
+                position: relative;
+            }
+            .field{
                 width: 100%;
-                padding: 0 5px;
+                margin-bottom: 1rem;
+                .label{
+                    font-weight: bold;
+                    margin-bottom: .5rem;
+                    display: inline-block;
+                }
+                .input{
+                    height: 2.5rem;
+                    width: 100%;
+                    padding: 0 5px;
+                    border-radius: 5px;
+                    background-color: white;
+                    border: 1px solid lightgray;
+                }
+
+            }
+            .subheader{
+                margin-bottom: .5rem;
+            }
+            .description{
                 border-radius: 5px;
+                outline: 1px solid lightgray;
+                padding: 5px;
+                min-height: 1.5lh;
+                text-wrap: wrap;
                 background-color: white;
-                border: 1px solid lightgray;
-                &:focus + .label, &:valid + .label{
-                    top: .2rem;
-                    left: 5px;
-                    font-size: .7rem;
+            }
+            .newjob-time-date-field{
+                display: flex;
+                gap: .5rem;
+                align-items: center;
+                margin-bottom: .3rem;
+            }
+            .deleteBtn{
+                height: 2rem;
+                width: 2rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .deleteIcon{
+                    width: 100%;
+                    height: 100%;
                 }
             }
-            .withLabel{
-                padding: 10px 5px 0px 5px;
+            .advantage{
+                display: grid;
+                grid-template-columns: 1fr .1fr;
+                gap: .5rem;
+                margin-bottom: 1rem;
+                .input{
+                    height: 100%;
+                    width: 100%;
+                    padding: 0 5px;
+                    border-radius: 5px;
+                    background-color: white;
+                    border: 1px solid lightgray;
+                }
             }
-
-        }
-        .description{
-            border-radius: 5px;
-            outline: 1px solid lightgray;
-            padding: 5px;
-            text-wrap: wrap;
-            background-color: white;
-        }
-    }
-    .deleteBtn{
-        height: 2rem;
-        width: 2rem;
-        border: 1px solid lightgray;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .addBtn{
-        height: 2rem;
-        width: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        border: 1px solid lightgray;
-    }
-    .newjob_section{
-        border: 1px solid lightgray;
-        padding: 5px;
-        border-radius: 5px;
-        .headerWithButton{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .advantage{
-            display: grid;
-            grid-template-columns: 1fr .1fr;
-            gap: .5rem;
-            .input{
-                height: 100%;
+            .addBtn{
+                height: 2rem;
                 width: 100%;
-                padding: 0 5px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 border-radius: 5px;
-                background-color: white;
-                border: 1px solid lightgray;
+                border: 2px dashed black;
+                &::after{
+                    content: "+";
+                    border-radius: 50%;
+                    height: 1rem;
+                    aspect-ratio: 1/1;
+                    border: 1px solid black;
+                }
             }
-        }
-        .profile{
-            display: grid;
-            gap: .5rem;
-            grid-template-columns: 1fr .3fr .2fr;
-            .header{
-                font-size: .9rem;
+            .profile{
+                display: grid;
+                gap: .5rem;
+                grid-template-columns: 1fr .3fr .2fr;
+                margin-bottom: 1rem;
+                .header{
+                    font-size: .9rem;
+                }
+                
+                .input{
+                    height: 100%;
+                    width: 100%;
+                    padding: 0 5px;
+                    border-radius: 5px;
+                    background-color: white;
+                    border: 1px solid lightgray;
+                }
             }
-            
-            .input{
-                height: 100%;
-                width: 100%;
-                padding: 0 5px;
-                border-radius: 5px;
-                background-color: white;
-                border: 1px solid lightgray;
+            @container form (width >= 950px){
+                .newjob-time-date{
+                    display: flex;
+                    column-gap: .5rem;
+                }
             }
         }
     }
-
+}
     .newjob_submitBtn, .newjob_templateBtn{
         height: 2rem;
         border-radius: 10px;
@@ -137,11 +161,12 @@
     }
     #addr{
         position: absolute;
-        top: 2.9rem;
+        top: calc(100% - .5rem);
         z-index: 1;
         background-color: lightgray;
         width: 100%;
         border-radius: 5px;
+        overflow: hidden;
     }
     .addr_item{
         height: 2rem;
@@ -156,125 +181,90 @@
 {{end}}
 %end
 {{define "Body"}}
-    <main onclick="onMainClick(event)">
-        <h1 class="title">Nouvelle Offre</h1>
-        <div class="template">
-            <h2 class="subheader">Modèle</h2>
-            <dropdown-ele height="2rem" id="template" array="{{.Templates}}"></dropdown-ele>
+    <main onclick="onMainClick(event)" class="form">
+        <div class="form-header">
+            <h1 class="title">Nouvelle Offre</h1>
+            <div class="template">
+                <h2 class="subheader">Modèle</h2>
+                <dropdown-ele height="2rem" id="template" array="{{.Templates}}"></dropdown-ele>
+            </div>
         </div>
         <form class="newjob" hx-post="/job/creer" hx-ext="json-enc" hx-swap="none" id="offert" hx-vals='js:{...getValues()}' onsubmit="onSubmitForm()" >
-            <div class="field">
-                <input type="text" autocomplete="off" required id="title" onchange="onSaveSnapshot(this)"  name="title" class="input withLabel" />
-                <label for="title" class="label">Titre</label>
-            </div>
-            <div class="flex">
-                <div class="field" style="flex: 1;">
-                    <input type="text" autocomplete="off" placeholder="Paris" id="city" name="city" class="input withLabel" oninput="onCityInput(this)" onchange="onSaveSnapshot(this)"/>
-                    <label for="city" class="label">Departement</label>
-                </div>
-                <div class="field" style="flex: .3;">
-                    <input type="number" autocomplete="off" placeholder="75001" id="postal" name="postal" class="input withLabel" onchange="onSaveSnapshot(this)" />
-                    <label for="adresse" class="label">Postal</label>
-                </div>
-                <div id="addr" >
-                </div>
-            </div>
-            <h2 class="subheader">Salaire</h2>
-            <div class="flex">
+            <div class="newjob-section">
+                <h2 class="newjob-section-name">General</h2>
                 <div class="field">
-                    <input type="number" placeholder="1500" step=".01"  id="minSalary" class="input salary withLabel" onchange="onSaveSnapshot(this)" />
-                    <label for="minSalary" class="label">Min</label>
+                    <label for="title" class="label">Titre</label>
+                    <input type="text" autocomplete="off" required id="title" onchange="onSaveSnapshot(this)"  name="title" class="input " />
                 </div>
-                <div class="field">
-        
-                    <input type="number" placeholder="2000" step=".01" id="maxSalary" class="input salary withLabel" onchange="onSaveSnapshot(this)" />
-                    <label for="maxSalary" class="label">Max</label>
+                <div class="newjob-flex-form">
+                    <div class="field" style="flex: 1;">
+                        <label for="city" class="label">Departement</label>
+                        <input type="text" autocomplete="off" placeholder="Paris" id="city" name="city" class="input " oninput="onCityInput(this)" onchange="onSaveSnapshot(this)"/>
+                    </div>
+                    <div class="field" style="flex: .3;">
+                        <label for="adresse" class="label">Postal</label>
+                        <input type="number" autocomplete="off" placeholder="75001" id="postal" name="postal" class="input " onchange="onSaveSnapshot(this)" />
+                    </div>
+                    <div id="addr" >
+                    </div>
                 </div>
-            </div>
-            <h2 class="subheader">Contrat</h2>
-            <div class="flex">
-                <dropdown-ele id="contract" array="{{.Contract}}"></dropdown-ele>
-                <div class="field">
-                    <input type="number" placeholder="35" id="weeklyWorkTime" name="weeklyWorkTime" class="input withLabel" onchange="onSaveSnapshot(this)" />
-                    <label for="weeklyWorkTime" class="label">Heures</label>
-                </div>
-                <div class="field">
-                    <input type="date" placeholder="2000" id="startDate" name="startDate" class="input withLabel" onchange="onSaveSnapshot(this)" />
-                    <label for="startDate" class="label">Debut</label>
-                </div>
-            </div>
-            <h2 class="subheader">Description</h2>
-            <div class="description" contenteditable="true" onblur="onSnapshotDescription(this)"></div>
-            <div class="newjob_section" id="advantage">
-                <div class="headerWithButton">
-                    <h2 class="subheader">Avantages</h2>
-                    <button type="button" class="addBtn" onclick="onNewAdvantage(this)">
-                        <svg
-                            width="63.999996"
-                            height="63.999996"
-                            style="width: 60%;height: 60%;"
-                            viewbox="0 0 16.933332 16.933332">
-                            <g
-                                transform="translate(-49.871622,-101.59117)">
-                            <rect
-                                style="fill:#000000;stroke-width:0.0701647"
-                                id="rect113"
-                                width="2.6458337"
-                                height="15.875"
-                                x="108.73493"
-                                y="-66.275787"
-                                ry="1.3229169"
-                                transform="rotate(90)" />
-                            <rect
-                                style="fill:#000000;stroke-width:0.0701647"
-                                id="rect273"
-                                width="2.6458337"
-                                height="15.875"
-                                x="57.015373"
-                                y="102.12034"
-                                ry="1.3229169" />
-                            </g>
-                        </svg>
-                    </button>
+                <div>
+                    <h2 class="subheader">Description</h2>
+                    <div class="description" contenteditable="true" onblur="onSnapshotDescription(this)"></div>
                 </div>
             </div>
-            <div class="newjob_section" id="skill"> 
-                <div class="headerWithButton">
-                    <h2 class="subheader">Compétances</h2>
-                    <button type="button" class="addBtn" onclick="onNewProfil(this)">
-                        <svg
-                            width="63.999996"
-                            height="63.999996"
-                            style="width: 60%;height: 60%;"
-                            viewbox="0 0 16.933332 16.933332">
-                            <g
-                                transform="translate(-49.871622,-101.59117)">
-                            <rect
-                                style="fill:#000000;stroke-width:0.0701647"
-                                id="rect113"
-                                width="2.6458337"
-                                height="15.875"
-                                x="108.73493"
-                                y="-66.275787"
-                                ry="1.3229169"
-                                transform="rotate(90)" />
-                            <rect
-                                style="fill:#000000;stroke-width:0.0701647"
-                                id="rect273"
-                                width="2.6458337"
-                                height="15.875"
-                                x="57.015373"
-                                y="102.12034"
-                                ry="1.3229169" />
-                            </g>
-                        </svg>
-                    </button>
+            <div class="newjob-section">
+                <h3 class="newjob-section-name">Details</h3>
+                <div class="newjob-flex-form">
+                    <div class="field">
+                        <label for="minSalary" class="label">Salaire Min</label>
+                        <input type="number" placeholder="1500" step=".01"  id="minSalary" class="input salary " onchange="onSaveSnapshot(this)" />
+                    </div>
+                    <div class="field">
+                        <label for="maxSalary" class="label">Salaire Max</label>
+                        <input type="number" placeholder="2000" step=".01" id="maxSalary" class="input salary " onchange="onSaveSnapshot(this)" />
+                    </div>
                 </div>
+                <div class="newjob-flex-form" style="flex-wrap: wrap;justify-content: space-between;">
+                    <div>
+                        <h2 class="subheader">Contrat</h2>
+                        <dropdown-ele id="contract" array="{{.Contract}}" height="2.5rem"></dropdown-ele>
+                    </div>
+                    <div class="field" style="width: 75px;">
+                        <label for="weeklyWorkTime" class="label">Heures</label>
+                        <input type="number" placeholder="35"  id="weeklyWorkTime" name="weeklyWorkTime" class="input" onchange="onSaveSnapshot(this)" />
+                    </div>
+                    <div class="field" style="width: 100px;">
+                        <label for="exp" class="label">Experience</label>
+                        <input type="number" placeholder="2" id="exp" name="exp" class="input " onchange="onSaveSnapshot(this)" />
+                    </div>
+                    <div>
+                        <h3 class="subheader">Duré</h3>
+                        <div class="newjob-time-date">
+                            <div class="newjob-time-date-field">
+                                <p>Du</p>
+                                <calendar-ele></calendar-ele>
+                            </div>
+                            <div class="newjob-time-date-field">
+                                <p>AU</p>
+                                <calendar-ele></calendar-ele>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="newjob-section" id="advantage">
+                <h2 class="newjob-section-name">Avantages</h2>
+                <button type="button" class="addBtn" onclick="onNewAdvantage(this)"></button>
+            </div>
+            <div class="newjob-section" id="skill"> 
+                <h2 class="newjob-section-name">Compétances</h2>
                 <div class="profile">
                     <h3 class="header">Titre</h3>
                     <h3 class="header">Nécessaire</h3>
                     <h3></h3>
                 </div>
+                <button type="button" class="addBtn" onclick="onNewProfil(this)"></button>
             </div>
             <button type="submit" class="newjob_submitBtn" >Creer</button>
         </form>
@@ -282,6 +272,20 @@
     <script>
         let requestAddr 
 
+        const trashIcon = `
+            <svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                     width="800px" height="800px" viewBox="0 0 41.336 41.336" class="deleteIcon"
+                     xml:space="preserve">
+            <g>
+                    <path d="M36.335,5.668h-8.167V1.5c0-0.828-0.672-1.5-1.5-1.5h-12c-0.828,0-1.5,0.672-1.5,1.5v4.168H5.001c-1.104,0-2,0.896-2,2
+                            s0.896,2,2,2h2.001v29.168c0,1.381,1.119,2.5,2.5,2.5h22.332c1.381,0,2.5-1.119,2.5-2.5V9.668h2.001c1.104,0,2-0.896,2-2
+                            S37.438,5.668,36.335,5.668z M14.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21c0-0.828,0.672-1.5,1.5-1.5
+                            s1.5,0.672,1.5,1.5V35.67z M22.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21c0-0.828,0.672-1.5,1.5-1.5
+                            s1.5,0.672,1.5,1.5V35.67z M25.168,5.668h-9V3h9V5.668z M30.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21
+                            c0-0.828,0.672-1.5,1.5-1.5s1.5,0.672,1.5,1.5V35.67z"/>
+            </g>
+            </svg
+        `
         window.addEventListener("load", ()=>{
             savedSnapshotIntoFields()
             const template = document.querySelector("#template .dropdown_display")
@@ -295,42 +299,14 @@
         }
 
         const onNewProfil = (ele)=>{
-            const skillContainer = ele.closest("#skill")
             const newProfile = document.createElement("div")
             newProfile.classList.add("profile", "skill")
             newProfile.innerHTML = `
                 <input type="text" autocomplete="off"  placeholder="Experience 2 ans"  class="input" />
                 <toggle-btn on="false"></toggle-btn>
-                <button type="button" onclick="onDeleteProfil(this)"  class="deleteBtn">
-                    <svg
-                        width="63.999996"
-                        height="63.999996"
-                        style="width: 60%;height: 60%;"
-                        viewBox="0 0 16.933332 16.933332">
-                        <g
-                            transform="translate(-51.903267,-103.62282)">
-                            <rect
-                                style="fill:#000000;stroke-width:0.0928013"
-                                width="3.4994376"
-                                height="20.996624"
-                                x="120.19751"
-                                y="26.072937"
-                                ry="1.7497188"
-                                transform="rotate(45)" />
-                            <rect
-                                style="fill:#000000;stroke-width:0.0928013"
-                                id="rect273"
-                                width="3.4994376"
-                                height="20.996624"
-                                x="-38.320965"
-                                y="111.44891"
-                                ry="1.7497188"
-                                transform="rotate(-45)" />
-                        </g>
-                    </svg>
-                </button>
+                <button type="button" onclick="onDeleteProfil(this)"  class="deleteBtn">${trashIcon}</button>
             `
-            skillContainer.appendChild(newProfile)
+            ele.insertAdjacentElement('beforebegin', newProfile)
         }
 
         const onDeleteProfil = (ele)=>{
@@ -349,41 +325,13 @@
         }
 
         const onNewAdvantage = (ele)=>{
-            const advantageContainer = ele.closest("#advantage")
             const newAdvantage = document.createElement("div")
             newAdvantage.classList.add("advantage")
             newAdvantage.innerHTML = `
                 <input type="text" autocomplete="off" placeholder="Titre de transport" name="advantage" class="input advantage" onchange="onSaveAdvantageSnapshot()" onkeyup="onNewAdvantageByKey(event)" />
-                <button type="button" class="deleteBtn" onclick="onDeleteAdvantage(this)">
-                    <svg
-                        width="63.999996"
-                        height="63.999996"
-                        style="width: 60%;height: 60%;"
-                        viewBox="0 0 16.933332 16.933332">
-                        <g
-                            transform="translate(-51.903267,-103.62282)">
-                            <rect
-                                style="fill:#000000;stroke-width:0.0928013"
-                                width="3.4994376"
-                                height="20.996624"
-                                x="120.19751"
-                                y="26.072937"
-                                ry="1.7497188"
-                                transform="rotate(45)" />
-                            <rect
-                                style="fill:#000000;stroke-width:0.0928013"
-                                id="rect273"
-                                width="3.4994376"
-                                height="20.996624"
-                                x="-38.320965"
-                                y="111.44891"
-                                ry="1.7497188"
-                                transform="rotate(-45)" />
-                        </g>
-                    </svg>
-                </button>
+                <button type="button" class="deleteBtn" onclick="onDeleteAdvantage(this)">${trashIcon}</button>
             `
-            advantageContainer.appendChild(newAdvantage)
+            ele.insertAdjacentElement('beforebegin', newAdvantage)
         }
         const onSaveAdvantageSnapshot = ()=>{
             const allAdvantage = document.getElementsByClassName("advantage")
@@ -469,7 +417,6 @@
             title.value = snapshot.title
             description.innerText = snapshot.description
             postal.value = snapshot.postal
-            startDate.value = snapshot.startDate
             minSalary.value = snapshot.minSalary
             maxSalary.value = snapshot.maxSalary
             weeklyWorkTime.value = snapshot.weeklyWorkTime
@@ -478,40 +425,14 @@
                 newAdvantage.classList.add("advantage")
                 newAdvantage.innerHTML = `
                     <input type="text" value="${adv}" autocomplete="off" placeholder="Titre de transport"  class="input advantage" onchange="onSaveAdvantageSnapshot()" />
-                    <button type="button" class="deleteBtn" onclick="onDeleteAdvantage(this)">
-                    <svg
-                width="63.999996"
-                height="63.999996"
-                style="width: 60%;height: 60%;"
-                viewBox="0 0 16.933332 16.933332">
-                    <g
-                transform="translate(-51.903267,-103.62282)">
-                    <rect
-                style="fill:#000000;stroke-width:0.0928013"
-                width="3.4994376"
-                height="20.996624"
-                x="120.19751"
-                y="26.072937"
-                ry="1.7497188"
-                transform="rotate(45)" />
-                    <rect
-                style="fill:#000000;stroke-width:0.0928013"
-                id="rect273"
-                width="3.4994376"
-                height="20.996624"
-                x="-38.320965"
-                y="111.44891"
-                ry="1.7497188"
-                transform="rotate(-45)" />
-                    </g>
-                    </svg>
-                    </button>
+                    <button type="button" class="deleteBtn" onclick="onDeleteAdvantage(this)">${trashIcon}</button>
                     `
                 advantageContainer.appendChild(newAdvantage)
             }
         }
         const getValues = ()=>{
 
+            const exp = document.getElementById("exp")
             const city = document.getElementById("city")
             const description = document.querySelector(".description")
             const weeklyWorkTime = document.getElementById("weeklyWorkTime")
@@ -544,7 +465,8 @@
                 advantage: advantageList,
                 description: description.innerText,
                 lat: parseFloat(city.dataset.lat),
-                long: parseFloat(city.dataset.long)
+                long: parseFloat(city.dataset.long),
+                exp: parseInt(exp.value)
             }
         }
     </script>

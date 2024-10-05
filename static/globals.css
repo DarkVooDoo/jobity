@@ -1,5 +1,6 @@
 :root{
-    --primary_color: oklch(69.58% 0.1213 246.23);    
+    --primary_color: oklch(37% 0.1247 266.86);    
+    --primary_light_color: oklch(65% 0.1247 266.86);    
     --warning_color: #f9eed7;
     --warning_border_color: #fec022;
     --success_color: #AFFFC2;
@@ -29,7 +30,8 @@ body{
 }
 
 main{
-    padding: 3rem .5rem 0 .5rem;
+    padding-inline: .5rem;
+    margin-top: 3rem;
     margin-inline: auto;
     min-height: 100vh;
 }
@@ -95,6 +97,7 @@ nav{
     }
     &::backdrop{
         background-color: transparent;
+        backdrop-filter: blur(2px);
     }
     .fields{
         display: grid;
@@ -134,7 +137,9 @@ nav{
     justify-content: end;
     gap: .5rem;
     width: 7rem;
-
+    .desktop-paths{
+        display: none;
+    }
 }
 
 .nav_search_inner{
@@ -204,6 +209,7 @@ nav{
     }
     &::backdrop{
         background-color: transparent;
+        backdrop-filter: blur(0px);
     }
 }
 
@@ -373,6 +379,19 @@ a{
     outline: none;
 }
 
+*::-webkit-scrollbar{
+    height: 5px;
+    width: 5px;
+}
+*::-webkit-scrollbar-track{
+    background: rgb(200,200,200);
+    border-radius: 25px;
+}
+*::-webkit-scrollbar-thumb{
+    background: #5b5b5b;
+    border-radius: 25px;
+}
+
 button{
     color: black;
     border: none;
@@ -382,11 +401,16 @@ button{
 
 *::backdrop{
     background-color: rgba(0, 0, 0, .6);
+    backdrop-filter: blur(5px);
 }
 
 @media only screen and (min-width: 768px) {
     main, .nav_content, #search-pop{
         width: 750px;
+    }
+    .desktop-paths{
+        display: flex !important;
+        gap: 1rem;
     }
     #nav_userBtn_menu{
         right: calc((100vw - 750px) / 2);

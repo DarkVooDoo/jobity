@@ -17,27 +17,31 @@
         <div class="nav_blur"></div>
         <div class="nav_content">
             <a href="/" class="nav_home">Home</a>
-                <div class="mobile_nav_right">
-                    <button type="button" class="nav_search"  popovertarget="search-pop">
-                        <img src="/static/search.svg" class="nav_search_icon" />
-                    </button>
-                    {{if .User.Id}}
-                        <button type="button" class="nav_userBtn" popovertarget="nav_userBtn_menu">
-                            <!-- <img src="/static/eye.svg" class="nav_userBtn_icon"  /> -->
-                            <p>{{.User.ShortName}}</p>
-                        </button>
-                    {{else}}
-                        <a href="/connexion" class="nav_sign">Connexion</a>
-                    {{end}}
+            <div class="mobile_nav_right">
+                <button type="button" class="nav_search"  popovertarget="search-pop">
+                    <img src="/static/search.svg" class="nav_search_icon" />
+                </button>
+                {{if .User.Id}}
+                <div class="desktop-paths">
+                    <a href="/mes-postulations" style="text-wrap: nowrap;">Mes postulations</a>
+                    <a href="/profile" style="text-wrap: nowrap;">Mon compte</a>
                 </div>
-                <div id="nav_userBtn_menu" popover>
-                    <a href="/mes-postulations" class="nav_userBtn_menu_item">Mes postulations</a>
-                    <a href="/profile"  class="nav_userBtn_menu_item">Mon compte</a>
-                    <button type="button" hx-delete="/connexion" hx-swap="none"  class="nav_userBtn_menu_item">
-                        <img src="/static/signout.svg" style="height:1.5rem;width: 1.5rem;" />
-                        Se Déconnecter
-                    </button>
-                </div>
+                <button type="button" class="nav_userBtn" popovertarget="nav_userBtn_menu">
+                    <!-- <img src="/static/eye.svg" class="nav_userBtn_icon"  /> -->
+                    <p>{{.User.ShortName}}</p>
+                </button>
+                {{else}}
+                <a href="/connexion" class="nav_sign">Connexion</a>
+                {{end}}
+            </div>
+            <div id="nav_userBtn_menu" popover>
+                <a href="/mes-postulations" class="nav_userBtn_menu_item">Mes postulations</a>
+                <a href="/profile"  class="nav_userBtn_menu_item">Mon compte</a>
+                <button type="button" hx-delete="/connexion" hx-swap="none"  class="nav_userBtn_menu_item">
+                    <img src="/static/signout.svg" style="height:1.5rem;width: 1.5rem;" />
+                    Se Déconnecter
+                </button>
+            </div>
             <form popover id="search-pop" action="/search">
                 <div class="fields">
                     <input placeholder="Ex. Web Dev" value="{{.Search.Query}}" required class="input" name="q" id="search_query" autocomplete="off"/>

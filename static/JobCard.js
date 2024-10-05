@@ -1,8 +1,120 @@
 customElements.define("job-card", class JobCard extends HTMLElement{
     constructor(){
         super()
+        this.shadow = this.attachShadow({mode: "open"})
         this.picture = !this.getAttribute("picture") ? "hidden" : ""
-        this.innerHTML = `
+        this.shadow.innerHTML = `
+            <style>
+            .card {
+                width: 100%;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: var(--card_shadow);
+                margin-bottom: 20px;
+                overflow: hidden;
+                .card-content {
+                    padding: 20px;
+                    .card-header {
+                        display: flex;
+                        gap: 16px;
+                        .company-photo {
+                            width: 3rem;
+                            aspect-ratio: 1/1;
+                            object-fit: cover;
+                            border-radius: 10px;
+                        }
+                            .card-info {
+                                flex-grow: 1;
+                                .card-top{
+                                    display:flex;
+                                    gap:1rem;
+                                    align-items:center;
+                                    margin-bottom: .5rem;
+                                    .card-title {
+                                        view-transition-name: title;
+                                        font-size: 1rem;
+                                        font-weight: 600;
+                                        min-height: 3.9rem;
+                                        align-content: center;
+                                        text-wrap: balance;
+
+                                    }
+                                }
+                                    .card-company-info {
+                                        display: flex;
+                                        flex-direction: column;
+                                        height: 6rem;
+                                        justify-content: space-evenly;
+                                        .company-name, .card-location, .card-salary {
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                            color: #666;
+                                            margin-bottom: .2rem;
+                                            .salary, .location, .name{
+                                                font-size: .85rem;
+                                            }
+                                        }
+                                            .card-salary, .company-name{
+                                                text-wrap: balance;
+                                            }
+                                    }
+                                    .card-meta {
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 12px;
+                                        margin-top: 8px;
+                                    }
+                            }
+                    }
+                }
+            }
+            .badge {
+                background-color: var(--primary_light_color);
+                color: black;
+                font-size: 0.75rem;
+                padding: 2px 8px;
+                border-radius: 9999px;
+            }
+            .card-footer {
+                background-color: var(--primary_light_color);
+                padding: 16px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .card-posted {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 0.875rem;
+                    color: black;
+                }
+                    .button {
+                        background-color: transparent;
+                        color: #204767;
+                        border: none;
+                        height: 32px;
+                        width: 32px;
+                        border-radius: 50%;
+                        font-size: 0.875rem;
+                        font-weight: 500;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 4px;
+                        font-weight: bold;
+                        background-color: rgb(230,230,230);
+                        &:hover{
+                            background-color: #b2c4d3;
+                        }
+                    }
+            }
+            .icon {
+                width: 16px;
+                height: 16px;
+            }
+            </style>
             <div class="card">
                 <div class="card-content">
                     <div class="card-header">
@@ -59,6 +171,5 @@ customElements.define("job-card", class JobCard extends HTMLElement{
             </div>
         `
     }
-
 })
 

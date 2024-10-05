@@ -24,6 +24,8 @@ func Subdomain () {
         mux.HandleFunc("/job/creer", handler.CreateJobHandler)
         mux.HandleFunc("/job/{id}", handler.ProJobHandler)
         mux.HandleFunc("/job/{id}/cv/{userId}", handler.CurriculumHandler)
+        mux.HandleFunc("/boutiques", handler.ShopHandler)
+        mux.HandleFunc("/employe", handler.EmployeHandler)
         mux.HandleFunc("/template/{id}", handler.TemplateHandler)
         mux.HandleFunc("/connexion", handler.ProSignHandler)
         if err := server.ListenAndServe(); err != nil {

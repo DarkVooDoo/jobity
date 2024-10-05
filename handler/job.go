@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"job/store"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ type JobPage struct{
 var JobHandler = func(res http.ResponseWriter, req *http.Request){
     route, _ := NewRoute(res, req)
 
+    var recomendationVector []byte
     id := route.Request.PathValue("id")
     job := store.Job{Id: id, EntrepriseId: route.User.Id}
     route.Get(func() {
@@ -33,17 +35,15 @@ var JobHandler = func(res http.ResponseWriter, req *http.Request){
                 log.Println(err)
                 return
             }
+            recomendationVector,_ = json.Marshal(job.Vector())
         }
         page := JobPage{RequireData{Search: SearchQuery{Query: ""}, User: route.User}, job}
-        //var recomendation []lib.RecomendationToken
-        //cookie, err := req.Cookie("foryou")
+        //cookie, err := req.Cookie("pref")
         //if err != nil{
         //    log.Printf("error cookie: %v", err)
         //}else{
         //    foryou := strings.ReplaceAll(cookie.Value, "%22", `"`)
-        //    if err = json.Unmarshal([]byte(foryou), &recomendation); err != nil{
-        //        log.Println(err)
-        //    }
+        //    log.Println(foryou)
         //}
 
         //TODO: How to handle both our app and france travail api contract names
@@ -58,15 +58,15 @@ var JobHandler = func(res http.ResponseWriter, req *http.Request){
         //    queue.Enqueue(lib.RecomendationToken{Postal: job.Postal[:2], Contract: job.Contract, Fulltime: job.Fulltime, Label: label})
         //}
         //decRecomendation, _ := json.Marshal(queue.List)
-        //cookieStruct := http.Cookie{
-        //    Name: "foryou",
-        //    MaxAge: 60*60*24*5,
-        //    Path: "/",
-        //    SameSite: http.SameSiteStrictMode,
-        //    HttpOnly: true,
-        //    Value: strings.ReplaceAll(string(decRecomendation), `"`, "%22"),
-        //}
-        //http.SetCookie(route.Response, &cookieStruct)
+        cookieStruct := http.Cookie{
+            Name: "pref",
+            MaxAge: 60*60*24*5,
+            Path: "/",
+            SameSite: http.SameSiteStrictMode,
+            HttpOnly: true,
+            Value: string(recomendationVector),
+        }
+        http.SetCookie(route.Response, &cookieStruct)
         route.Render(page, "route/template.html", "route/job.html")
 
     })

@@ -1,0 +1,482 @@
+{{define "Head"}}
+    <title>Mes boutiques</title>
+    <script src="/static/Dropdown.js" type="module"></script>
+{{end}}
+%end
+{{define "Style"}}
+    
+    #shops{
+        overflow-x: scroll;
+        display: inline-flex;
+        gap: 1rem;
+        width: 100%;
+        margin-bottom: 1lh;
+        padding-block: 10px;
+        .newShopBtn, .card{
+            height: 9lh;
+            aspect-ratio: 1.8/1;
+            border-radius: 10px;
+        }
+        .newShopBtn{
+            display: flex;
+            gap: .3rem;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #666;
+            &::before{
+                content: "+";
+                height: 1lh;
+                aspect-ratio: 1/1;
+                border: 2px solid;
+                border-radius: 50%;
+            }
+        }
+        .card-selected{
+            box-shadow: 0 0 5px 1px #353535;
+        }
+        .card{
+            border: 1px solid lightgray;
+            background-color: white;
+            padding: 10px;
+            .card-data{
+                display: flex;
+                gap: .5rem;
+                margin-bottom: 10px;
+                .shop-icon{
+                    height: 4lh;
+                    aspect-ratio: 1/1;
+                    border: 1px solid black;
+                }
+                .card-content{
+                    .card-title{
+                        font-size: 1rem;
+                    }
+                    .card-addr{
+                        color: #666;
+                    }
+                }
+            }
+            .card-footer{
+                display: flex;
+                align-items: center;
+                padding-block: 10px;
+                border-top: 1px solid lightgray;
+                justify-content: space-between;
+
+                .card-footer-btn, .card-footer-deleteBtn{
+                    padding: .5rem;
+                    border-radius: 5px;
+                    background-color: black;
+                    color: white;
+                }
+                .card-footer-deleteBtn{
+                    color: var(--delete_color);
+                    border: 1px solid var(--delete_color);
+                    background-color: transparent;
+                }
+            }
+        }
+    }
+
+    .employe-section{
+        container: employe / inline-size;
+        background-color: white;
+        border-radius: 20px;
+        border: 1px solid lightgray;
+        padding-block: 10px;
+        & > *{
+            padding-inline: 10px;
+        }
+        .employe-shop{
+            font-size: 1.1rem;
+            margin-bottom: 1lh;
+        }
+        .employe-count{
+            font-size: .9rem;
+            color: #535353;
+            font-weight: normal;
+            margin-inline: .3rem;
+        }
+        .employe-search{
+            position: relative;
+            height: 2rem;
+            margin-bottom: 1lh;
+            width: 100%;
+            max-width: 400px;
+            .employe-input{
+                height: 100%;
+                width: 100%;
+                border-radius: 25px;
+                border: 1px solid lightgray;
+                padding-inline: 13px;
+            }
+            .employe-search-suggest{
+                position: absolute;
+                top: 2.1lh;
+                left: 10px;
+                width: calc(100% - 20px);
+                background-color: rgb(230,230,230);
+                border-radius: 5px;
+                border: 1px solid lightgray;
+                z-index: 1;
+                .employe-suggest-preview{
+                    display: flex;
+                    align-items: center;
+                    gap: .5rem;
+                    padding: 5px;
+                    cursor: pointer;
+                    .preview-photo{
+                        height: 2lh;
+                        aspect-ratio: 1/1;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    &:hover{
+                        background-color: rgb(225,225,225);
+                    }
+                }
+            }
+        }
+        .employe{
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: 1lh;
+            &:hover{
+                transition: background-color 200ms linear;
+                background-color: rgb(240,240,240);
+            }
+            .employe-photo{
+                height: 3lh;
+                aspect-ratio: 1/1;
+                border-radius: 50%;
+            }
+
+            .employe-content{
+                flex: 1;
+                .employe-name{
+                    font-size: 1rem;
+                }
+                .employe-date{
+                    color: rgb(120, 120, 120);
+                }
+            }
+
+            &:last-child{
+                margin-bottom: 0;
+            }
+            .employe-moreBtn{
+                position: relative;
+                height: 2lh;
+                width: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-evenly;
+                .dot{
+                    height: 5px;
+                    aspect-ratio: 1/1;
+                    background-color: black;
+                    border-radius: 50%;
+                }
+            }
+            .employe-action{
+                display: none;
+            }
+
+            #employe-actionModal{
+                position: fixed;
+                width: 100%;
+                border: none;
+                inset: unset;
+                left: 0;
+                padding: 15px;
+                background-color: white;
+                border-top-left-radius: 15px;
+                border-top-right-radius: 15px;
+                transition: bottom 150ms linear, display 150ms linear allow-discrete, overlay 150ms linear allow-discrete;
+                bottom: -300px;
+                .actionModal-header{
+                    font-size: 1.2rem;
+                    margin-bottom: .3lh;
+                }
+                & > *{
+                    margin-bottom: 1lh;
+                }
+                *:last-child{
+                    margin-bottom: 0;
+                }
+                &:popover-open{
+                    bottom: 0;
+                    transition: transform 150ms linear;
+                    transform translateY(0);
+                    @starting-style{
+                        transform: translateY(100%);
+                    }
+                }
+                .deleteBtn{
+                    color: var(--delete_color);
+                    padding-block: .5rem;
+                    border: 1px solid var(--delete_color);
+                    border-radius: 7px;
+                    width: 100%;
+                }
+            }
+            @container employe (width >= 678px){
+                .employe-moreBtn{
+                    display: none;
+                }
+                .employe-action{
+                    display: flex;
+                    gap: 1rem;
+                    .actionBtn{
+                        padding-inline: 5px;
+                        height: 2rem;
+                        border: 1px solid lightgray;
+                        border-radius: 5px;
+                    }
+                    .deleteBtn{
+                        border: 1px solid var(--delete_color);
+                        color: var(--delete_color);
+                    }
+                }
+            }
+        }
+    }
+    #new-shop-form{
+        background-color: white;
+        border-radius: 10px;
+        margin: auto;
+        padding: 10px;
+        width: 300px;
+        overflow: visible;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 150ms linear, display 150ms linear allow-discrete, overlay 150ms linear allow-discrete;
+        &:popover-open{
+            transition: all 150ms linear;
+            opacity: 1;
+            transform: translateY(0px);
+            @starting-style{
+                opacity: 0;
+                transform: translateY(100px);
+            }
+        }
+        #addr-suggest{
+            position: absolute;
+            z-index: 1;
+            left: 0;
+            top: 2.1rem;
+            width: 100%;
+            background: rgb(230,230,230);
+            border: 1px solid lightgray;
+            border-radius: 5px;
+            .addr-suggest-item{
+                padding: .5rem;
+            }
+        }
+        .new-shop-input{
+            display: block;
+            width: 100%;
+            padding-inline: 5px;
+            height: 2rem;
+            border-radius: 5px;
+            border: 1px solid lightgray;
+            margin-bottom: .5lh;
+            &:last-child{
+                margin-bottom: 0;
+            }
+        }
+        .form-dates{
+            display: flex;
+            gap: 1rem;
+            #city{
+                flex: 1;
+            }
+            #postal{
+                flex: .3;
+            }
+        }
+        .form-action{
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            .actionBtn{
+                padding: 5px;
+                width: 100%;
+                border: 1px solid black;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+        }
+    }
+{{end}}
+%end
+{{define "Body"}}
+    {{$shop := .Shop}}
+    <main>
+        <form id="new-shop-form" popover hx-put="/boutiques" hx-ext="json-enc" hx-swap="afterend" hx-target=".newShopBtn" hx-vals='js:{...newShopValues()}'>
+            <input type="text" name="name" required id="name" class="new-shop-input" placeholder="Nom" autocomplete="off"/>
+            <div style="position: relative;">
+                <input type="text" name="adresse" required id="adresse" class="new-shop-input" placeholder="7 Avenue Victor Hugo" autocomplete="off" onkeyup="onFetchAdresse(this)" />
+                <div id="addr-suggest" class="hidden">
+                    <p class="addr-suggest-item" onclick="onSelectAddr(this)" data-lat="22.323" data-long="42.222" data-city="Vitry-sur-seine">7 Rue Vineuse, 75002</p>
+                </div>
+            </div>
+            <div class="form-dates">
+                <input type="text" name="city" required id="city" class="new-shop-input" placeholder="Commune" autocomplete="off"/>
+                <input type="number" name="postal" required id="postal" class="new-shop-input" placeholder="Postal" autocomplete="off"/>
+            </div>
+            <div class="form-action">
+                <button type="button" popovertargetaction="hide" popovertarget="new-shop-form" style="border-color: oklch(52.08% 0.1554 40.06);color: oklch(52.08% 0.1554 40.06);" class="actionBtn">Cancel</button>
+                <button type="submit" style="border-color: oklch(59.5% 0.1861 142.61); color: oklch(59.5% 0.1861 142.61);" class="actionBtn">Creer</button>
+            </div>
+        </form>
+        <section id="shops">
+            <button class="newShopBtn" type="button" popovertarget="new-shop-form">Nouvelle boutique</button>
+            {{range .Shop}}
+                <div class="card">
+                    <div class="card-data">
+                        <div class="shop-icon">
+                            <svg width="24" height="24" style="width: 100%;height: 100%;" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M21 14h.004l1.996 4h-2v4h2v2h-22v-2h2v-4h-2l1.996-4h.004v-14h18v14zm-12 5h-4v4h4v-4zm10 0h-4v4h4v-4zm-5 0h-4v4h4v-4zm6.386-4h-16.772l-1 2h18.772l-1-2zm-1.386-13h-14v11h14v-11zm-12 7h2v2h-2v-2zm4 0h2v2h-2v-2zm6 0v2h-2v-2h2zm-10-3h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm-8-3h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"/></svg>
+                        </div>
+                        <div class="card-content">
+                            <h1>{{.Name}}</h1>
+                            <p>{{.Adresse}}, {{.Postal}}</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="card-footer-deleteBtn" hx-delete="/boutiques" hx-vals='{"id": "{{.Id}}"}' hx-target="closest .card" hx-swap="delete">Supprimer</button>
+                        <button type="button" class="card-footer-btn" hx-post="/boutiques" hx-vals='{"id": "{{.Id}}"}' hx-ext="json-enc" hx-target="#shop-employes" onclick="onSelectShop(this)">Ouvrir</button>
+                    </div>
+                </div>
+            {{end}}
+        </section>
+        <section class="employe-section">
+            <div class="employe-search">
+                <input 
+                    type="email" placeholder="Email" class="employe-input" autocomplete="off" name="email"  
+                    hx-get="/employe" hx-target=".employe-search-suggest" hx-swap="outerHTML" hx-trigger="keyup delay:700ms changed"  />
+                <div class="employe-search-suggest hidden"></div>
+            </div>
+            {{if gt (len .NotAssignEmploye) 0}}
+                <h1 class="employe-shop">Employées sans établissement</h1>
+                {{range .NotAssignEmploye}}
+                    <div class="employe">
+                        <img src="/static/profile-picture.jpeg" class="employe-photo"  />
+                        <div class="employe-content">
+                            <h1 class="employe-name">{{.Name}}</h1>
+                            <p class="employe-date">Ancienneté: {{.Age}}</p>
+                        </div>
+                        <div class="employe-action">
+                            <button type="button" class="actionBtn deleteBtn" hx-delete="/employe" hx-vals='{"id": "{{.Id}}"}' hx-target="closest .employe" hx-swap="delete">Supprimer</button>
+                            <dropdown-ele array='[{"id": "", "value": "User"}, {"id": "", "value": "Admin"}]'></dropdown-ele>
+                            <button type="button" class="actionBtn">Velizy 2</button>
+                            <button type="button" class="actionBtn">Planning</button>
+                        </div>
+                        <button type="button" class="employe-moreBtn" popovertarget="employe-actionModal">
+                            <div class="dot" ></div>
+                            <div class="dot" ></div>
+                            <div class="dot" ></div>
+                        </button>
+                        <div id="employe-actionModal" popover>
+                            <form type="" class="actionBtn" >
+                                <h2 class="actionModal-header">Role</h2>
+                                <label for="user">User</label>
+                                <input type="radio" name="role" id="user" value="User" />
+                                <label for="admin">Admin</label>
+                                <input type="radio" name="role" id="admin" value="Admin" />
+                            </form>
+                            <div>
+                                <h2 class="actionModal-header">Boutique</h2>
+                                <select hx-put="/employe" name="shopId" hx-swap="delete" hx-trigger="change" hx-target="closest .employe" hx-vals='{"id": "{{.Id}}"}' hx-ext="json-enc">
+                                    <option value=""></option>
+                                    {{range $shop}}
+                                        <option value="{{.Id}}">{{.Name}}</option>
+                                    {{end}}
+                                </select>
+                            </div>
+                            <div>
+                                <h2>Planning</h2>
+                                <button type="button" class="actionBtn">Planning</button>
+                            </div>
+                            <button type="button" class="actionBtn deleteBtn" hx-delete="/employe" hx-vals='{"id": "{{.Id}}"}' hx-target="closest .employe" hx-swap="delete">Supprimer</button>
+                        </div>
+                    </div>
+                {{end}}
+            {{end}}
+            <section id="shop-employes" >
+            </section>
+
+        </section>
+
+    </main>
+    <script>
+
+        let fetchTimer
+        const newShopForm = document.getElementById("new-shop-form")
+        const suggestAddrContainer = document.getElementById("addr-suggest")
+        const suggestCity = document.getElementById("city")
+        const suggestAddr = document.getElementById("adresse")
+        const suggestPostal = document.getElementById("postal")
+
+        const onSelectAddr = (ele)=>{
+            const city = ele.dataset.city
+            const [addr, postal] = ele.textContent.split(",")
+            suggestCity.value = city
+            newShopForm.dataset.lat = ele.dataset.lat
+            newShopForm.dataset.long = ele.dataset.long
+            suggestPostal.value = postal.trim()
+            suggestAddr.value = addr
+
+            suggestAddrContainer.classList.add("hidden")
+        }
+
+        const onFetchAdresse = (ele)=>{
+            fetchAdresseHtml = ""
+            if (fetchTimer) clearTimeout(fetchTimer)
+            fetchTimer = setTimeout(async ()=>{
+                try{
+                    const fetchAddr = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${ele.value}&limit=5`)
+                        const result = await fetchAddr.json()
+                    for(const adr of result.features){
+                        fetchAdresseHtml += `<p class="addr-suggest-item" data-lat="${adr.geometry.coordinates[1]}" data-long="${adr.geometry.coordinates[0]}" data-city="${adr.properties.city}" onclick="onSelectAddr(this)">${adr.properties.name}, ${adr.properties.postcode}</p>` 
+                    }
+                    console.log(result)
+                    suggestAddrContainer.innerHTML = fetchAdresseHtml
+                    suggestAddrContainer.classList.remove("hidden")
+                    //if(result.features.length > 0){
+                    //    const firstELement = result.features[0]
+                    //    propagateProfileAddr(firstELement.properties.city, firstELement.properties.postcode, firstELement.geometry.coordinates[1], firstELement.geometry.coordinates[0])
+                    //}
+                }catch(err){}
+            }, 500)
+        }
+
+        const onSelectShop = (ele)=>{
+            const cards = document.querySelectorAll(".cards")
+            for(const card of cards){
+                card.classList.remove("card-selected")
+            }
+            const card = ele.closest(".card")
+            card.classList.add("card-selected")
+        }
+
+        const newShopValues = ()=>{
+            return {lat: parseFloat(newShopForm.dataset.lat), long: parseFloat(newShopForm.dataset.long)}
+        }
+
+        document.body.addEventListener("closeModal", (ev)=>{
+            ev.target.hidePopover()
+        })
+        window.addEventListener("click", (ev)=>{
+            const search = ev.target.closest(".employe-search")
+            const suggestSearch = document.querySelector(".employe-search-suggest")
+            if(!search) suggestSearch.classList.add("hidden")
+            
+        })
+    </script>
+{{end}}
