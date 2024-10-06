@@ -290,18 +290,17 @@ const getValues = ()=>{
     const skills = document.querySelectorAll("#skill .skill")
     const interests = document.querySelectorAll("#interest .interest")
 
-    const skillList = []
-    const interestList = []
-    const schoolList = []
-    const workList = []
-    const taskList = []
+    let skillList = []
+    let interestList = []
+    let schoolList = []
+    let workList = []
+    let taskList = []
     for(const work of workCards){
         taskList.length = 0
         const position = work.querySelector(".position")
         const entreprise = work.querySelector(".entreprise")
         const start = work.querySelector(".start_date .picker-display")
         const end = work.querySelector(".end_date .picker-display")
-        console.log(start)
         const tasks = work.querySelectorAll(".task .field")
         for(const task of tasks){
             taskList.push(task.innerText)
@@ -323,6 +322,7 @@ const getValues = ()=>{
         interestList.push(interest.value)
     }
 
+    console.log(workList)
     return {school: schoolList, work: workList, interest: interestList, skill: skillList}
 }
 

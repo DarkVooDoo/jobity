@@ -555,7 +555,7 @@
             <button type="submit" class="submitBtn">Modifier le profile</button>
         </form>
 
-        <form id="cv" hx-post="/profile/cv" hx-vals='js:{...getValues()}' hx-swap="none" hx-ext="json-enc" class="hidden scene">
+        <form id="cv" hx-post="/profile/cv" hx-swap="none" hx-ext="json-enc" hx-vals='js:{...getValues()}' class="hidden scene">
             <div class="header">
                 <h1 class="title">Mon Curriculum</h1>
                 <button type="button" popovertarget="curriculum_action" class="submitBtn" onclick="calcPopoverPosition()">
@@ -701,6 +701,7 @@
             </div>
         </div>
         `
+
     </script>
 {{end}}
 %end
