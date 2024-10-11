@@ -43,6 +43,7 @@ type Job struct{
     StartDay string `json:"startTime"`
     IsThirdParty bool
     ApplicationCount int
+    RecomendationVector []float64
     ThirdPartyLink string
     TemplateName string `json:"tname"`
     BookmarkId string
@@ -73,6 +74,11 @@ type Skill struct{
 type EntrepriseTemplates struct{
     Id string
     Name string
+}
+
+type Contract struct{
+    Id int `json:"id"`
+    Name string `json:"value"`
 }
 
 type FranceTravailToken struct{
@@ -149,14 +155,14 @@ func GetAppJobs(recomendationVector []float64)[]Job{
     defer conn.Close()
     query := ""
     if len(recomendationVector) > 0{
-        query = `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city, j.contract, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id WHERE Test($1,vector) >= 0.8 LIMIT 10`
+        query = `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city, c.name, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN Contract AS c ON c.id=j.contract WHERE Recomendation($1,vector) >= 0.8 LIMIT 10`
         rows, err := conn.QueryContext(context.Background(), query, pq.Array(recomendationVector))
         if err != nil{
             log.Println(err)
         }
         jobRows = rows
     }else{
-        query = `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city, j.contract, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id ORDER BY RANDOM() LIMIT 10`
+        query = `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city, c.name, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN Contract AS c ON c.id=j.contract ORDER BY RANDOM() LIMIT 10`
         rows, err := conn.QueryContext(context.Background(), query)
         if err != nil{
             log.Println(err)
@@ -175,7 +181,6 @@ func GetAppJobs(recomendationVector []float64)[]Job{
         if err := jobRows.Scan(&id, &title, &sal, &fullAddr, &contract, &date, &entrepriseName, &fulltime); err != nil{
             log.Println(err)
         }
-        salaryString, _ = postgresSalaryIntoString(sal.String)
         formatedDate := PostgresIntervalIntoString(strings.Split(date, "-"))
         if fulltime{
             fulltimeString = "Temps plein"
@@ -197,19 +202,6 @@ func GetAppJobs(recomendationVector []float64)[]Job{
     return jobs
 }
 
-func(j *Job) Vector()[]float64{
-    var recomendationVector []float64
-    if j.Contract == "CDI"{
-        recomendationVector = append(recomendationVector, 1)   
-    }else if j.Contract == "CDD"{
-        recomendationVector = append(recomendationVector, 2)
-    }else{
-        recomendationVector = append(recomendationVector, 0)
-    }
-    recomendationVector = append(recomendationVector, j.WeeklyWorkTime / 35, j.Salary[0] / 1000, float64(j.Experience))
-    return recomendationVector
-}
-
 func (j *Job) CreateJob()(string, error){
     conn, err := GetDBConn()   
     if err != nil{
@@ -223,8 +215,7 @@ func (j *Job) CreateJob()(string, error){
     if j.WeeklyWorkTime >= 35{
         j.Fulltime = true
     }
-    recomendationVector := j.Vector()
-    jobRow := conn.QueryRowContext(context.Background(), `INSERT INTO Job(title, description, salary, city, postal, contract, worktime, advantage, skill, fulltime, lat, long, experience, vector, entreprise_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$15,$14) RETURNING id`, j.Title, j.Description, h, j.City, j.Postal, j.Contract, j.WeeklyWorkTime, pq.Array(j.Advantage), string(skill), j.Fulltime, j.Lat, j.Long, j.Experience, pq.Array(recomendationVector), j.EntrepriseId)
+    jobRow := conn.QueryRowContext(context.Background(), `INSERT INTO Job(title, description, salary, city, postal, contract, worktime, advantage, skill, fulltime, lat, long, experience, entreprise_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`, j.Title, j.Description, h, j.City, j.Postal, j.Contract, j.WeeklyWorkTime, pq.Array(j.Advantage), string(skill), j.Fulltime, j.Lat, j.Long, j.Experience, j.EntrepriseId)
     if err = jobRow.Scan(&j.Id); err != nil{
         log.Println(err)
         return "", errors.New("error inserting job to the db")
@@ -274,7 +265,8 @@ func (j *Job) DeleteJob()error{
 }
 
 func (j *Job) GetJobById()error{
-    var skill, sal, applicationId, bookmarkId  sql.NullString
+    var skill, applicationId, bookmarkId  sql.NullString
+    var sal []float64
     var dateAge string
     conn, err := GetDBConn()
     if err != nil{
@@ -286,8 +278,8 @@ func (j *Job) GetJobById()error{
         log.Println(err)
         return errors.New("error transction")
     }
-    jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, j.contract, j.city, j.postal,  CONCAT(LEFT(j.postal, 2), ' - ', J.city), j.salary, j.advantage, j.skill, j.worktime, j.fulltime, j.lat, j.long, j.experience , ja.id, b.id FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobApplication AS ja ON ja.job_id=j.id LEFT JOIN Bookmark AS b ON j.id=b.job_id WHERE j.id=$1`, j.Id)
-    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &j.FullAdresse, &sal, pq.Array(&j.Advantage), &skill, &j.WeeklyWorkTime, &j.Fulltime, &j.Lat, &j.Long,&j.Experience, &applicationId, &bookmarkId); err != nil{
+    jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, c.name, j.city, j.postal,  CONCAT(LEFT(j.postal, 2), ' - ', J.city), j.salary, j.advantage, j.skill, j.worktime, j.fulltime, j.lat, j.long, j.experience, j.vector, ja.id, b.id FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobApplication AS ja ON ja.job_id=j.id LEFT JOIN Bookmark AS b ON j.id=b.job_id LEFT JOIN Contract AS c ON c.id=j.contract WHERE j.id=$1`, j.Id)
+    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &j.FullAdresse, pq.Array(&sal), pq.Array(&j.Advantage), &skill, &j.WeeklyWorkTime, &j.Fulltime, &j.Lat, &j.Long,&j.Experience, pq.Array(&j.RecomendationVector),  &applicationId, &bookmarkId); err != nil{
         log.Println(err)
         return errors.New("error scanning job")
     }
@@ -295,7 +287,7 @@ func (j *Job) GetJobById()error{
     j.Description = strings.ReplaceAll(j.Description, `\n`, "\n")
     j.BookmarkId = bookmarkId.String
     j.Date = PostgresIntervalIntoString(strings.Split(dateAge, "-"))
-    j.SalaryString, j.Salary = postgresSalaryIntoString(sal.String)
+    j.SalaryString, j.Salary = postgresSalaryIntoString(sal)
     j.ContractArray =  GetContracts()
     if err := json.Unmarshal([]byte(skill.String), &j.SkillNeeded); err != nil{
         log.Println(err)
@@ -313,7 +305,8 @@ func GetEntrepriseJobs(entrepriseId string)[]Job{
         log.Println(err)
         return jobs
     }
-    entrepriseJobRows, err := conn.QueryContext(context.Background(), `SELECT j.title, j.id, LEFT(j.postal, 2), j.city, (SELECT count(id) FROM JobApplication WHERE status <= 'Vue' AND j.id=job_id), j.contract FROM Job AS j WHERE j.entreprise_id=$1`, entrepriseId)
+    defer conn.Close()
+    entrepriseJobRows, err := conn.QueryContext(context.Background(), `SELECT j.title, j.id, LEFT(j.postal, 2), j.city, (SELECT count(id) FROM JobApplication WHERE status <= 'Vue' AND j.id=job_id), c.name FROM Job AS j LEFT JOIN Contract AS c ON c.id=j.contract WHERE j.entreprise_id=$1`, entrepriseId)
     if err != nil{
         log.Println(err)
         return jobs
@@ -325,8 +318,44 @@ func GetEntrepriseJobs(entrepriseId string)[]Job{
     return jobs
 }
 
+func GetEntrepriseJobCards(entrepriseId string)[]Job{
+    var date, fulltimeString string
+    var jobList []Job
+    var job Job
+    conn, err := GetDBConn()
+    if err != nil{
+        log.Printf("error in the db: %v", err)
+        return jobList
+    }
+    defer conn.Close()
+
+    jobRows, err := conn.QueryContext(context.Background(), `SELECT j.id, j.title, j.salary, LEFT(j.postal, 2) || ' - ' || j.city, c.name, TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), e.name, j.fulltime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN Contract AS c ON c.id=j.contract WHERE j.entreprise_id=$1`, entrepriseId)
+    if err != nil{
+        log.Printf("error in the query: %v", err)
+        return jobList
+    }
+    for jobRows.Next(){
+        if err := jobRows.Scan(&job.Id, &job.Title, pq.Array(&job.Salary), &job.FullAdresse, &job.Contract, &date, &job.EntrepriseName, &job.Fulltime); err != nil{
+            log.Printf("error scan: %v", err)
+        }
+        formatedDate := PostgresIntervalIntoString(strings.Split(date, "-"))
+        if job.Fulltime{
+            fulltimeString = "Temps plein"
+        }else{
+            fulltimeString = "Temps partiel"
+        }
+        job.FulltimeString = fulltimeString
+        job.Date = formatedDate
+        job.SalaryString, _ = postgresSalaryIntoString(job.Salary)
+
+        jobList = append(jobList, job)
+    }
+    return jobList
+}
+
 func (j *Job) GetJobByTemplateId(id string)error{
-    var advantage, skill, sal sql.NullString
+    var advantage, skill sql.NullString
+    var sal []float64
     var dateAge string
     conn, err := GetDBConn()
     if err != nil{
@@ -335,11 +364,11 @@ func (j *Job) GetJobByTemplateId(id string)error{
     }
     defer conn.Close()
     jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, j.contract, j.city, j.postal, j.salary, j.advantage, j.skill, j.worktime FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobTemplate AS jt ON jt.job_id=j.id WHERE jt.id=$1`, id)
-    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &sal, &advantage, &skill, &j.WeeklyWorkTime); err != nil{
+    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, pq.Array(&sal), &advantage, &skill, &j.WeeklyWorkTime); err != nil{
         log.Println(err)
         return errors.New("error scanning job")
     }
-    j.SalaryString, j.Salary = postgresSalaryIntoString(sal.String)
+    j.SalaryString, j.Salary = postgresSalaryIntoString(sal)
     j.Date = PostgresIntervalIntoString(strings.Split(dateAge, "-"))
     if err := json.Unmarshal([]byte(advantage.String), &j.Advantage); err != nil{
         log.Println(err)
@@ -392,9 +421,9 @@ func (j *Job)GetTemplates()([]EntrepriseTemplates, error){
 
 func SearchJobWithFilter(query string, filter Filter)[]Job{
     var jobs []Job
-    var sal sql.NullString
     var name, addr, id, contract, date, entreprise, fulltimeString string
     var fulltime bool
+    var sal []float64
     conn, err := GetDBConn()
     if err != nil{
         log.Println(err)
@@ -407,8 +436,8 @@ func SearchJobWithFilter(query string, filter Filter)[]Job{
         return jobs
     }
     for rows.Next(){
-        rows.Scan(&name, &addr, &entreprise, &contract, &fulltime, &date, &id, &sal)
-        salaryString, _ := postgresSalaryIntoString(sal.String)
+        rows.Scan(&name, &addr, &entreprise, &contract, &fulltime, &date, &id, pq.Array(&sal))
+        salaryString, _ := postgresSalaryIntoString(sal)
         formatedDate := PostgresIntervalIntoString(strings.Split(date, "-"))
         if fulltime{
             fulltimeString = "Temps plein"
@@ -467,11 +496,11 @@ func SearchJobWithFilter(query string, filter Filter)[]Job{
 }
 
 func GetJobBySearch(query string, postal string, startRange int, appLastPosition int)(jobs []Job, ftOffset int, appPosition int,  err error){
-    var sal sql.NullString
     var id, title, contract, date, addrValue, salaryString, entrepriseName string
     var fulltime bool
     var franceTravailJobs Payload
     var fulltimeString string
+    var job Job
     conn, err := GetDBConn()
     if err != nil{
         log.Println(err)
@@ -484,10 +513,10 @@ func GetJobBySearch(query string, postal string, startRange int, appLastPosition
         }
         appPosition = appLastPosition
         for jobRows.Next(){
-            if err := jobRows.Scan(&id, &title, &sal, &addrValue, &contract, &date, &entrepriseName, &fulltime); err != nil{
+            if err := jobRows.Scan(&id, &title, pq.Array(&job.Salary), &addrValue, &contract, &date, &entrepriseName, &fulltime); err != nil{
                 log.Println(err)
             }
-            salaryString, _ = postgresSalaryIntoString(sal.String)
+            salaryString, _ = postgresSalaryIntoString(job.Salary)
             formatedDate := PostgresIntervalIntoString(strings.Split(date, "-"))
             if fulltime{
                 fulltimeString = "Temps plein"
@@ -653,39 +682,35 @@ func GetFranceTravailEmplois(jobLength int)(mostRecentJobs []Job, recomendationJ
 }
 
 func GetContracts()string{
-    var contract string
-    contractListString := "["
+    var contractArray []Contract
+    var contract Contract
     conn, err := GetDBConn()
     if err != nil{
         log.Println(err)
-        return contract
+        return ""
     }
     defer conn.Close()
-    row, err := conn.QueryContext(context.Background(), `SELECT unnest(enum_range(NULL::contract))`)
+    row, err := conn.QueryContext(context.Background(), `SELECT id, name FROM Contract`)
     if err != nil{
         log.Println(err)
-        return contract
+        return ""
     }
     for row.Next(){
-        if err := row.Scan(&contract); err != nil{
+        if err := row.Scan(&contract.Id, &contract.Name); err != nil{
             log.Println(err)
-            return contract
+            return ""
         }
-        
-        contractListString += fmt.Sprintf(`{"id": "", "value": "%v"},`, contract)
+        contractArray = append(contractArray, contract)
     }
-    return contractListString[:len(contractListString)-1]+"]"
+    contractMarshal, _ := json.Marshal(contractArray)
+    return string(contractMarshal)
 }
 
-func postgresSalaryIntoString(salary string)(string, []float64){
-    var salaryArray []float64
-    if err := json.Unmarshal([]byte(fmt.Sprintf("[%v]", salary[1:len(salary)-1])), &salaryArray); err != nil{
-        log.Println(err)
-    }
+func postgresSalaryIntoString(salary []float64)(string, []float64){
     if len(salary) > 1{
-        return fmt.Sprintf("Salaire entre %v et %v euros", salaryArray[0], salaryArray[1]), salaryArray
+        return fmt.Sprintf("Salaire entre %v et %v euros", salary[0], salary[1]), salary
     }else{
-        return fmt.Sprintf("Salaire %v euros", salaryArray[0]), salaryArray
+        return fmt.Sprintf("Salaire %v euros", salary[0]), salary
     }
 }
 

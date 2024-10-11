@@ -8,17 +8,17 @@ customElements.define("job-card", class JobCard extends HTMLElement{
             .card {
                 width: 100%;
                 background-color: #fff;
-                border-radius: 8px;
+                border-radius: 10px;
                 box-shadow: var(--card_shadow);
                 margin-bottom: 20px;
                 overflow: hidden;
                 .card-content {
-                    padding: 20px;
+                    padding: 15px;
                     .card-header {
                         display: flex;
                         gap: 16px;
                         .company-photo {
-                            width: 3rem;
+                            height: 3rem;
                             aspect-ratio: 1/1;
                             object-fit: cover;
                             border-radius: 10px;
@@ -28,15 +28,13 @@ customElements.define("job-card", class JobCard extends HTMLElement{
                                 .card-top{
                                     display:flex;
                                     gap:1rem;
-                                    align-items:center;
                                     margin-bottom: .5rem;
                                     .card-title {
                                         view-transition-name: title;
                                         font-size: 1rem;
                                         font-weight: 600;
-                                        min-height: 3.9rem;
-                                        align-content: center;
                                         text-wrap: balance;
+                                        margin: 0;
 
                                     }
                                 }

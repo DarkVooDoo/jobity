@@ -432,6 +432,7 @@
         }
         const getValues = ()=>{
 
+            const contract = document.getElementById("contract").querySelector(".dropdown_display")
             const exp = document.getElementById("exp")
             const city = document.getElementById("city")
             const description = document.querySelector(".description")
@@ -459,6 +460,7 @@
             }
             localStorage.removeItem("jobSnapshot")
             return {
+                contract: contract.dataset.id,
                 salary: salaryList, 
                 weeklyWorkTime: parseFloat(weeklyWorkTime.value), 
                 skill: skillNeeded, 

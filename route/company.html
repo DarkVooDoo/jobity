@@ -1,9 +1,12 @@
 {{define "Head"}}
     <title>Company name</title>
+    <script src="/static/JobCard.js" type="module"></script>
 {{end}}
 
 {{define "Style"}}
-
+    main{
+        container-type: inline-size;
+    }
     .company_info > *{
         margin-bottom: .5rem;
     }
@@ -41,6 +44,17 @@
         }
     }
 
+    .grid{
+        display: grid;
+        @container (width >= 678px){
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        @container (width >= 970px){
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
 {{end}}
 
 {{define "Body"}}
@@ -55,6 +69,11 @@
             <button type="button" class="company_tab_link" onclick="onTabClick(this)" >Mission</button>
             <button type="button" class="company_tab_link" onclick="onTabClick(this)" >Avis</button>
         </div>
+        <div class="grid">
+        {{range .Job}}
+            <job-card id="{{.Id}}" picture="/static/netflix.webp"  salary="{{.SalaryString}}" entreprise="{{.EntrepriseName}}" isThirdParty="{{.IsThirdParty}}"  contract="{{.Contract}}" title="{{.Title}}" fulladdr="{{.FullAdresse}}" date="{{.Date}}" fulltime="{{.FulltimeString}}" ></job-card>
+        {{end}}
+        </div> 
     </main>
     <script>
         const tabs = document.getElementsByClassName("company_tab_link")

@@ -10,6 +10,7 @@ type SignPage struct{
     RequireData
 }
 
+
 var SignHandler = func(res http.ResponseWriter, req *http.Request){
     var user store.User
     route, err := NewRoute(res, req)
@@ -29,6 +30,26 @@ var SignHandler = func(res http.ResponseWriter, req *http.Request){
         var token string
         googleCredential := route.UrlEncoded["credential"]
         if googleCredential != ""{
+            _, googleUser, err := store.VerifyGoogleToken(googleCredential)
+            if err != nil{
+                return
+            }
+            if err := store.SignGoogleUser(googleUser, googleCredential); err != nil{
+                return
+            }
+            token = googleCredential
+            authToken := http.Cookie{
+                Name: "x-auth",
+                Path: "/",
+                SameSite: http.SameSiteStrictMode,
+                HttpOnly: true,
+                MaxAge: 60*60*6,
+                Value: token,
+            }
+            http.SetCookie(route.Response, &authToken)
+            route.Response.Header().Add("Location", "/")
+            route.Response.WriteHeader(http.StatusMovedPermanently)
+            return
             //Log in with google
         }else{
             email := route.UrlEncoded["email"]
@@ -40,18 +61,19 @@ var SignHandler = func(res http.ResponseWriter, req *http.Request){
                 return
             }
             token, _ = store.CreateToken(user)
+
+            authToken := http.Cookie{
+                Name: "x-auth",
+                Path: "/",
+                SameSite: http.SameSiteStrictMode,
+                HttpOnly: true,
+                MaxAge: 60*60*6,
+                Value: token,
+            }
+            http.SetCookie(route.Response, &authToken)
+            route.Response.Header().Add("HX-Redirect", "/")
+            route.Response.WriteHeader(http.StatusTemporaryRedirect)
         }
-        authToken := http.Cookie{
-            Name: "x-auth",
-            Path: "/",
-            SameSite: http.SameSiteStrictMode,
-            HttpOnly: true,
-            MaxAge: 60*60*6,
-            Value: token,
-        }
-        http.SetCookie(route.Response, &authToken)
-        route.Response.Header().Add("HX-Redirect", "/")
-        route.Response.WriteHeader(http.StatusTemporaryRedirect)
     })
     
     route.Put(nil, func() {

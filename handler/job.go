@@ -35,7 +35,7 @@ var JobHandler = func(res http.ResponseWriter, req *http.Request){
                 log.Println(err)
                 return
             }
-            recomendationVector,_ = json.Marshal(job.Vector())
+            recomendationVector,_ = json.Marshal(job.RecomendationVector)
         }
         page := JobPage{RequireData{Search: SearchQuery{Query: ""}, User: route.User}, job}
         //cookie, err := req.Cookie("pref")

@@ -68,7 +68,7 @@ func NewRoute(response http.ResponseWriter, request *http.Request) (*Route, ErrT
     var multip Multipart = Multipart{Body: map[string]string{}}
 	contentType := request.Header.Get("Content-Type")
     token, err := request.Cookie("x-auth")
-    if err == nil{
+    if err == nil && token.Value != ""{
         userData, accessToken, errToken := store.VerifyToken(token.Value)
         if errToken != nil{
             err = errToken
