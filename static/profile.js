@@ -84,13 +84,15 @@ const description = document.querySelector("#description textarea")
 const descriptionLength = document.getElementById("length")
 descriptionLength.textContent = 250 - description.textContent.length
 
-const calcPopoverPosition = ()=>{
-    const curriculumActionBtn = document.querySelector("#cv .submitBtn")
-    const popover = document.querySelector("#cv #curriculum_action")
+const calcPopoverPosition = (ele)=>{
 
-    const {left, top} = curriculumActionBtn.getBoundingClientRect()
-    popover.style.left = `calc(${left}px - 100px  + 2rem)`
-    popover.style.top = `calc(${top}px + 2.3rem)`
+    ele.querySelector("#curriculum_action").classList.remove("hidden")
+    //const curriculumActionBtn = document.querySelector("#cv .submitBtn")
+    //const popover = document.querySelector("#cv #curriculum_action")
+
+    //const {left, top} = curriculumActionBtn.getBoundingClientRect()
+    //popover.style.left = `calc(${left}px - 100px  + 2rem)`
+    //popover.style.top = `calc(${top}px + 2.3rem)`
 }
 
 const onHideCurriculumAction = (ele)=>{

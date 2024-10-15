@@ -56,7 +56,7 @@ func SigninUser(email string, password string)(ConnectedUser, error){
     }
     defer conn.Close()
     userRow := conn.QueryRowContext(context.Background(), `SELECT id, CONCAT(LEFT(firstname, 1), LEFT(lastname, 1)), picture, password, salt FROM Users WHERE email=$1`, email)
-    if err := userRow.Scan(user.Id, &user.ShortName, &picture, &cryptPassword, &salt); err != nil{
+    if err := userRow.Scan(&user.Id, &user.ShortName, &picture, &cryptPassword, &salt); err != nil{
         log.Println(err)
         return user, errors.New("error selecting users")
     }

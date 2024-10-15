@@ -183,6 +183,7 @@
                 font-size: 1.5rem;
             }
             .submitBtn{
+                position: relative;
                 height: 2rem;
                 width: 2rem;
                 display: flex;
@@ -198,32 +199,29 @@
                 &:has(+ #curriculum_action:popover-open){
                     background-color: lightgray;
                 } 
-            }
-            #curriculum_action{
-                width: 100px;
-                position: absolute;
-                inset: unset;
-                border-radius: 5px;
-                border: 1px solid darkgray;
-                transform-origin: top right;
-                scale: 0;
-                transition: scale 200ms linear, display 100ms linear allow-discrete, overlay 100ms linear allow-discrete;
-                &:popover-open{
+                #curriculum_action{
+                    width: 100px;
+                    position: absolute;
+                    top: 100%;
+                    border-radius: 5px;
+                    border: 1px solid darkgray;
+                    transform-origin: top right;
                     scale: 1;
-                    @starting-style{
-                        scale: 0;
+                    background-color: white;
+                    transition: scale 200ms linear, display 100ms linear allow-discrete, overlay 100ms linear allow-discrete;
+                    &:popover-open{
+                        scale: 1;
+                        @starting-style{
+                            scale: 0;
+                        }
                     }
-                }
-                &::backdrop{
-                    background-color: transparent;
-                    backdrop-filter: blur(0px);
-                }
-                .btn{
-                    height: 2rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 100%;
+                    .btn{
+                        height: 2rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                    }
                 }
             }
         }
@@ -558,14 +556,14 @@
         <form id="cv" hx-post="/profile/cv" hx-swap="none" hx-ext="json-enc" hx-vals='js:{...getValues()}' class="hidden scene">
             <div class="header">
                 <h1 class="title">Mon Curriculum</h1>
-                <button type="button" popovertarget="curriculum_action" class="submitBtn" onclick="calcPopoverPosition()">
+                <div class="submitBtn" onclick="calcPopoverPosition(this)">
                     <div class="dot"></div>
                     <div class="dot"></div>
                     <div class="dot"></div>
-                </button>
-                <div id="curriculum_action" popover>
-                    <button type="submit" class="btn" onclick="onHideCurriculumAction(this)">Sauvegarder</button>
-                    <a href="/profile/cv?type=pdf" class="btn" onclick="onHideCurriculumAction(this)">Telecharger</a>
+                    <div id="curriculum_action" class="hidden">
+                        <button type="submit" class="btn" onclick="onHideCurriculumAction(this)">Sauvegarder</button>
+                        <a href="/profile/cv?type=pdf" class="btn" onclick="onHideCurriculumAction(this)">Telecharger</a>
+                    </div>
                 </div>
             </div>
             <div class="flex-container">
