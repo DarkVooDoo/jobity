@@ -1,7 +1,6 @@
 {{define "Head"}}
     <title>Recherche</title>
     <script src="/static/JobCard.js" type="module"></script>
-    <script src="/static/Dropdown.js" type="module"></script>
     <script src="/static/ToggleBtn.js" type="module"></script>
 {{end}}
 %end
@@ -256,7 +255,9 @@ main{
             </div>
             <div class="row">
                 <h2 class="header">Contrat</h2>
-                <dropdown-ele height="2rem" id="contract" array="{{.Contract}}"></dropdown-ele>
+                <select name="contract">
+                    <option value="{{.Id}}">{{.Name}}</option>
+                </select>
             </div>
             <div class="row" style="display: flex;align-items: center;justify-content: space-between;">
                 <h2 class="header">Temps plein</h2>

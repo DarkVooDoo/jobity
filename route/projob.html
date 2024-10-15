@@ -10,8 +10,8 @@
         container-type: inline-size;
         container-name: main_section;
     }
-    .newjob > * , .title, .newjob_section > *, #template_save > *{
-        margin-bottom: .5rem;
+    .newjob > * , .select-category .title, .newjob_section > *, #template_save > *{
+        margin-bottom: 1rem;
     }
     .title{
         font-size: 1.2rem;
@@ -76,6 +76,20 @@
             }
         }
 
+        .category{
+            display: flex;
+            flex-wrap: wrap;
+            .select-category{
+                margin-right: 1rem;
+                .subheader{
+                    margin-bottom: .5rem;
+                }
+                .select-element{
+                    height: 2rem;
+                    padding-inline: .5rem;
+                }
+            }
+        }
         @container advantagesAncSKill (width >= 650px){
             .bottomContent{
                 flex-direction: row;
@@ -89,6 +103,7 @@
     }
     .subheader{
         font-size: 1rem;
+        margin-bottom: .5rem;
     }
     .newjob_field{
         position: relative;
@@ -467,6 +482,9 @@
 
 {{define "Body"}}
         {{$InterviewType := .InterviewType}}
+        {{$CategoryName := .Job.Category}}
+        {{$SubcategoryName := .Job.Subcategory}}
+        {{$ContractName := .Job.Contract}}
         <div class="header">
             <div class="preview">
                 <h1 class="title">{{.Job.Title}}</h1>
@@ -492,6 +510,25 @@
                     <label for="adresse" class="newjob_field_label">Postal</label>
                 </div>
             </div>
+            <div class="category">
+                <div class="select-category">
+                    <h2 class="subheader">Categorie</h2>
+                    <select id="category" name="category" class="select-element" hx-patch="/job/creer" hx-trigger="change" 
+                        hx-target="#subcategory" hx-swap="innerHTML" hx-params="category" hx-ext="ignore:json-enc">
+                        {{range .Category}}
+                            <option value="{{.Id}}" id="category-{{.Id}}" {{if eq .Name $CategoryName}}selected{{end}}>{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                <div id="subcategory" class="select-category">
+                    <h2 class="subheader">Subcategorie</h2>
+                    <select id="subcategory" name="subcategory" class="select-element">
+                        {{range .Subcategory}}
+                            <option value="{{.Id}}" id="category-{{.Id}}" {{if eq .Name $SubcategoryName}}selected{{end}}>{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
             <h2 class="subheader">Salaire</h2>
             <div class="newjob_flex">
                 <div class="newjob_field">
@@ -505,7 +542,11 @@
             </div>
             <h2 class="subheader">Contrat</h2>
             <div class="newjob_flex">
-                <dropdown-ele id="contract" value="{{.Job.Contract}}" items="{{.Job.ContractArray}}"></dropdown-ele>
+                <select name="contract">
+                    {{range .Contract}}
+                        <option value="{{.Id}}" {{if eq $ContractName .Name}}selected{{end}}>{{.Name}}</option>
+                    {{end}}
+                </select>
                 <div class="newjob_field">
                     <input type="number" value="{{.Job.WeeklyWorkTime}}" placeholder="35" id="weeklyWorkTime" name="weeklyWorkTime" class="newjob_field_input newjob_field_input_withLabel" />
                     <label for="weeklyWorkTime" class="newjob_field_label">Heures</label>
@@ -890,7 +931,6 @@
             const profilWanted = []
             const advantageList = []
             const salaryList = []
-            const contractValue = contract.shadowRoot.querySelector(".dropdown-input")
             const profilNeeded = document.getElementsByClassName("content")
             const advantage = document.getElementsByClassName("advantage")
 
@@ -906,7 +946,6 @@
                 salaryList.push(parseFloat(sal.value))
             }
             return {
-                contract: contractValue.value,
                 salary: salaryList,
                 description: description.innerText, 
                 weeklyWorkTime: parseFloat(weeklyWorkTime.value),

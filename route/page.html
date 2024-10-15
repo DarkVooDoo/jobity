@@ -31,7 +31,7 @@
         
         <div class="grid">
         {{range .Job}}
-            <job-card id="{{.Id}}" picture="/static/netflix.webp"  salary="{{.SalaryString}}" entreprise="{{.EntrepriseName}}" isThirdParty="{{.IsThirdParty}}"  contract="{{.Contract}}" title="{{.Title}}" fulladdr="{{.FullAdresse}}" date="{{.Date}}" fulltime="{{.FulltimeString}}" ></job-card>
+            <job-card id="{{.Id}}" picture="{{.EntreprisePicture}}"  salary="{{.SalaryString}}" entreprise="{{.EntrepriseName}}" isThirdParty="{{.IsThirdParty}}"  contract="{{.Contract}}" title="{{.Title}}" fulladdr="{{.FullAdresse}}" date="{{.Date}}" fulltime="{{.FulltimeString}}" ></job-card>
         {{end}}
         </div> 
     </main>

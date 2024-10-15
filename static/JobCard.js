@@ -118,7 +118,7 @@ customElements.define("job-card", class JobCard extends HTMLElement{
                     <div class="card-header">
                         <div class="card-info">
                             <div class="card-top" style=""> 
-                                <img src="/static/netflix.webp" alt="DesignWave logo" class="company-photo m-photo ${this.picture}"/>
+                                <img src=${this.getAttribute("picture")}  alt="DesignWave logo" class="company-photo m-photo ${this.picture}"/>
                                 <h3 class="card-title">${this.getAttribute("title")}</h3>
                             </div>
                             <div class="card-company-info">

@@ -247,6 +247,8 @@
 
 {{define "Body"}}
     <main class="job">
+        <span>{{.Job.Category}}</span>
+        <span>{{.Job.Subcategory}}</span>
         <div class="job_title">
             <h1 class="text">{{.Job.Title}}</h1>
             {{if .User.Id}}

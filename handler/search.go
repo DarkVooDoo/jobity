@@ -13,7 +13,7 @@ import (
 type SearchPayload struct{
     RequireData   
     Jobs []store.Job
-    Contract string
+    Contract []store.Contract
 }
 
 

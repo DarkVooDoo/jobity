@@ -24,7 +24,11 @@ type Job struct{
     Salary []float64 `json:"salary"`
     SalaryString string
     Contract string `json:"contract"`
-    ContractArray string
+    Category string `json:"category"`
+    CategoryId string 
+    Subcategory string `json:"subcategory"`
+    SubcategoryId string
+    EntreprisePicture string
     EntrepriseName string
     EntrepriseId string 
     Experience int `json:"exp"`
@@ -79,6 +83,11 @@ type EntrepriseTemplates struct{
 type Contract struct{
     Id int `json:"id"`
     Name string `json:"value"`
+}
+
+type Category struct{
+    Id string `json:"id"`
+    Name string `json:"name"`
 }
 
 type FranceTravailToken struct{
@@ -193,6 +202,7 @@ func GetAppJobs(recomendationVector []float64)[]Job{
             Title: title, 
             Contract: contract, 
             Date: formatedDate, 
+            EntreprisePicture: "/static/netflix.webp",
             FullAdresse: fullAddr, 
             FulltimeString: fulltimeString,
             SalaryString: salaryString,
@@ -215,7 +225,7 @@ func (j *Job) CreateJob()(string, error){
     if j.WeeklyWorkTime >= 35{
         j.Fulltime = true
     }
-    jobRow := conn.QueryRowContext(context.Background(), `INSERT INTO Job(title, description, salary, city, postal, contract, worktime, advantage, skill, fulltime, lat, long, experience, entreprise_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`, j.Title, j.Description, h, j.City, j.Postal, j.Contract, j.WeeklyWorkTime, pq.Array(j.Advantage), string(skill), j.Fulltime, j.Lat, j.Long, j.Experience, j.EntrepriseId)
+    jobRow := conn.QueryRowContext(context.Background(), `INSERT INTO Job(title, description, salary, city, postal, contract, worktime, advantage, skill, fulltime, lat, long, experience, category_id, subcategory_id, entreprise_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING id`, j.Title, j.Description, h, j.City, j.Postal, j.Contract, j.WeeklyWorkTime, pq.Array(j.Advantage), string(skill), j.Fulltime, j.Lat, j.Long, j.Experience, j.Category, j.Subcategory, j.EntrepriseId)
     if err = jobRow.Scan(&j.Id); err != nil{
         log.Println(err)
         return "", errors.New("error inserting job to the db")
@@ -238,13 +248,12 @@ func (j *Job) ModifyJob()error{
     }
     defer conn.Close()
     salaryMarshal, _ := json.Marshal(j.Salary)
-    advantage, _ := json.Marshal(j.Advantage)
     skill, _ := json.Marshal(j.SkillNeeded)
     if j.WeeklyWorkTime >= 35{
         j.Fulltime = true
     }
     salary := fmt.Sprintf("{%v}", string(salaryMarshal)[1:len(salaryMarshal)-1])
-    _, err = conn.ExecContext(context.Background(), `UPDATE Job SET title=$1, city=$2, postal=$3, contract=$4, description=$5, salary=$6, worktime=$7, advantage=$8, skill=$9, fulltime=$10 WHERE id=$11 AND entreprise_id=$12`,j.Title, j.City, j.Postal, j.Contract, j.Description, salary, j.WeeklyWorkTime, string(advantage), string(skill), j.Fulltime, j.Id, j.EntrepriseId)
+    _, err = conn.ExecContext(context.Background(), `UPDATE Job SET title=$1, city=$2, postal=$3, contract=$4, description=$5, salary=$6, worktime=$7, advantage=$8, skill=$9, fulltime=$10, category_id=$11, subcategory_id=$12 WHERE id=$13 AND entreprise_id=$14`,j.Title, j.City, j.Postal, j.Contract, j.Description, salary, j.WeeklyWorkTime, pq.Array(j.Advantage), string(skill), j.Fulltime, j.Category, j.Subcategory, j.Id, j.EntrepriseId)
     if err != nil{
         log.Println(err)
         return errors.New("error updating job")
@@ -278,8 +287,8 @@ func (j *Job) GetJobById()error{
         log.Println(err)
         return errors.New("error transction")
     }
-    jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, c.name, j.city, j.postal,  CONCAT(LEFT(j.postal, 2), ' - ', J.city), j.salary, j.advantage, j.skill, j.worktime, j.fulltime, j.lat, j.long, j.experience, j.vector, ja.id, b.id FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobApplication AS ja ON ja.job_id=j.id LEFT JOIN Bookmark AS b ON j.id=b.job_id LEFT JOIN Contract AS c ON c.id=j.contract WHERE j.id=$1`, j.Id)
-    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &j.FullAdresse, pq.Array(&sal), pq.Array(&j.Advantage), &skill, &j.WeeklyWorkTime, &j.Fulltime, &j.Lat, &j.Long,&j.Experience, pq.Array(&j.RecomendationVector),  &applicationId, &bookmarkId); err != nil{
+    jobRow := conn.QueryRowContext(context.Background(), `SELECT UPPER(e.name) , TO_CHAR(AGE(NOW(), j.created), 'Y-MM-DD-HH24-MI-SS'), j.title, j.description, c.name, j.city, j.postal,  CONCAT(LEFT(j.postal, 2), ' - ', J.city), j.salary, j.advantage, j.skill, j.worktime, j.fulltime, j.lat, j.long, j.experience, j.vector, ja.id, b.id, cat.name, cat.id, subcat.name FROM Job AS j LEFT JOIN Entreprise AS e ON j.entreprise_id=e.id LEFT JOIN JobApplication AS ja ON ja.job_id=j.id LEFT JOIN Bookmark AS b ON j.id=b.job_id LEFT JOIN Contract AS c ON c.id=j.contract LEFT JOIN Category AS cat ON cat.id=j.category_id LEFT JOIN Subcategory AS subcat ON subcat.id=j.subcategory_id  WHERE j.id=$1`, j.Id)
+    if err := jobRow.Scan(&j.EntrepriseName, &dateAge, &j.Title, &j.Description, &j.Contract, &j.City, &j.Postal, &j.FullAdresse, pq.Array(&sal), pq.Array(&j.Advantage), &skill, &j.WeeklyWorkTime, &j.Fulltime, &j.Lat, &j.Long,&j.Experience, pq.Array(&j.RecomendationVector),  &applicationId, &bookmarkId, &j.Category, &j.CategoryId, &j.Subcategory); err != nil{
         log.Println(err)
         return errors.New("error scanning job")
     }
@@ -288,7 +297,6 @@ func (j *Job) GetJobById()error{
     j.BookmarkId = bookmarkId.String
     j.Date = PostgresIntervalIntoString(strings.Split(dateAge, "-"))
     j.SalaryString, j.Salary = postgresSalaryIntoString(sal)
-    j.ContractArray =  GetContracts()
     if err := json.Unmarshal([]byte(skill.String), &j.SkillNeeded); err != nil{
         log.Println(err)
         return errors.New("error making skill into json")
@@ -681,29 +689,90 @@ func GetFranceTravailEmplois(jobLength int)(mostRecentJobs []Job, recomendationJ
     return mostRecentJobs, recomendationJobs, nil
 }
 
-func GetContracts()string{
+func GetCategoryByTitle(title string)(category Category, subcategory Category){
+    conn, err := GetDBConn()
+    if err != nil{
+        log.Printf("error in the db conn: %v", err)
+        return
+    }
+    defer conn.Close()
+    autoCategoryRow := conn.QueryRowContext(context.Background(), `SELECT sc.id, sc.name, c.id, c.name FROM Subcategory AS sc LEFT JOIN Category AS c ON c.id=sc.category_id 
+    WHERE sc.ts @@ websearch_to_tsquery('french', $1)`, title)
+    if err := autoCategoryRow.Scan(&subcategory.Id, &subcategory.Name, &category.Id, &category.Name); err != nil{
+        log.Printf("error scanning the row: %v", err)
+        return
+    }
+    return
+}
+
+func GetCategorys()[]Category{
+    var categoryList []Category
+    var category Category
+    conn, err := GetDBConn()
+    if err != nil{
+        log.Printf("error in the db conn: %v", err)
+        return categoryList
+    }
+    defer conn.Close()
+    categoryRow, err := conn.QueryContext(context.Background(), `SELECT id, name FROM Category`)
+    if err != nil{
+        log.Printf("error selecting category: %v", err)
+        return categoryList
+    }
+    for categoryRow.Next(){
+        if err := categoryRow.Scan(&category.Id, &category.Name); err != nil{
+            log.Printf("error scanning columns: %v", err)
+            return categoryList
+        }
+        categoryList = append(categoryList, category)
+    }
+    return categoryList
+}
+
+func GetSubcategory(categoryId string)[]Category{
+    var subcategoryList []Category
+    var subcategory Category
+    conn, err := GetDBConn()
+    if err != nil{
+        log.Printf("error in the conn to the db: %v", err)
+        return subcategoryList
+    }
+    subcategoryRow, err := conn.QueryContext(context.Background(), `SELECT id, name FROM Subcategory WHERE category_id=$1`, categoryId)
+    if err != nil{
+        log.Printf("error in the query: %v", err)
+    }
+    for subcategoryRow.Next(){
+        if err := subcategoryRow.Scan(&subcategory.Id, &subcategory.Name); err != nil{
+            log.Printf("error scanning subcategory: %v", err)
+            return subcategoryList
+        }
+        subcategoryList = append(subcategoryList, subcategory)
+    }
+    return subcategoryList
+}
+
+func GetContracts()[]Contract{
     var contractArray []Contract
     var contract Contract
     conn, err := GetDBConn()
     if err != nil{
         log.Println(err)
-        return ""
+        return contractArray
     }
     defer conn.Close()
     row, err := conn.QueryContext(context.Background(), `SELECT id, name FROM Contract`)
     if err != nil{
         log.Println(err)
-        return ""
+        return contractArray
     }
     for row.Next(){
         if err := row.Scan(&contract.Id, &contract.Name); err != nil{
             log.Println(err)
-            return ""
+            return contractArray
         }
         contractArray = append(contractArray, contract)
     }
-    contractMarshal, _ := json.Marshal(contractArray)
-    return string(contractMarshal)
+    return contractArray
 }
 
 func postgresSalaryIntoString(salary []float64)(string, []float64){
@@ -774,6 +843,7 @@ func getFranceTravailFrontpageJobs(request string)([]Job, error){
             Id: value.Id,
             Title: value.Title, 
             Description: value.Description, 
+            EntreprisePicture: "/static/france-travail.png",
             SalaryString: value.Salary.Amount,
             EntrepriseName: value.Enpreprise.Name,
             FullAdresse: value.Adresse.Name,

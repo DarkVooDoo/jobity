@@ -12,6 +12,9 @@ type ProjobPage struct{
     Candidate []store.Curriculum
     Interview []store.Curriculum
     InterviewType []string
+    Category []store.Category
+    Subcategory []store.Category
+    Contract []store.Contract
 }
 
 var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
@@ -36,6 +39,9 @@ var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
             candidates,
             interview,
             store.GetInterviewType(),
+            store.GetCategorys(),
+            store.GetSubcategory(job.CategoryId),
+            store.GetContracts(),
         }
         route.Render(page, "route/protemplate.html", "route/projob.html")
     })

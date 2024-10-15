@@ -11,7 +11,19 @@ import (
 type NewJobPage struct{
     RequireData
     Templates string
-    Contract string
+    Contract []store.Contract
+    Category []store.Category
+}
+
+type TemplateLoad struct{
+    CntractList []store.Contract
+    Job store.Job
+}
+
+type CategoryUpdate struct{
+    Category store.Category
+    SelectSubcategory store.Category
+    Subcategory []store.Category
 }
 
 var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
@@ -29,18 +41,69 @@ var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
         }
         stringTemplate := store.TemplatesIntoString(templ)
         contract := store.GetContracts()
+        category := store.GetCategorys()
         data := NewJobPage{
             Contract: contract,
             Templates: stringTemplate,
             RequireData: RequireData{Search: SearchQuery{Query: ""}},
+            Category: category,
         }
         route.Render(data, "route/protemplate.html", "route/create_job.html")
+    })
+
+    route.Patch(nil, func() {
+        title := route.UrlEncoded["title"]
+        category := route.UrlEncoded["category"]
+        if title != ""{
+            category, subcategory := store.GetCategoryByTitle(title)
+            if category.Id == ""{
+                return
+            }
+            subcategoryList := store.GetSubcategory(category.Id)
+            updateCategory := CategoryUpdate{category, subcategory,  subcategoryList}
+            temp, err := template.New("category").Parse(`
+                {{$selectSubcategory := .SelectSubcategory}}
+                <option value="{{.Category.Id}}" id="category-{{.Category.Id}}" hx-swap-oob="true" selected>{{.Category.Name}}</option>
+                <div>
+                    <h2 class="subheader">Subcategorie</h2>
+                    <select name="subcategory" class="newjob-select-category">
+                        {{range .Subcategory}}
+                            <option value="{{.Id}}" {{if eq $selectSubcategory.Id .Id}}selected{{end}}>{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            `)
+            if err != nil{
+                log.Printf("error parsing template: %v", err)
+            }
+            if err := temp.Execute(route.Response, updateCategory); err != nil{
+                log.Printf("execute temp error: %v", err)
+            }
+        }else{
+            subcategory := store.GetSubcategory(category)
+            temp, err := template.New("Subcategory").Parse(`
+                <div>
+                    <h2 class="subheader">Subcategorie</h2>
+                    <select name="subcategory" class="select-element">
+                        {{range .}}
+                            <option value="{{.Id}}">{{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            `)
+            if err != nil{
+                log.Printf("error parsing template: %v", err)
+            }
+            if err := temp.Execute(route.Response, subcategory); err != nil{
+                log.Printf("error executing template: %v", err)
+            }
+        }
     })
 
     route.Put(nil, func() {
         templateId := route.UrlEncoded["template"]
         job.GetJobByTemplateId(templateId)
-        job.ContractArray = store.GetContracts()
+        data := TemplateLoad{store.GetContracts(), job}
         templ, _ := template.New("form").Parse(`
         <form class="newjob" hx-post="/job/creer" hx-ext="json-enc" hx-swap="none" id="offert" hx-vals='js:{...getValues()}' onclick="onSubmitForm()">
             <div class="newjob_field">
@@ -71,6 +134,11 @@ var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
             </div>
             <h2 class="subheader">Contrat</h2>
             <div class="newjob_flex">
+                <select name="contract">
+                    {{range .ContractList}}
+                        <option value="{{.Id}}">{{.Name}}</option>
+                    {{end}}
+                </select>
                 <dropdown-ele id="contract" value="{{.Contract}}"  array="{{.ContractArray}}"></dropdown-ele>
                 <div class="newjob_field">
                     <input type="number" placeholder="35" value="{{.WeeklyWorkTime}}" id="weeklyWorkTime" name="weeklyWorkTime" class="newjob_field_input newjob_field_input_withLabel" />
@@ -224,7 +292,7 @@ var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
             <button type="submit" class="newjob_submitBtn" >Creer</button>
         </form>
         `)
-        if err := templ.Execute(route.Response, job); err != nil{
+        if err := templ.Execute(route.Response, data); err != nil{
             log.Println(err)
         }
     })
