@@ -22,8 +22,10 @@ var ProfileHandler = func(res http.ResponseWriter, req *http.Request){
             route.Response.WriteHeader(http.StatusTemporaryRedirect)
             return
         }
-        user.GetProfile()
-        curriculum.Get(store.EncryptCurriculumId(route.User.Id))
+        conn := store.GetDBPoolConn()
+        defer conn.Close()
+        user.GetProfile(conn)
+        curriculum.Get(conn, store.EncryptCurriculumId(route.User.Id))
         data := ProfilePage{
             RequireData{Search: SearchQuery{Query: ""}, User: route.User},
             user,

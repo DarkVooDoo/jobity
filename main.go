@@ -27,7 +27,10 @@ func Subdomain () {
         mux.HandleFunc("/boutiques", handler.ShopHandler)
         mux.HandleFunc("/employe", handler.EmployeHandler)
         mux.HandleFunc("/template/{id}", handler.TemplateHandler)
+        mux.HandleFunc("/parametre", handler.ProParametre)
         mux.HandleFunc("/connexion", handler.ProSignHandler)
+        mux.HandleFunc("/interview/{id}", handler.ProInterviewHandler)
+        mux.HandleFunc("GET /websocket", handler.WebsocketHandler)
         if err := server.ListenAndServe(); err != nil {
             log.Println(err)
             log.Fatal("Keke crash")

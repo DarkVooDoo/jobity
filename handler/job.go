@@ -31,7 +31,9 @@ var JobHandler = func(res http.ResponseWriter, req *http.Request){
             }
             job = ftJob
         }else{
-            if err := job.GetJobById(); err != nil{
+            conn := store.GetDBPoolConn()
+            defer conn.Close()
+            if err := job.GetJobById(conn); err != nil{
                 log.Println(err)
                 return
             }

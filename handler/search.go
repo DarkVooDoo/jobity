@@ -28,11 +28,13 @@ var SearcHandler = func(res http.ResponseWriter, req *http.Request){
         postal := route.Request.URL.Query().Get("postal")
         appLastPosition, _ := strconv.Atoi(route.Request.URL.Query().Get("lp"))
         startRange, _ := strconv.Atoi(route.Request.URL.Query().Get("sr"))
+        conn, _ := store.GetDBConn()
+        defer conn.Close()
         jobs,ftOffset, lastPosition, err := store.GetJobBySearch(query, postal, startRange, appLastPosition)
         if err != nil{
             log.Printf("Q paso %v", err)
         }
-        contract := store.GetContracts()
+        contract := store.GetContracts(conn)
         searchData := SearchQuery{
             Query: query, 
             Postal: postal, 

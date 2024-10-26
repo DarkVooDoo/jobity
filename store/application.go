@@ -63,38 +63,8 @@ func (a *JobApplication) GetUserApplications()(applications []JobApplication){
     return 
 }
 
-func (a *JobApplication) Interviews(entrepriseId string) []JobApplication{
-    var interviews []JobApplication
-    var inter JobApplication
-    var date sql.NullString
-    conn, err := GetDBConn()
-    if err != nil{
-        log.Printf("error in the conn %v", err)
-        return interviews
-    }
-    defer conn.Close()
-    interviewsRows, err := conn.QueryContext(context.Background(), `SELECT DISTINCT j.title, ja.location, ja.interview_date, ja.interview_type, ja.id, CONCAT(u.firstname, ' ', u.lastname), j.id, ja.user_id FROM Job AS j RIGHT JOIN JobApplication AS ja ON j.id=ja.job_id AND ja.status='Interview' RIGHT JOIN Users AS u ON u.id=ja.user_id WHERE j.entreprise_id=$1`, entrepriseId)
-    if err != nil{
-        log.Printf("error in the query: %v", err)
-    }
-    for interviewsRows.Next(){
-        if err := interviewsRows.Scan(&inter.Title, &inter.Addr, &date, &inter.Type, &inter.Id, &inter.UserName, &inter.JobId, &inter.UserId); err != nil{
-            log.Printf("error scan %v", err)
-        }
-        inter.InterviewDate = date.String[:len(date.String)-4]
-        interviews = append(interviews, inter)
-    }
-    return interviews
-}
-
-func (a *JobApplication) Delete()error{
-    conn, err := GetDBConn()
-    if err !=  nil{
-        log.Println(err)
-        return errors.New("error db conn")
-    }
-    defer conn.Close()
-    _, err = conn.ExecContext(context.Background(), `DELETE FROM JobApplication WHERE id=$1`, a.Id)
+func (a *JobApplication) Delete(conn *sql.Conn)error{
+    _, err := conn.ExecContext(context.Background(), `DELETE FROM JobApplication WHERE id=$1`, a.Id)
     if err != nil{
         log.Println(err)
         return errors.New("error deleting job application")
@@ -102,17 +72,9 @@ func (a *JobApplication) Delete()error{
     return nil
 }
 
-func (a JobApplication) UpdateStatus(status string)(error){
-    conn, err := GetDBConn()
-    if err != nil{
-        log.Printf("error conn db %v", err)
-        return errors.New("error db conn")
-    }
-    if status == "Interview"{
-        _, err = conn.ExecContext(context.Background(), `UPDATE JobApplication SET status=$1, interview_date=$2, location=$3, interview_type=$4 WHERE id=$5`, status, a.InterviewDate, a.Addr, a.Type, a.Id)
-    }else{
-        _, err = conn.ExecContext(context.Background(), `UPDATE JobApplication SET status=$1 WHERE id=$2 AND status < $3`, status, a.Id, status)
-    }
+func (a JobApplication) UpdateStatus(conn *sql.Conn, status string)(error){
+    var err error
+    _, err = conn.ExecContext(context.Background(), `UPDATE JobApplication SET status=$1 WHERE id=$2`, status, a.Id)
     if err != nil{
         log.Printf("error updating application status \n%v", err)
         return errors.New("error updating application")

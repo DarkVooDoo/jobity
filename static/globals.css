@@ -160,11 +160,10 @@ nav{
 }
 
 .nav_sign{
-    height: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 .3rem;
+    padding: .3rem;
     border-radius: 5px;
     color: black;
     font-weight: bold;

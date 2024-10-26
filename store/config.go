@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -22,6 +23,7 @@ func InitDB()error{
     db.SetMaxIdleConns(5)
     db.SetConnMaxIdleTime(time.Second*10)
     db.SetMaxOpenConns(15)
+    db.SetConnMaxLifetime(time.Second * 10)
     database = db 
     return nil
 }
@@ -31,4 +33,15 @@ func GetDBConn()(*sql.Conn, error){
         return nil, errors.New("database pointer is nil")
     } 
     return database.Conn(context.Background())
+}
+
+func GetDBPoolConn() *sql.Conn{
+    cxt := context.Background()
+    conn, err := database.Conn(cxt)
+    if err != nil{
+        log.Println("error in the conn")
+        return conn
+    }
+    log.Printf("Conn in use: %v", database.Stats().InUse)
+    return conn
 }

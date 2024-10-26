@@ -38,7 +38,7 @@ type ProUser struct{
     Email string `json:"email"`
     City string 
     Postal string
-    Name string
+    Name string `json:"name"`
     Siren string `json:"siren"`
     Description string `json:"description"`
     Picture string
@@ -97,15 +97,9 @@ func (u *User) Modify()error{
     return nil
 }
 
-func (u *User) GetProfile()error{
+func (u *User) GetProfile(conn *sql.Conn)error{
     var city, postal, birthdate, gender, description sql.NullString
     var lat, long sql.NullFloat64
-    conn, err := GetDBConn()
-    if err != nil{
-        log.Println(err)
-        return errors.New("error conn to the db")
-    }
-    defer conn.Close()
     userRow := conn.QueryRowContext(context.Background(), `SELECT firstname, lastname, city, postal, TO_CHAR(birthdate, 'YYYY-MM-DD'), gender, description, lat, long FROM Users WHERE id=$1`, u.Id)
     if err := userRow.Scan(&u.Firstname, &u.Lastname, &city, &postal, &birthdate, &gender, &description, &lat, &long); err != nil{
         log.Println(err)
@@ -155,27 +149,37 @@ func (p *ProUser) Create(password string)error{
     return nil
 }
 
+func (p *ProUser) Modify(conn *sql.Conn)error{
+    result, err := conn.ExecContext(context.Background(), `UPDATE Entreprise SET name=$1, description=$2 WHERE id=$3`, p.Name, p.Description, p.Id)
+    if err != nil{
+        log.Printf("error in the query: %v", err)
+        return errors.New("error in the query")
+    }
+    affected, err := result.RowsAffected()
+    if err != nil || affected == 0{
+        return errors.New("no rows affected")
+    }
+    return nil
+}
+
 func (p *ProUser) GetProfile()(error){
     var picture, description sql.NullString
-    var name, siren string
     conn, err := GetDBConn()
     if err != nil{
         log.Println(err)
         return errors.New("error db conn")
     }
     defer conn.Close()
-    profileRows, err := conn.QueryContext(context.Background(), `SELECT e.name, e.siren, e.description, e.picture FROM Entreprise AS e WHERE e.id=$1`, p.Id)
+    profileRows, err := conn.QueryContext(context.Background(), `SELECT e.name, e.city, e.postal, e.siren, e.description, e.picture FROM Entreprise AS e WHERE e.id=$1`, p.Id)
     if err != nil{
         log.Println(err)
         return errors.New("error postgres query")
     }
     for profileRows.Next(){
-        if err := profileRows.Scan(&name, &siren, &description, &picture); err != nil{
+        if err := profileRows.Scan(&p.Name, &p.City, &p.Postal, &p.Siren, &description, &picture); err != nil{
             log.Println(err)
         }
     }
-    p.Name = name
-    p.Siren = siren
     p.Description = description.String
     p.Picture = picture.String
     return nil

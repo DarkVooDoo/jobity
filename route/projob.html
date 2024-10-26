@@ -1,8 +1,6 @@
 {{define "Head"}}
     <title>{{.Job.Title}}</title>
-    <script src="/static/Dropdown.mjs" type="module"></script>
     <script src="/static/ToggleBtn.js" type="module"></script>
-    <script src="/static/Calendar.js" type="module"></script>
 {{end}}
 
 {{define "Style"}}
@@ -10,7 +8,7 @@
         container-type: inline-size;
         container-name: main_section;
     }
-    .newjob > * , .select-category .title, .newjob_section > *, #template_save > *{
+    .newjob > * , .select-category .title, .newjob_section > *{
         margin-bottom: 1rem;
     }
     .title{
@@ -79,14 +77,21 @@
         .category{
             display: flex;
             flex-wrap: wrap;
+            margin-bottom: 0;
             .select-category{
-                margin-right: 1rem;
+                margin-bottom: 1rem;
+                &:first-child{
+                    margin-right: 1rem;
+                }
                 .subheader{
                     margin-bottom: .5rem;
                 }
                 .select-element{
-                    height: 2rem;
+                    height: 2.5rem;
                     padding-inline: .5rem;
+                    background: white;
+                    border: 1px solid lightgray;
+                    border-radius: 5px;
                 }
             }
         }
@@ -111,7 +116,7 @@
         width: 100%;
     }
     .newjob_field_input{
-        height: 100%;
+        height: 2.5rem;
         width: 100%;
         padding: 0px 5px;
         border: 1px solid lightgray;
@@ -169,6 +174,7 @@
     .newjob_submitBtn{
         border: 1px solid var(--success_border_color);
         color: var(--success_border_color);
+        margin-bottom: 1.5rem;
     }
     .deleteModalBtn{
         border: 1px solid #c11c30;
@@ -300,7 +306,20 @@
                 color: #ff6d35;
             }
         }
+        .template_save_input{
+            height: 2rem;
+            padding-inline: 5px;
+            border-radius: 5px;
+            border: 1px solid lightgray;
+            margin-right: .5rem;
+        }
+        .template_save_btn{
+            padding: .5rem;
+            border-radius: 5px;
+            background: var(--primary_light_color);
+        }
     }
+
 
     #application{
         margin-top: 1rem;
@@ -542,7 +561,7 @@
             </div>
             <h2 class="subheader">Contrat</h2>
             <div class="newjob_flex">
-                <select name="contract">
+                <select name="contract" class="newjob_field_input">
                     {{range .Contract}}
                         <option value="{{.Id}}" {{if eq $ContractName .Name}}selected{{end}}>{{.Name}}</option>
                     {{end}}
@@ -552,7 +571,7 @@
                     <label for="weeklyWorkTime" class="newjob_field_label">Heures</label>
                 </div>
                 <div class="newjob_field">
-                    <input type="date"  id="startTime" name="startTime" class="newjob_field_input newjob_field_input_withLabel" />
+                    <input type="date" value="{{.Job.StartDate}}"  id="startTime" name="startTime" class="newjob_field_input newjob_field_input_withLabel" />
                     <label for="startTime" class="newjob_field_label">Debut</label>
                 </div>
             </div>
@@ -657,7 +676,8 @@
                 <button type="button" class="deleteBtn" hx-delete="/job/{{.Job.Id}}" onclick="onDeleteOffert(this)" hx-swap="none">Supprimer</button>
             </div>
         </div>
-        <form hx-put="/job/{{.Job.Id}}" hx-swap="none" id="template_save" popover> <h1 style="text-align: center;font-size: 1.2rem;">Enregistrer ce modele</h1>
+        <form hx-post="/job/{{.Job.Id}}" hx-swap="none" id="template_save" popover> 
+            <h1 style="text-align: center;font-size: 1.2rem;margin-bottom: 1rem;">Enregistrer ce modele</h1>
             <input type="text" placeholder="CDD Compable H/F" name="tname" autocomplete="off" class="template_save_input"/>
             <button type="submit" class="template_save_btn" onclick="onSaveTemplate(this)">Enregistrer</button>
         </form>
@@ -687,8 +707,7 @@
                         </div>
                         <dialog class="interviewModal">
                             <h1 style="margin-bottom: .5rem;text-align: center;">Creer Interview</h1>
-                            <form hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
-                                hx-swap="delete" hx-target="closest .card" >
+                            <form hx-post="/interview/{{.Id}}" hx-swap="delete" hx-target="closest .card" hx-ext="json-enc" hx-vals='{"jobId": "{{.JobId}}", "userId": "{{.UserId}}"}' >
                                 <div style="display: flex;justify-content: space-between;gap: .5rem;">
                                     <div>
                                         <b class="input-label">Date</b>
@@ -705,7 +724,7 @@
                                 </div>
                                 <div class="interviewModal-location hidden" style="position: relative;">
                                     <b class="input-label">Location</b>
-                                    <input type="text" autocomplete="off" name="location" class="interview-input" oninput="onFetchAddr(this)"/>
+                                    <input type="text" autocomplete="off" name="addr" class="interview-input" oninput="onFetchAddr(this)"/>
                                     <div class="interviewModal-location-suggest hidden"></div>
                                 </div>
                                 <div class="interview-buttons">
@@ -721,7 +740,7 @@
             <details class="section" name="candidate">
                 <summary class="application_header">A revoir</summary>
                 <div class="inner">
-                    {{range .Interview}}
+                    {{range .Possible}}
                     <div class="card">
                         <div class="content">
                             <img src="/static/profile-picture.jpeg" class="photo" />
@@ -742,8 +761,7 @@
                         </div>
                         <dialog class="interviewModal">
                             <h1 style="margin-bottom: .5rem;text-align: center;">Creer Interview</h1>
-                            <form hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-vals='{"id": "{{.Id}}", "status": "Interview"}' 
-                                hx-swap="delete" hx-target="closest .card" >
+                            <form hx-put="/job/{{.JobId}}/cv/{{.UserId}}" hx-swap="delete" hx-target="closest .card" hx-ext="json-enc" hx-vals='{"jobId": "{{.JobId}}", "userId": "{{.UserId}}"}'>
                                 <div style="display: flex;justify-content: space-between;gap: .5rem;">
                                     <div>
                                         <b class="input-label">Date</b>
@@ -760,7 +778,7 @@
                                 </div>
                                 <div class="interviewModal-location hidden" style="position: relative;">
                                     <b class="input-label">Location</b>
-                                    <input type="text" autocomplete="off" name="location" class="interview-input" oninput="onFetchAddr(this)"/>
+                                    <input type="text" autocomplete="off" name="addr" class="interview-input" oninput="onFetchAddr(this)"/>
                                     <div class="interviewModal-location-suggest hidden"></div>
                                 </div>
                                 <div class="interview-buttons">

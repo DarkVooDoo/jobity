@@ -211,6 +211,7 @@
                     transition: scale 200ms linear, display 100ms linear allow-discrete, overlay 100ms linear allow-discrete;
                     &:popover-open{
                         scale: 1;
+                        margin: 0;
                         @starting-style{
                             scale: 0;
                         }
@@ -556,15 +557,15 @@
         <form id="cv" hx-post="/profile/cv" hx-swap="none" hx-ext="json-enc" hx-vals='js:{...getValues()}' class="hidden scene">
             <div class="header">
                 <h1 class="title">Mon Curriculum</h1>
-                <div class="submitBtn" onclick="calcPopoverPosition(this)">
+                <button class="submitBtn" popovertarget="curriculum_action" onclick="calcPopoverPosition(this)" type="button">
                     <div class="dot"></div>
                     <div class="dot"></div>
                     <div class="dot"></div>
-                    <div id="curriculum_action" class="hidden">
-                        <button type="submit" class="btn" onclick="onHideCurriculumAction(this)">Sauvegarder</button>
+                    <dialog id="curriculum_action" popover>
+                        <input type="submit" class="btn" onclick="onHideCurriculumAction(this)" value="Sauvegarder">
                         <a href="/profile/cv?type=pdf" class="btn" onclick="onHideCurriculumAction(this)">Telecharger</a>
-                    </div>
-                </div>
+                    </dialog>
+                </button>
             </div>
             <div class="flex-container">
                 <div id="work">

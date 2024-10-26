@@ -86,13 +86,14 @@ descriptionLength.textContent = 250 - description.textContent.length
 
 const calcPopoverPosition = (ele)=>{
 
-    ele.querySelector("#curriculum_action").classList.remove("hidden")
-    //const curriculumActionBtn = document.querySelector("#cv .submitBtn")
-    //const popover = document.querySelector("#cv #curriculum_action")
+    //ele.querySelector("#curriculum_action").classList.remove("hidden")
+    const curriculumActionBtn = document.querySelector("#cv .submitBtn")
+    const popover = document.querySelector("#cv #curriculum_action")
 
-    //const {left, top} = curriculumActionBtn.getBoundingClientRect()
-    //popover.style.left = `calc(${left}px - 100px  + 2rem)`
-    //popover.style.top = `calc(${top}px + 2.3rem)`
+    const {left, top} = curriculumActionBtn.getBoundingClientRect()
+    console.log(left, top)
+    popover.style.left = `calc(${left}px - 100px  + 2rem)`
+    popover.style.top = `calc(${top}px + 2.3rem)`
 }
 
 const onHideCurriculumAction = (ele)=>{

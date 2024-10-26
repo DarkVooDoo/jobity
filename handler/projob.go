@@ -10,7 +10,7 @@ type ProjobPage struct{
     RequireData
     Job store.Job
     Candidate []store.Curriculum
-    Interview []store.Curriculum
+    Possible []store.Curriculum
     InterviewType []string
     Category []store.Category
     Subcategory []store.Category
@@ -19,7 +19,6 @@ type ProjobPage struct{
 
 var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
     route, err := NewRoute(res, req)
-
     var job store.Job = store.Job{Id: route.Request.PathValue("id"), EntrepriseId: route.User.Id}
 
     route.Get(func() {
@@ -28,20 +27,22 @@ var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
             route.Response.WriteHeader(http.StatusTemporaryRedirect)
             return 
         }
-        if err = job.GetJobById(); err != nil{
-            log.Println(err)
+        conn := store.GetDBPoolConn()
+        defer conn.Close()
+        if err := job.GetJobById(conn); err != nil{
+            log.Printf("error getting the job")
             return
         }
-        candidates, interview := store.GetJobCurriculum(job.Id)
+        candidates, possible := store.GetJobCurriculum(conn, job.Id)
         page := ProjobPage{
             RequireData{Search: SearchQuery{Query: ""}},
             job,
             candidates,
-            interview,
-            store.GetInterviewType(),
-            store.GetCategorys(),
-            store.GetSubcategory(job.CategoryId),
-            store.GetContracts(),
+            possible,
+            store.GetInterviewType(conn),
+            store.GetCategorys(conn),
+            store.GetSubcategory(conn, job.CategoryId),
+            store.GetContracts(conn),
         }
         route.Render(page, "route/protemplate.html", "route/projob.html")
     })
@@ -70,7 +71,9 @@ var ProJobHandler = func(res http.ResponseWriter, req *http.Request){
 
     route.Delete(nil, func() {
         //Delete job application
-        if err := job.DeleteJob(); err != nil{
+        conn := store.GetDBPoolConn()
+        defer conn.Close()
+        if err := job.DeleteJob(conn); err != nil{
             route.Notification("error", "Impossible de supprimer")
             return
         }

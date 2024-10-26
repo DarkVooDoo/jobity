@@ -1,6 +1,5 @@
 {{define "Head"}}
     <script src="/static/ToggleBtn.js" type="module"></script>
-    <script src="/static/Calendar.js" type="module"></script>
     <title>Pro job creation</title>
 {{end}}
 %end
@@ -15,9 +14,17 @@
         }
     }
     .template{
-        display: flex;
-        gap: .5rem;
-        align-items: center;
+        select[name="template"]{
+            height: 2rem;
+            border: 1px solid lightgray;
+            border-radius: 5px;
+            background: white;
+            padding-inline: 5px;
+        }
+        .subheader{
+            text-align: end;
+            margin-bottom: 5px;
+        }
     }
     .newjob{
         container: form / inline-size;
@@ -41,7 +48,11 @@
             }
             .newjob-select-category{
                 margin-bottom: 1rem;
+                &:first-child{
+                    margin-right: 1rem;
+                }
                 .select-element{
+                    -webkit-appearance: none;
                     height: 2rem;
                     padding-inline: .5rem;
                     margin-right: 1rem;
@@ -60,15 +71,14 @@
                     margin-bottom: .5rem;
                     display: inline-block;
                 }
-                .input{
-                    height: 2rem;
-                    width: 100%;
-                    padding: 0 5px;
-                    border-radius: 5px;
-                    background-color: white;
-                    border: 1px solid lightgray;
-                }
-
+            }
+            .input{
+                height: 2rem;
+                width: 100%;
+                padding: 0 5px;
+                border-radius: 5px;
+                background-color: white;
+                border: 1px solid lightgray;
             }
             .subheader{
                 margin-bottom: .5rem;
@@ -85,7 +95,7 @@
                 display: flex;
                 gap: .5rem;
                 align-items: center;
-                margin-bottom: .3rem;
+                margin-bottom: .5rem;
             }
             .deleteBtn{
                 height: 2rem;
@@ -161,7 +171,8 @@
         width: 100%;
     }
     .newjob_submitBtn{
-        background-color: var(--primary_color);
+        background-color: var(--primary_light_color);
+        margin-bottom: 1.5rem;
     }
     .newjob_templateBtn{
         border: 2px solid var(--primary_color);
@@ -193,10 +204,15 @@
             <h1 class="title">Nouvelle Offre</h1>
             <div class="template">
                 <h2 class="subheader">Modèle</h2>
-                <dropdown-ele height="2rem" id="template" array="{{.Templates}}"></dropdown-ele>
+                <select name="template" hx-put="/job/creer" hx-target=".newjob" hx-trigger="change">
+                    <option value=""> </option>
+                    {{range .Templates}}
+                        <option value="{{.Id}}">{{.Name}}</option>
+                    {{end}}
+                </select>
             </div>
         </div>
-        <form class="newjob" hx-post="/job/creer" hx-ext="json-enc" hx-swap="none" id="offert" hx-vals='js:{...getValues()}' onsubmit="onSubmitForm()" >
+        <form class="newjob" hx-post="/job/creer" hx-ext="json-enc" hx-swap="none" hx-vals='js:{...getValues()}' onsubmit="onSubmitForm()" >
             <div class="newjob-section">
                 <h2 class="newjob-section-name">General</h2>
                 <div class="field">
@@ -226,7 +242,7 @@
                 <div style="display: flex;flex-wrap: wrap;">
                     <div class="newjob-select-category">
                         <h2 class="subheader">Categorie</h2>
-                        <select id="category" name="category" class="select-element" hx-patch="/job/creer" hx-trigger="change" 
+                        <select id="category" name="category" class="select-element input" hx-patch="/job/creer" hx-trigger="change" 
                             hx-target="#subcategory" hx-swap="innerHTML" hx-params="category" hx-ext="ignore:json-enc">
                             {{range .Category}}
                                 <option value="{{.Id}}" id="category-{{.Id}}" >{{.Name}}</option>
@@ -250,7 +266,7 @@
                 <div class="newjob-flex-form" style="flex-wrap: wrap;justify-content: space-between;">
                     <div>
                         <h2 class="subheader">Contrat</h2>
-                        <select name="contract">
+                        <select name="contract" class="input" onchange="onContractChange(this)">
                             {{range .Contract}}
                                 <option value="{{.Id}}">{{.Name}}</option>
                             {{end}}
@@ -262,18 +278,18 @@
                     </div>
                     <div class="field" style="width: 75px;">
                         <label for="exp" class="label">Experience</label>
-                        <input type="number" placeholder="2" id="exp" name="exp" class="input " onchange="onSaveSnapshot(this)" />
+                        <input type="number"  placeholder="2" id="exp" name="exp" class="input " onchange="onSaveSnapshot(this)" />
                     </div>
                     <div>
                         <h3 class="subheader">Duré</h3>
                         <div class="newjob-time-date">
                             <div class="newjob-time-date-field">
                                 <p>Du</p>
-                                <calendar-ele></calendar-ele>
+                                <input type="date" value="{{.Job.StartDate}}" name="startDate" class="input" />
                             </div>
-                            <div class="newjob-time-date-field">
+                            <div class="newjob-time-date-field hidden" id="endDate">
                                 <p>AU</p>
-                                <calendar-ele></calendar-ele>
+                                <input type="date" name="endDate"class="input" />
                             </div>
                         </div>
                     </div>
@@ -312,13 +328,11 @@
             </g>
             </svg
         `
-        window.addEventListener("load", ()=>{
-            savedSnapshotIntoFields()
-            const template = document.querySelector("#template .dropdown_display")
-            template.addEventListener("valueChange", ()=>{
-                htmx.ajax("PUT", "/job/creer", {values: {"template": template.dataset.id}, swap: "outerHTML", target: "#offert"})
-            })
-        })
+        const endDate = document.getElementById("endDate")
+
+        const onContractChange = (ele)=>{
+            parseInt(ele.value) > 2 ? endDate.classList.remove("hidden") : endDate.classList.add("hidden")
+        }
 
         const onSubmitForm = ()=>{
             localStorage.removeItem("jobSnapshot")

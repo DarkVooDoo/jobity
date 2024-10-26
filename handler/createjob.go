@@ -10,13 +10,14 @@ import (
 
 type NewJobPage struct{
     RequireData
-    Templates string
+    Templates []store.EntrepriseTemplates
     Contract []store.Contract
     Category []store.Category
 }
 
 type TemplateLoad struct{
-    CntractList []store.Contract
+    Contract []store.Contract
+    Category []store.Category
     Job store.Job
 }
 
@@ -34,17 +35,18 @@ var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
             route.Response.Header().Add("Location", "/")
             route.Response.WriteHeader(http.StatusTemporaryRedirect)
         }
-        templ, err := job.GetTemplates()
+        conn := store.GetDBPoolConn()
+        defer conn.Close()
+        templ, err := job.GetTemplates(conn)
         if err != nil{
             log.Println(err)
             //route.Notification("warning", "impossible dans les modéles")
         }
-        stringTemplate := store.TemplatesIntoString(templ)
-        contract := store.GetContracts()
-        category := store.GetCategorys()
+        contract := store.GetContracts(conn)
+        category := store.GetCategorys(conn)
         data := NewJobPage{
             Contract: contract,
-            Templates: stringTemplate,
+            Templates: templ,
             RequireData: RequireData{Search: SearchQuery{Query: ""}},
             Category: category,
         }
@@ -54,19 +56,22 @@ var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
     route.Patch(nil, func() {
         title := route.UrlEncoded["title"]
         category := route.UrlEncoded["category"]
+
+        conn, _ := store.GetDBConn()
+        defer conn.Close()
         if title != ""{
             category, subcategory := store.GetCategoryByTitle(title)
             if category.Id == ""{
                 return
             }
-            subcategoryList := store.GetSubcategory(category.Id)
+            subcategoryList := store.GetSubcategory(conn, category.Id)
             updateCategory := CategoryUpdate{category, subcategory,  subcategoryList}
             temp, err := template.New("category").Parse(`
                 {{$selectSubcategory := .SelectSubcategory}}
                 <option value="{{.Category.Id}}" id="category-{{.Category.Id}}" hx-swap-oob="true" selected>{{.Category.Name}}</option>
                 <div>
                     <h2 class="subheader">Subcategorie</h2>
-                    <select name="subcategory" class="newjob-select-category">
+                    <select name="subcategory" class="select-element input">
                         {{range .Subcategory}}
                             <option value="{{.Id}}" {{if eq $selectSubcategory.Id .Id}}selected{{end}}>{{.Name}}</option>
                         {{end}}
@@ -80,11 +85,11 @@ var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
                 log.Printf("execute temp error: %v", err)
             }
         }else{
-            subcategory := store.GetSubcategory(category)
+            subcategory := store.GetSubcategory(conn, category)
             temp, err := template.New("Subcategory").Parse(`
                 <div>
                     <h2 class="subheader">Subcategorie</h2>
-                    <select name="subcategory" class="select-element">
+                    <select name="subcategory" class="select-element inpu">
                         {{range .}}
                             <option value="{{.Id}}">{{.Name}}</option>
                         {{end}}
@@ -102,195 +107,142 @@ var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
 
     route.Put(nil, func() {
         templateId := route.UrlEncoded["template"]
+        conn, _ := store.GetDBConn() 
+        defer conn.Close()
         job.GetJobByTemplateId(templateId)
-        data := TemplateLoad{store.GetContracts(), job}
+        data := TemplateLoad{store.GetContracts(conn), store.GetCategorys(conn), job}
         templ, _ := template.New("form").Parse(`
-        <form class="newjob" hx-post="/job/creer" hx-ext="json-enc" hx-swap="none" id="offert" hx-vals='js:{...getValues()}' onclick="onSubmitForm()">
-            <div class="newjob_field">
-                <input type="text" autocomplete="off" value="{{.Title}}"  required id="title"  name="title" class="newjob_field_input newjob_field_input_withLabel" onchange="onSaveSnapshot(this)" />
-                <label for="title" class="newjob_field_label">Titre</label>
-            </div>
-            <div class="newjob_flex" style="position: relative;">
-                <div class="newjob_field" style="flex: 1;">
-                    <input type="text" autocomplete="off" value="{{.City}}" placeholder="Paris" id="city" name="city" class="newjob_field_input newjob_field_input_withLabel" oninput="onCityInput(this)" onchange="onSaveSnapshot(this)"/>
-                    <label for="adresse" class="newjob_field_label">Departement</label>
+            <div class="newjob-section">
+                <h2 class="newjob-section-name">General</h2>
+                <div class="field">
+                    <label for="title" class="label">Titre</label>
+                    <input type="text" value="{{.Job.Title}}" autocomplete="off" required id="title" onchange="onSaveSnapshot(this)"  name="title" class="input" hx-patch="/job/creer"
+                    hx-params="title" hx-trigger="input delay:500ms" hx-ext="ignore:json-enc" hx-target="#subcategory" hx-swap="innerHTML" />
                 </div>
-                <div class="newjob_field" style="flex: .3;">
-                    <input type="number" autocomplete="off" value="{{.Postal}}"  placeholder="75001" id="postal" name="postal" class="newjob_field_input newjob_field_input_withLabel" onchange="onSaveSnapshot(this)" />
-                    <label for="adresse" class="newjob_field_label">Postal</label>
+                <div class="newjob-flex-form">
+                    <div class="field" style="flex: 1;">
+                        <label for="city" class="label">Departement</label>
+                        <input type="text" value="{{.Job.City}}" autocomplete="off" placeholder="Paris" id="city" name="city" class="input " oninput="onCityInput(this)" onchange="onSaveSnapshot(this)"/>
+                    </div>
+                    <div class="field" style="flex: .3;">
+                        <label for="adresse" class="label">Postal</label>
+                        <input type="number" value="{{.Job.Postal}}"  autocomplete="off" placeholder="75001" id="postal" name="postal" class="input " onchange="onSaveSnapshot(this)" />
+                    </div>
+                    <div id="addr" >
+                    </div>
                 </div>
-                <div id="newjob_addr"></div>
-            </div>
-            <h2 class="subheader">Salaire</h2>
-            <div class="newjob_flex">
-                <div class="newjob_field">
-                    <input type="number" placeholder="1500" value="{{index .Salary 0}}"  step=".01" id="minSalary" class="newjob_field_input salary newjob_field_input_withLabel" />
-                    <label for="minSalary" class="newjob_field_label">Min</label>
-                </div>
-                <div class="newjob_field">
-                    <input type="number" placeholder="2000" value="{{index .Salary 1}}"  step=".01" id="maxSalary" class="newjob_field_input salary newjob_field_input_withLabel" />
-                    <label for="maxSalary" class="newjob_field_label">Max</label>
+                <div>
+                    <h2 class="subheader">Description</h2>
+                    <div class="description" contenteditable="true" onblur="onSnapshotDescription(this)">{{.Job.Description}}"</div>
                 </div>
             </div>
-            <h2 class="subheader">Contrat</h2>
-            <div class="newjob_flex">
-                <select name="contract">
-                    {{range .ContractList}}
-                        <option value="{{.Id}}">{{.Name}}</option>
-                    {{end}}
-                </select>
-                <dropdown-ele id="contract" value="{{.Contract}}"  array="{{.ContractArray}}"></dropdown-ele>
-                <div class="newjob_field">
-                    <input type="number" placeholder="35" value="{{.WeeklyWorkTime}}" id="weeklyWorkTime" name="weeklyWorkTime" class="newjob_field_input newjob_field_input_withLabel" />
-                    <label for="weeklyWorkTime" class="newjob_field_label">Heures</label>
+            <div class="newjob-section">
+                <h3 class="newjob-section-name">Details</h3>
+                <div style="display: flex;flex-wrap: wrap;">
+                    <div class="newjob-select-category">
+                        <h2 class="subheader">Categorie</h2>
+                        <select id="category" name="category" class="select-element input" hx-patch="/job/creer" hx-trigger="change" 
+                            hx-target="#subcategory" hx-swap="innerHTML" hx-params="category" hx-ext="ignore:json-enc">
+                            {{range .Category}}
+                                <option value="{{.Id}}" id="category-{{.Id}}" >{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div id="subcategory" class="newjob-select-category">
+                        
+                    </div>
                 </div>
-                <div class="newjob_field">
-                    <input type="date" placeholder="2000" id="startDate" name="startDate" class="newjob_field_input newjob_field_input_withLabel" />
-                    <label for="startDate" class="newjob_field_label">Debut</label>
+                <div class="newjob-flex-form">
+                    <div class="field">
+                        <label for="minSalary" class="label">Salaire Min</label>
+                        <input type="number" value="{{index .Job.Salary 0}}" placeholder="1500" step=".01"  id="minSalary" class="input salary " onchange="onSaveSnapshot(this)" />
+                    </div>
+                    <div class="field">
+                        <label for="maxSalary" class="label">Salaire Max</label>
+                        <input type="number" value="{{index .Job.Salary 1}}" placeholder="2000" step=".01" id="maxSalary" class="input salary " onchange="onSaveSnapshot(this)" />
+                    </div>
+                </div>
+                <div class="newjob-flex-form" style="flex-wrap: wrap;justify-content: space-between;">
+                    <div>
+                        <h2 class="subheader">Contrat</h2>
+                        <select name="contract" class="input" onchange="onContractChange(this)">
+                            {{range .Contract}}
+                                <option value="{{.Id}}">{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
+                    <div class="field" style="width: 75px;">
+                        <label for="weeklyWorkTime" class="label">Heures</label>
+                        <input type="number" placeholder="35" value="{{.Job.WeeklyWorkTime}}"  id="weeklyWorkTime" name="weeklyWorkTime" class="input" onchange="onSaveSnapshot(this)" />
+                    </div>
+                    <div class="field" style="width: 75px;">
+                        <label for="exp" class="label">Experience</label>
+                        <input type="number" placeholder="2" id="exp" name="exp" value="{{.Job.Experience}}" class="input " onchange="onSaveSnapshot(this)" />
+                    </div>
+                    <div>
+                        <h3 class="subheader">Duré</h3>
+                        <div class="newjob-time-date">
+                            <div class="newjob-time-date-field">
+                                <p>Du</p>
+                                <input type="date" name="startDate" class="input" value="{{.Job.StartDate}}"/>
+                            </div>
+                            <div class="newjob-time-date-field hidden" id="endDate">
+                                <p>AU</p>
+                                <input type="date" name="endDate"class="input" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="newjob_section" id="advantage">
-                <div class="newjob_headerWithButton">
-                    <h2 class="subheader">Avantages</h2>
-                    <button type="button" class="newjob_addBtn" onclick="onNewAdvantage(this)">
-                        <svg
-                            width="63.999996"
-                            height="63.999996"
-                            style="width: 60%;height: 60%;"
-                            viewbox="0 0 16.933332 16.933332">
-                            <g
-                                transform="translate(-49.871622,-101.59117)">
-                            <rect
-                                style="fill:#000000;stroke-width:0.0701647"
-                                id="rect113"
-                                width="2.6458337"
-                                height="15.875"
-                                x="108.73493"
-                                y="-66.275787"
-                                ry="1.3229169"
-                                transform="rotate(90)" />
-                            <rect
-                                style="fill:#000000;stroke-width:0.0701647"
-                                id="rect273"
-                                width="2.6458337"
-                                height="15.875"
-                                x="57.015373"
-                                y="102.12034"
-                                ry="1.3229169" />
-                            </g>
-                        </svg>
-                    </button>
-                </div>
-                {{range .Advantage}}
-                <div class="newjob_advantage">
-                    <input type="text" autocomplete="off" value="{{.}}" name="advantage" placeholder="Titre de transport" class="newjob_field_input advantage" />
-                    <button type="button" class="newjob_profile_deleteBtn" onclick="onDeleteAdvantage(this)">
-                        <svg
-                            width="63.999996"
-                            height="63.999996"
-                            style="width: 60%;height: 60%;"
-                            viewBox="0 0 16.933332 16.933332">
-                            <g
-                                transform="translate(-51.903267,-103.62282)">
-                                <rect
-                                    style="fill:#000000;stroke-width:0.0928013"
-                                    width="3.4994376"
-                                    height="20.996624"
-                                    x="120.19751"
-                                    y="26.072937"
-                                    ry="1.7497188"
-                                    transform="rotate(45)" />
-                                <rect
-                                    style="fill:#000000;stroke-width:0.0928013"
-                                    id="rect273"
-                                    width="3.4994376"
-                                    height="20.996624"
-                                    x="-38.320965"
-                                    y="111.44891"
-                                    ry="1.7497188"
-                                    transform="rotate(-45)" />
+            <div class="newjob-section" id="advantage">
+                <h2 class="newjob-section-name">Avantages</h2>
+                {{range .Job.Advantage}}
+                    <div class="advantage">
+                        <input type="text" value="{{.}}" autocomplete="off" placeholder="Titre de transport" name="advantage" class="input advantage" onchange="onSaveAdvantageSnapshot()" onkeyup="onNewAdvantageByKey(event)" />
+                        <button type="button" class="deleteBtn" onclick="onDeleteAdvantage(this)">
+                            <svg fill="#000000" width="800px" height="800px" viewBox="0 0 41.336 41.336" class="deleteIcon">
+                                <g>
+                                    <path d="M36.335,5.668h-8.167V1.5c0-0.828-0.672-1.5-1.5-1.5h-12c-0.828,0-1.5,0.672-1.5,1.5v4.168H5.001c-1.104,0-2,0.896-2,2
+                                            s0.896,2,2,2h2.001v29.168c0,1.381,1.119,2.5,2.5,2.5h22.332c1.381,0,2.5-1.119,2.5-2.5V9.668h2.001c1.104,0,2-0.896,2-2
+                                            S37.438,5.668,36.335,5.668z M14.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21c0-0.828,0.672-1.5,1.5-1.5
+                                            s1.5,0.672,1.5,1.5V35.67z M22.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21c0-0.828,0.672-1.5,1.5-1.5
+                                            s1.5,0.672,1.5,1.5V35.67z M25.168,5.668h-9V3h9V5.668z M30.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21
+                                            c0-0.828,0.672-1.5,1.5-1.5s1.5,0.672,1.5,1.5V35.67z"/>
                                 </g>
-                        </svg>
-                    </button>
-                </div>
+                            </svg>
+                        </button>
+                    </div>
                 {{end}}
+                <button type="button" class="addBtn" onclick="onNewAdvantage(this)"></button>
             </div>
-            <h2 class="subheader">Description</h2>
-            <pre class="newjob_description" contenteditable="true">{{.Description}}</pre>
-            <div class="newjob_section" id="skill"> 
-                <div class="newjob_headerWithButton">
-                    <h2 class="subheader">Compétances</h2>
-                    <button type="button" class="newjob_addBtn" onclick="onNewProfil(this)">
-                        <svg
-                            width="63.999996"
-                            height="63.999996"
-                            style="width: 60%;height: 60%;"
-                            viewbox="0 0 16.933332 16.933332">
-                            <g
-                                transform="translate(-49.871622,-101.59117)">
-                            <rect
-                                style="fill:#000000;stroke-width:0.0701647"
-                                id="rect113"
-                                width="2.6458337"
-                                height="15.875"
-                                x="108.73493"
-                                y="-66.275787"
-                                ry="1.3229169"
-                                transform="rotate(90)" />
-                            <rect
-                                style="fill:#000000;stroke-width:0.0701647"
-                                id="rect273"
-                                width="2.6458337"
-                                height="15.875"
-                                x="57.015373"
-                                y="102.12034"
-                                ry="1.3229169" />
-                            </g>
-                        </svg>
-                    </button>
-                </div>
-                <div class="newjob_profile">
-                    <h3 class="newjob_profile_header">Titre</h3>
-                    <h3 class="newjob_profile_header">Nécessaire</h3>
+            <div class="newjob-section" id="skill"> 
+                <h2 class="newjob-section-name">Compétances</h2>
+                <div class="profile">
+                    <h3 class="header">Titre</h3>
+                    <h3 class="header">Nécessaire</h3>
                     <h3></h3>
                 </div>
-
-                {{range .SkillNeeded}}
-                <div class="newjob_profile skill">
-                    <input type="text" autocomplete="off" value="{{.Label}}"  placeholder="Experience 2 ans"  class="newjob_field_input" />
-                    <toggle-btn on="{{if .Required}}true{{else}}false{{end}}"></toggle-btn>
-                    <button type="button" onclick="onDeleteProfil(this)"  class="newjob_profile_deleteBtn">
-                        <svg
-                            width="63.999996"
-                            height="63.999996"
-                            style="width: 60%;height: 60%;"
-                            viewBox="0 0 16.933332 16.933332">
-                            <g transform="translate(-51.903267,-103.62282)">
-                                <rect
-                                    style="fill:#000000;stroke-width:0.0928013"
-                                    width="3.4994376"
-                                    height="20.996624"
-                                    x="120.19751"
-                                    y="26.072937"
-                                    ry="1.7497188"
-                                    transform="rotate(45)" />
-                                <rect
-                                    style="fill:#000000;stroke-width:0.0928013"
-                                    id="rect273"
-                                    width="3.4994376"
-                                    height="20.996624"
-                                    x="-38.320965"
-                                    y="111.44891"
-                                    ry="1.7497188"
-                                    transform="rotate(-45)" />
-                            </g>
-                        </svg>
-                    </button>
-                </div>
-                {{end}}
+                    {{range .Job.SkillNeeded}}
+                        <div class="profile skill">
+                            <input type="text" autocomplete="off"  placeholder="Experience 2 ans"  class="input" value="{{.Label}}" />
+                            <toggle-btn on="{{.Required}}"></toggle-btn>
+                            <button type="button" onclick="onDeleteProfil(this)"  class="deleteBtn">
+                                <svg fill="#000000" width="800px" height="800px" viewBox="0 0 41.336 41.336" class="deleteIcon">
+                                    <g>
+                                        <path d="M36.335,5.668h-8.167V1.5c0-0.828-0.672-1.5-1.5-1.5h-12c-0.828,0-1.5,0.672-1.5,1.5v4.168H5.001c-1.104,0-2,0.896-2,2
+                                                s0.896,2,2,2h2.001v29.168c0,1.381,1.119,2.5,2.5,2.5h22.332c1.381,0,2.5-1.119,2.5-2.5V9.668h2.001c1.104,0,2-0.896,2-2
+                                                S37.438,5.668,36.335,5.668z M14.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21c0-0.828,0.672-1.5,1.5-1.5
+                                                s1.5,0.672,1.5,1.5V35.67z M22.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21c0-0.828,0.672-1.5,1.5-1.5
+                                                s1.5,0.672,1.5,1.5V35.67z M25.168,5.668h-9V3h9V5.668z M30.168,35.67c0,0.828-0.672,1.5-1.5,1.5s-1.5-0.672-1.5-1.5v-21
+                                                c0-0.828,0.672-1.5,1.5-1.5s1.5,0.672,1.5,1.5V35.67z"/>
+                                    </g>
+                                </svg>
+                            </button>
+                        </div>
+                    {{end}}
+                <button type="button" class="addBtn" onclick="onNewProfil(this)"></button>
             </div>
             <button type="submit" class="newjob_submitBtn" >Creer</button>
-        </form>
         `)
         if err := templ.Execute(route.Response, data); err != nil{
             log.Println(err)
@@ -302,8 +254,10 @@ var CreateJobHandler = func(res http.ResponseWriter, req *http.Request){
             route.Notification("error", "erreur dans le salaire")
             return
         }
+        conn := store.GetDBPoolConn()
+        defer conn.Close()
         job.EntrepriseId = route.User.Id
-        job, err := job.CreateJob()
+        job, err := job.CreateJob(conn)
         if  err != nil{
             log.Println(err)
             route.Notification("error", "Error dans la creationn de l'annonce")

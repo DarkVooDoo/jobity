@@ -138,6 +138,7 @@ func DecodeJson(jsonStruct any, body io.ReadCloser){
     }
 }
 
+// jsonStruct must be a pointer or nil
 func (r *Route) Post(jsonStruct any, handleFunc func()) {
 	if r.Request.Method == http.MethodPost {
         if r.ContentType == "application/json" && jsonStruct != nil{
@@ -147,6 +148,7 @@ func (r *Route) Post(jsonStruct any, handleFunc func()) {
 	}
 }
 
+// jsonStruct must be a pointer or nil
 func (r *Route) Patch(jsonStruct any, handleFunc func()) {
 	if r.Request.Method == http.MethodPatch {
         if r.ContentType == "application/json" && jsonStruct != nil{
@@ -156,6 +158,7 @@ func (r *Route) Patch(jsonStruct any, handleFunc func()) {
 	}
 }
 
+// jsonStruct must be a pointer or nil
 func (r *Route) Put(jsonStruct any, handleFunc func()) {
 	if r.Request.Method == http.MethodPut {
         if r.ContentType == "application/json" && jsonStruct != nil{
@@ -165,6 +168,7 @@ func (r *Route) Put(jsonStruct any, handleFunc func()) {
 	}
 }
 
+// jsonStruct must be a pointer or nil
 func (r *Route) Delete(jsonStruct any, handleFunc func()) {
     if r.Request.Method == http.MethodDelete {
         if r.ContentType == "application/json" && jsonStruct != nil{

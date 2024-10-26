@@ -56,13 +56,8 @@ type Curriculum struct{
     JobId string
 }
 
-func (c *Curriculum) Get(userId string)error{
+func (c *Curriculum) Get(conn *sql.Conn, userId string)error{
     var school, work, description sql.NullString
-    conn, err := GetDBConn()
-    if err != nil{
-        log.Println("err db conn")
-        return errors.New("error conn db")
-    }
     userId = DecryptCurriculumId(userId)
     curriculumRow := conn.QueryRowContext(context.Background(), `SELECT CONCAT(u.firstname,' ',u.lastname), CONCAT(u.city,', ', u.postal), CONCAT(EXTRACT(YEAR FROM AGE(NOW(), u.birthdate)), ' Ans'), u.interest, u.skill, u.school, u.work, u.email, u.description FROM Users AS u WHERE u.id=$1`, userId)
     if err := curriculumRow.Scan(&c.Name, &c.Adresse, &c.Age, pq.Array(&c.Interest), pq.Array(&c.Skill), &school, &work, &c.Email, &description); err != nil{
@@ -236,19 +231,13 @@ func printCurriculumAbout(pdf *gofpdf.Fpdf, width float64, header string, data [
     pdf.Ln(10)
 }
 
-func GetJobCurriculum(jobId string)(candidates []Curriculum, interview []Curriculum){
+func GetJobCurriculum(conn *sql.Conn, jobId string)(candidates []Curriculum, possible []Curriculum){
     var id, name, userId, status string
     var adresse, workString, schoolString, gender sql.NullString 
     var age sql.NullInt16
     var skill, interest []string
     var school []School
     var work []Work
-    conn, err := GetDBConn()
-    if err != nil{
-        log.Println(err)
-        return 
-    }
-    defer conn.Close()
     curriculumRows, err := conn.QueryContext(context.Background(), `SELECT c.id, u.id, CONCAT(u.firstname, ' ', u.lastname), CONCAT(u.City, ', ', u.Postal), DATE_PART('year', AGE(NOW(), u.birthdate)), u.gender, u.skill, u.interest, u.school,u.work, c.status FROM JobApplication AS c LEFT JOIN Users AS u ON u.id=c.user_id WHERE c.job_id=$1 AND c.status < 'Reject'`, jobId)
     if err != nil{
         log.Println(err)
@@ -259,8 +248,8 @@ func GetJobCurriculum(jobId string)(candidates []Curriculum, interview []Curricu
         json.Unmarshal([]byte(string(schoolString.String)), &school)
         json.Unmarshal([]byte(string(workString.String)), &work)
         userId = EncryptCurriculumId(userId)
-        if status == "Interview"{
-            interview = append(interview, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
+        if status == "A revoir"{
+            possible = append(possible, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
         }else{
             candidates = append(candidates, Curriculum{Name: name, Adresse: adresse.String, Skill: skill, Interest: interest, Id: id, Work: work, School: school, Age: fmt.Sprintf("%v Ans", age.Int16), Gender: gender.String, UserId: userId, JobId: jobId})
         }
@@ -268,15 +257,9 @@ func GetJobCurriculum(jobId string)(candidates []Curriculum, interview []Curricu
     return 
 }
 
-func GetInterviewType()[]string{
+func GetInterviewType(conn *sql.Conn)[]string{
     var interviewType []string
     var name string
-    conn, err := GetDBConn()
-    if err != nil{
-        log.Println(err)
-        return interviewType
-    }
-    defer conn.Close()
     row, err := conn.QueryContext(context.Background(), `SELECT unnest(enum_range(NULL::interview_type))`)
     if err != nil{
         log.Println(err)

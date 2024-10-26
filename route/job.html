@@ -10,6 +10,17 @@
     .job{
         container-type: inline-size;
         container-name: job;
+        .job-category::after{
+            content: "";
+            border: 3px solid oklch(10% 0.20 100);
+            border-left: none;
+            border-top: none;
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            rotate: -45deg;
+            margin-inline: .5rem;
+        }
         .job_header{
             margin-bottom: .5rem;
         }
@@ -247,8 +258,10 @@
 
 {{define "Body"}}
     <main class="job">
-        <span>{{.Job.Category}}</span>
-        <span>{{.Job.Subcategory}}</span>
+        {{if not .Job.IsThirdParty}}
+            <span class="job-category">{{.Job.Category}}</span>
+            <span>{{.Job.Subcategory}}</span>
+        {{end}}
         <div class="job_title">
             <h1 class="text">{{.Job.Title}}</h1>
             {{if .User.Id}}
@@ -279,7 +292,7 @@
                 </div>
                 <div>
                     <p class="label">Enterprise</p>
-                    <a class="entreprise" href="{{with .Job.IsThirdParty}}#{{else}}/entreprise/4{{end}}">{{.EntrepriseName}}</a>
+                    <a class="entreprise" href="{{with .Job.IsThirdParty}}#{{else}}/entreprise/{{.Job.EntrepriseId}}{{end}}">{{.EntrepriseName}}</a>
                 </div>
             </div>
             <div class="job_info_data">

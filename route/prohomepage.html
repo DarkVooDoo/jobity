@@ -19,10 +19,19 @@
                 display: flex;
                 gap: 1rem;
                 margin-bottom: 1rem;
+                .name{
+                    font-size: 1.1rem;
+                    margin-bottom: 3px;
+                }
+                .addr{
+                    margin-bottom: 3px;
+                }
             }
             .tab-paths{
                 display: flex;
                 gap: 1rem;
+                overflow-x: auto;
+                padding-bottom: .5rem;
                 .tab-paths-link{
                     padding: 5px 10px;
                     border: 1px solid black;
@@ -107,7 +116,6 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        border-radius: 50%;
                     }
                     .interview-row{
                         padding: .3rem 1.5lh .3rem 0;
@@ -244,6 +252,13 @@
         border-radius: 5px;
         background-color: var(--primary_color);
     }
+    .logout{
+        color: var(--primary_color);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
     .form_readonly_field{
         background-color: lightgray;
         padding: 5px;
@@ -274,6 +289,68 @@
         height: 2rem;
     }
 
+
+
+    /******************* Parametre CSS ********************/
+    .parametre{
+        flex: 1;
+    }
+    .parametre-signoutBtn{
+        padding: 5px 20px;
+        margin-bottom: 1rem;
+        display: flex;
+        gap: .5rem;
+        align-items: center;
+        font-weight: bold;
+        color: var(--primary_color);
+    }
+    .parametre-form{
+        margin-bottom: 1rem;
+        .field{
+            margin-bottom: 1rem;
+            .label{
+                margin-bottom: .5rem;
+                display: block;
+            }
+            .input{
+                height: 2rem;
+                width: 100%;
+                padding-inline: 5px;
+                border-radius: 5px;
+                border: 1px solid lightgray;
+            }
+        }
+        .desc{
+            height: 6lh;
+            width: 100%;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid lightgray;
+            resize: none;
+        }
+        .submit{
+            display: flex;
+            justify-content: flex-end;
+            .submitBtn{
+                padding: 5px 10px;
+                border-radius: 5px;
+                background: var(--primary_light_color);
+            }
+        }
+    }
+    .parametre-desactive{
+        padding: 25px 5px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .offBtn{
+            width: 2rem;
+            aspect-ratio: 1/1;
+        }
+    }
+
 {{end}}
 %end
 {{define "Body"}}
@@ -282,18 +359,26 @@
         <div class="tab-entreprise">
             <label for="picture" id="picture_label">Picture</label>
             <input type="file" name="picture" id="picture" class="hidden" />
-            <div>
-                <h1>Test Entreprise</h1>
-                <p>3 Avenue fotch, 75005</p>
+            <div style="flex: 1;">
+                <h1 class="name" id="entreprise_name">{{.Profile.Name}}</h1>
+                <p class="addr">{{.Profile.City}}, {{.Profile.Postal}}</p>
+                <button type="button" class="logout" hx-delete="/connexion" hx-swap="none">
+                    <svg style="width: 1.5rem;aspect-ratio: 1/1;" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2px" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2px" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 12H9" stroke="currentColor" stroke-width="2px" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Se deconnecter
+                </button>
             </div>
             <!--<button type="submit" class="picture_submitBtn">Enregistrer la photo</button>-->
         </div>
         <div class="tab-paths">
-            <button hx-post="/" hx-target="#content" hx-swap="innerHTML" type="button" class="tab-paths-link select">Annonces</button>
-            <button type="button" hx-put="/" hx-target="#content" hx-swap="innerHTML"  class="tab-paths-link">Interview</button>
+            <button hx-post="/" hx-target="#content" hx-swap="innerHTML" type="button" class="tab-paths-link select" onclick="onHideParametre()">Annonces</button>
+            <button type="button" hx-put="/" hx-target="#content" hx-swap="innerHTML"  class="tab-paths-link" onclick="onHideParametre()">Interview</button>
             <a href="#" class="tab-paths-link">Messages</a>
             <a href="#" class="tab-paths-link">Mission</a>
-            <a href="#" class="tab-paths-link">Mon compte</a>
+            <button type="button" onclick="onOpenParametre()" class="tab-paths-link">Parametre</button>
         </div>
     </section>
     <div id="content">
@@ -320,9 +405,58 @@
             {{end}}
         </div>
     </div>
+    <div id="parametre" class="hidden" style="flex: 0;">
+        <form class="parametre-form" hx-post="/parametre" hx-ext="json-enc" hx-swap="none">
+            <div class="field">
+                <label for="name" class="label">Nom</label>
+                <input type="text" id="name" name="name" class="input" value="{{.Profile.Name}}" autocomplete="off"/>
+            </div>
+            <div class="field">
+                <label class="label" for="description">Description</label>
+                <textarea name="description" maxlength="250" id="description" class="desc">{{.Profile.Description}}</textarea>
+            </div>
+            <div class="submit">
+                <button type="submit" class="submitBtn">Sauvegarder</button>
+            </div>
+        </form>
+
+        <div class="parametre-desactive">
+            <b>Desactivez votre compte</b>
+            <button type="button" class="offBtn">
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="red"
+                    stroke-width="2px"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    >
+                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+                    <line x1="12" y1="2" x2="12" y2="12" />
+                </svg>
+            </button>
+        </div>
+    </div>
     <script>
 
         let fetchTimer
+
+        const content = document.getElementById("content")
+        const parametre = document.getElementById("parametre")
+        const onHideParametre = ()=>{
+            content.style.flex = "1";
+            parametre.style.flex = "0"
+            parametre.classList.add("hidden")
+        }
+        const onOpenParametre = ()=>{
+            content.style.flex = "0";
+            parametre.style.flex = "1"
+            content.innerHTML = ""
+            parametre.classList.remove("hidden")
+        }
+
         const onEditInterview = (ele)=>{
             const modal = ele.closest(".interview-card").querySelector(".interview-modal")
             modal.showModal()

@@ -20,8 +20,8 @@ customElements.define("job-card", class JobCard extends HTMLElement{
                         .company-photo {
                             height: 3rem;
                             aspect-ratio: 1/1;
-                            object-fit: cover;
                             border-radius: 10px;
+                            object-fit: cover;
                         }
                             .card-info {
                                 flex-grow: 1;

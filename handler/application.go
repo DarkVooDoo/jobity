@@ -63,7 +63,9 @@ var ApplicationHandler = func(res http.ResponseWriter, req *http.Request){
 
     route.Delete(nil, func() {
         jobApplication := store.JobApplication{Id: route.UrlEncoded["id"]}        
-        if err := jobApplication.Delete(); err != nil{
+        conn := store.GetDBPoolConn()
+        defer conn.Close()
+        if err := jobApplication.Delete(conn); err != nil{
             route.Notification("error", "suppresion impossible")
             return
         }
